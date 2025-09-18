@@ -1,4 +1,3 @@
-// lib/core/utils/stats_parser.dart
 import 'package:insight/stats/domain/entities/game_mode.dart';
 import 'package:insight/stats/domain/entities/player_stats.dart';
 

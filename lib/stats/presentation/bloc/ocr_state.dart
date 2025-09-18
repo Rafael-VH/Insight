@@ -1,4 +1,3 @@
-// lib/features/ocr/presentation/bloc/ocr_state.dart
 import 'package:equatable/equatable.dart';
 import 'package:insight/stats/domain/entities/ocr_result.dart';
 

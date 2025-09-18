@@ -1,4 +1,3 @@
-// lib/features/ocr/presentation/bloc/ocr_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/stats/domain/usecases/copy_text_to_clipboard.dart';
 import 'package:insight/stats/domain/usecases/pick_image_and_recognize_text.dart';

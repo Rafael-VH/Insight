@@ -1,4 +1,3 @@
-// lib/features/ocr/domain/entities/ocr_result.dart
 import 'package:insight/stats/domain/entities/text_block.dart';
 
 class OcrResult {

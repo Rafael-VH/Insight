@@ -1,4 +1,3 @@
-// lib/features/ocr/domain/entities/text_block.dart
 import 'dart:ui';
 
 import 'package:insight/stats/domain/entities/text_line.dart';

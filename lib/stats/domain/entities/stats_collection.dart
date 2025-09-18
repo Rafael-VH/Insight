@@ -1,4 +1,3 @@
-// lib/features/ml_stats/domain/entities/stats_collection.dart
 import 'package:insight/stats/domain/entities/player_stats.dart';
 
 class StatsCollection {

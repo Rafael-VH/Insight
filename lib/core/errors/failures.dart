@@ -1,5 +1,3 @@
-// lib/core/errors/failures.dart
-
 abstract class Failure {
   final String message;
   const Failure(this.message);

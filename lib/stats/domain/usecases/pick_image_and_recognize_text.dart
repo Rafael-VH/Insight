@@ -1,4 +1,3 @@
-// lib/features/ocr/domain/usecases/pick_image_and_recognize_text.dart
 import 'package:dartz/dartz.dart';
 import 'package:insight/core/errors/failures.dart';
 import 'package:insight/stats/domain/entities/ocr_result.dart';

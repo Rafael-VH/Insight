@@ -1,4 +1,3 @@
-// lib/stats/presentation/pages/widgets/image_upload_card.dart
 import 'dart:io';
 
 import 'package:flutter/material.dart';

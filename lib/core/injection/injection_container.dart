@@ -1,4 +1,4 @@
-// lib/core/injection/injection_container.dart (ACTUALIZADO)
+// Packages
 import 'package:get_it/get_it.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';

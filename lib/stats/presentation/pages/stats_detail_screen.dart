@@ -1,7 +1,6 @@
-// lib/features/ml_stats/presentation/pages/stats_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:insight/stats/domain/entities/stats_collection.dart';
-import 'package:insight/stats/presentation/pages/widgets/stats_verification_widget.dart';
+import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:intl/intl.dart';
 
 class StatsDetailScreen extends StatelessWidget {

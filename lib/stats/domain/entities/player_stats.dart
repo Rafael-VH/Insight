@@ -1,4 +1,3 @@
-// lib/features/ml_stats/domain/entities/player_stats.dart
 import 'package:insight/stats/domain/entities/game_mode.dart';
 
 class PlayerStats {

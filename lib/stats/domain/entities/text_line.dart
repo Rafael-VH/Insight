@@ -1,4 +1,3 @@
-// lib/features/ocr/domain/entities/text_line.dart
 import 'dart:ui';
 
 class TextLine {

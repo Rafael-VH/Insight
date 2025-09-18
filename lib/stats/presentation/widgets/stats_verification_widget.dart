@@ -1,4 +1,3 @@
-// lib/features/ml_stats/presentation/widgets/stats_verification_widget.dart
 import 'package:flutter/material.dart';
 import 'package:insight/core/utils/stats_parser.dart';
 import 'package:insight/stats/domain/entities/game_mode.dart';

@@ -1,21 +1,18 @@
-// lib/features/ml_stats/presentation/pages/stats_upload_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/utils/stats_parser.dart';
-//
 import 'package:insight/stats/domain/entities/game_mode.dart';
 import 'package:insight/stats/domain/entities/image_source_type.dart';
 import 'package:insight/stats/domain/entities/player_stats.dart';
 import 'package:insight/stats/domain/entities/stats_collection.dart';
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
-//
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_state.dart';
-import 'package:insight/stats/presentation/pages/widgets/image_upload_card.dart';
-import 'package:insight/stats/presentation/pages/widgets/stats_verification_widget.dart';
+import 'package:insight/stats/presentation/widgets/image_upload_card.dart';
+import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 
 class StatsUploadScreen extends StatefulWidget {
   const StatsUploadScreen({super.key, required this.uploadType});

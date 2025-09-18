@@ -1,5 +1,3 @@
-// lib/features/ml_stats/domain/entities/stats_upload_type.dart
-
 enum StatsUploadType {
   total('Estadísticas Totales', 1),
   byModes('Por Modos de Juego', 3);

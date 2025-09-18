@@ -1,4 +1,3 @@
-// lib/stats/data/models/stats_collection_model.dart
 import 'package:insight/stats/domain/entities/player_stats.dart';
 import 'package:insight/stats/domain/entities/stats_collection.dart';
 
