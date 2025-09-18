@@ -8,4 +8,8 @@ class AssetsRes {
 
   static const String PROJECT_NAME = 'insight';
   static const String PROJECT_VERSION = '1.0.0+1';
+  static const String SHARE_CLASICA = 'assets/images/Share_clasica.jpg';
+  static const String SHARE_CLASIFICATORIA = 'assets/images/Share_clasificatoria.jpg';
+  static const String SHARE_COLISEO = 'assets/images/Share_coliseo.jpg';
+  static const String SHARE_TOTAL = 'assets/images/Share_total.jpg';
 }

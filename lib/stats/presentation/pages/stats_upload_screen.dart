@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:insight/core/utils/stats_parser.dart';
 import 'package:insight/stats/domain/entities/game_mode.dart';
 import 'package:insight/stats/domain/entities/image_source_type.dart';
-import 'package:insight/stats/domain/entities/player_stats.dart';
-import 'package:insight/stats/domain/entities/stats_collection.dart';
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_state.dart';
+import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
 import 'package:insight/stats/presentation/widgets/image_upload_card.dart';
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 
@@ -24,90 +22,131 @@ class StatsUploadScreen extends StatefulWidget {
 }
 
 class _StatsUploadScreenState extends State<StatsUploadScreen> {
-  Map<GameMode, String?> uploadedImages = {};
-  Map<GameMode, PlayerStats?> parsedStats = {};
-  Map<GameMode, bool> isProcessing = {};
-
-  GameMode? _currentProcessingMode;
+  late final StatsUploadController _controller;
 
   @override
   void initState() {
     super.initState();
-    _initializeState();
+    _controller = StatsUploadController(uploadType: widget.uploadType);
   }
 
-  void _initializeState() {
-    if (widget.uploadType == StatsUploadType.total) {
-      isProcessing[GameMode.total] = false;
-      uploadedImages[GameMode.total] = null;
-    } else {
-      isProcessing[GameMode.ranked] = false;
-      isProcessing[GameMode.classic] = false;
-      isProcessing[GameMode.brawl] = false;
-      uploadedImages[GameMode.ranked] = null;
-      uploadedImages[GameMode.classic] = null;
-      uploadedImages[GameMode.brawl] = null;
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<OcrBloc, OcrState>(
+      listener: _handleOcrState,
+      child: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, child) {
+          return Scaffold(
+            appBar: AppBar(title: Text(widget.uploadType.appBarTitle)),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ..._buildImageUploadCards(),
+                  const SizedBox(height: 16),
+                  if (_controller.hasAnyParsedStats) ...[
+                    _buildStatsSection(),
+                    const SizedBox(height: 16),
+                    _buildSaveButton(),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _handleOcrState(BuildContext context, OcrState state) {
+    if (state is OcrSuccess) {
+      _controller.handleOcrSuccess(
+        state.result.recognizedText,
+        state.result.imagePath,
+      );
+
+      final mode = _controller.currentProcessingMode;
+      if (mode != null && _controller.parsedStats[mode] != null) {
+        _showSuccessSnackBar(_controller.getSuccessMessage(mode));
+      } else {
+        _showErrorSnackBar(
+          'No se pudieron extraer las estadísticas. Verifica la imagen.',
+        );
+      }
+    } else if (state is OcrError) {
+      _controller.handleOcrError();
+      _showErrorSnackBar('Error: ${state.message}');
+    } else if (state is OcrLoading) {
+      // El controller ya maneja el estado de loading
     }
+  }
+
+  List<Widget> _buildImageUploadCards() {
+    return _controller.availableModes.map((mode) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: ImageUploadCard(
+          key: ValueKey(mode),
+          gameMode: mode,
+          imagePath: _controller.uploadedImages[mode],
+          isProcessing: _controller.isProcessing[mode] ?? false,
+          onUploadPressed: (source) => _onImageUploadPressed(source, mode),
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _buildStatsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Estadísticas extraídas:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        ..._buildVerificationWidgets(),
+      ],
+    );
+  }
+
+  List<Widget> _buildVerificationWidgets() {
+    return _controller.parsedStats.entries
+        .where((entry) => entry.value != null)
+        .map((entry) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: StatsVerificationWidget(
+              gameMode: entry.key,
+              stats: entry.value!,
+            ),
+          );
+        })
+        .toList();
+  }
+
+  Widget _buildSaveButton() {
+    return ElevatedButton(
+      onPressed: _saveStats,
+      child: const Text('Guardar Estadísticas'),
+    );
   }
 
   void _onImageUploadPressed(ImageSourceType source, GameMode mode) {
-    setState(() {
-      _currentProcessingMode = mode;
-    });
+    _controller.startProcessing(mode);
     context.read<OcrBloc>().add(ProcessImageEvent(source));
   }
 
-  void _handleOcrSuccess(String text) {
-    final mode = _currentProcessingMode;
-    if (mode == null) return;
-
-    final stats = StatsParser.parseStats(text, mode);
-
-    setState(() {
-      final imagePath = context.read<OcrBloc>().state is OcrSuccess
-          ? (context.read<OcrBloc>().state as OcrSuccess).result.imagePath
-          : null;
-      uploadedImages[mode] = imagePath;
-      parsedStats[mode] = stats;
-      isProcessing[mode] = false;
-    });
-
-    _currentProcessingMode = null;
-
-    if (stats != null) {
-      _showSuccessSnackBar(
-        'Estadísticas extraídas correctamente para ${mode.displayName}',
-      );
-    } else {
-      _showErrorSnackBar(
-        'No se pudieron extraer las estadísticas. Verifica la imagen.',
-      );
-    }
-  }
-
-  void _handleOcrError(String message) {
-    setState(() {
-      isProcessing[_currentProcessingMode!] = false;
-    });
-    _currentProcessingMode = null;
-    _showErrorSnackBar('Error: $message');
-  }
-
-  bool _hasAnyParsedStats() {
-    return parsedStats.values.any((stats) => stats != null);
-  }
-
   void _saveStats() {
-    // Crear la colección de estadísticas
-    final collection = StatsCollection(
-      totalStats: parsedStats[GameMode.total],
-      rankedStats: parsedStats[GameMode.ranked],
-      classicStats: parsedStats[GameMode.classic],
-      brawlStats: parsedStats[GameMode.brawl],
-      createdAt: DateTime.now(),
-    );
-
-    // Usar el bloc para guardar
+    final collection = _controller.createCollection();
     context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
   }
 
@@ -127,94 +166,6 @@ class _StatsUploadScreenState extends State<StatsUploadScreen> {
         content: Text(message),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  List<Widget> _buildImageUploadCards() {
-    if (widget.uploadType == StatsUploadType.total) {
-      return [
-        ImageUploadCard(
-          gameMode: GameMode.total,
-          imagePath: uploadedImages[GameMode.total],
-          isProcessing: isProcessing[GameMode.total]!,
-          onUploadPressed: (source) =>
-              _onImageUploadPressed(source, GameMode.total),
-        ),
-      ];
-    } else {
-      return GameMode.values
-          .where((mode) => mode != GameMode.total)
-          .map(
-            (mode) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: ImageUploadCard(
-                key: ValueKey(mode),
-                gameMode: mode,
-                imagePath: uploadedImages[mode],
-                isProcessing: isProcessing[mode]!,
-                onUploadPressed: (source) =>
-                    _onImageUploadPressed(source, mode),
-              ),
-            ),
-          )
-          .toList();
-    }
-  }
-
-  List<Widget> _buildVerificationWidgets() {
-    return parsedStats.entries.where((entry) => entry.value != null).map((
-      entry,
-    ) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: StatsVerificationWidget(
-          gameMode: entry.key,
-          stats: entry.value!,
-        ),
-      );
-    }).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<OcrBloc, OcrState>(
-      listener: (context, state) {
-        if (state is OcrSuccess) {
-          _handleOcrSuccess(state.result.recognizedText);
-        } else if (state is OcrError) {
-          _handleOcrError(state.message);
-        } else if (state is OcrLoading) {
-          setState(() {
-            isProcessing[_currentProcessingMode!] = true;
-          });
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(title: Text(widget.uploadType.appBarTitle)),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ..._buildImageUploadCards(),
-              const SizedBox(height: 16),
-              if (_hasAnyParsedStats()) ...[
-                const Text(
-                  'Estadísticas extraídas:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                ..._buildVerificationWidgets(),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _saveStats,
-                  child: const Text('Guardar Estadísticas'),
-                ),
-              ],
-            ],
-          ),
-        ),
       ),
     );
   }

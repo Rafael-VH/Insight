@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
 import 'package:insight/stats/presentation/pages/stats_history_screen.dart';
 import 'package:insight/stats/presentation/pages/stats_upload_screen.dart';
+import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
+import 'package:insight/stats/presentation/widgets/info_banner.dart';
+import 'package:insight/stats/presentation/widgets/stats_upload_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,47 +14,15 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // App Bar con SliverAppBar para mejor experiencia
-          SliverAppBar(
+          AppSliverBar(
+            title: 'Mobile Legends Stats',
+            colors: const [
+              Color(0xFF1E3A8A),
+              Color(0xFF3B82F6),
+              Color(0xFF60A5FA),
+            ],
+            icon: Icons.analytics_rounded,
             expandedHeight: 200.0,
-            floating: false,
-            pinned: true,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: Text(
-                'Mobile Legends Stats',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      offset: Offset(0, 1),
-                      blurRadius: 3.0,
-                      color: Colors.black45,
-                    ),
-                  ],
-                ),
-              ),
-              background: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF1E3A8A),
-                      Color(0xFF3B82F6),
-                      Color(0xFF60A5FA),
-                    ],
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.analytics_rounded,
-                    size: 80,
-                    //color: Colors.white.withOpacity(0.3),
-                    color: Color(0xffFFFFFF),
-                  ),
-                ),
-              ),
-            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.history),
@@ -60,109 +31,85 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-
-          // Contenido principal
           SliverFillRemaining(
             hasScrollBody: false,
             child: Container(
               padding: const EdgeInsets.all(24.0),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  //colors: [Colors.grey[50]!, Colors.white],
-                  colors: [Color(0xFFc6c6c6), Color(0xFFc6c6c6)],
+                  colors: [Color(0xFFF9FAFB), Colors.white],
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 32),
-
-                  // Título de sección
-                  Text(
-                    'Cargar Estadísticas',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'Selecciona cómo deseas cargar tus estadísticas',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-
+                  _buildSectionTitle(context),
                   const SizedBox(height: 48),
-
-                  // Botón 1: Estadísticas Totales
-                  _StatsUploadButton(
-                    uploadType: StatsUploadType.total,
-                    icon: Icons.dashboard_rounded,
-                    color: const Color(0xFF059669),
-                    description:
-                        'Carga una imagen con todas tus estadísticas generales',
-                    onTap: () =>
-                        _navigateToUpload(context, StatsUploadType.total),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Botón 2: Por Modos de Juego
-                  _StatsUploadButton(
-                    uploadType: StatsUploadType.byModes,
-                    icon: Icons.view_module_rounded,
-                    color: const Color(0xFF7C3AED),
-                    description:
-                        'Carga 3 imágenes separadas:\nClasificatoria, Clásica y Coliseo',
-                    onTap: () =>
-                        _navigateToUpload(context, StatsUploadType.byModes),
-                  ),
-
-                  const SizedBox(height: 24),
-
+                  _buildUploadButtons(context),
                   const Spacer(),
-
-                  // Footer info
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.blue[600],
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Asegúrate de que las capturas de pantalla muestren claramente todas las estadísticas',
-                            style: TextStyle(
-                              color: Colors.blue[700],
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildInfoBanner(),
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          'Cargar Estadísticas',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Selecciona cómo deseas cargar tus estadísticas',
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUploadButtons(BuildContext context) {
+    return Column(
+      children: [
+        StatsUploadButton(
+          uploadType: StatsUploadType.total,
+          icon: Icons.dashboard_rounded,
+          color: const Color(0xFF059669),
+          description: 'Carga una imagen con todas tus estadísticas generales',
+          onTap: () => _navigateToUpload(context, StatsUploadType.total),
+        ),
+        const SizedBox(height: 24),
+        StatsUploadButton(
+          uploadType: StatsUploadType.byModes,
+          icon: Icons.view_module_rounded,
+          color: const Color(0xFF7C3AED),
+          description:
+              'Carga 3 imágenes separadas:\nClasificatoria, Clásica y Coliseo',
+          onTap: () => _navigateToUpload(context, StatsUploadType.byModes),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoBanner() {
+    return const InfoBanner(
+      message:
+          'Asegúrate de que las capturas de pantalla muestren claramente todas las estadísticas',
     );
   }
 
@@ -179,102 +126,6 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const StatsHistoryScreen()),
-    );
-  }
-}
-
-//
-class _StatsUploadButton extends StatelessWidget {
-  const _StatsUploadButton({
-    required this.uploadType,
-    required this.icon,
-    required this.color,
-    required this.description,
-    required this.onTap,
-  });
-
-  final StatsUploadType uploadType;
-  final IconData icon;
-  final Color color;
-  final String description;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(16),
-      elevation: 4,
-      shadowColor: color.withOpacity(0.3),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color, color.withOpacity(0.8)],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          uploadType.displayName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${uploadType.imageCount} imagen${uploadType.imageCount > 1 ? 'es' : ''}',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white.withOpacity(0.8),
-                    size: 16,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                description,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 14,
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

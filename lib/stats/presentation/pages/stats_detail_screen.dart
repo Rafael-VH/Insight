@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:insight/stats/domain/entities/stats_collection.dart';
+import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -15,47 +16,28 @@ class StatsDetailScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            expandedHeight: 120.0,
-            floating: false,
-            pinned: true,
-            backgroundColor: const Color(0xFF059669),
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Stats ${dateFormat.format(collection.createdAt)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF059669), Color(0xFF10B981)],
-                  ),
-                ),
-              ),
-            ),
+          AppSliverBar(
+            title: 'Stats ${dateFormat.format(collection.createdAt)}',
+            colors: const [Color(0xFF059669), Color(0xFF10B981)],
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const SizedBox(height: 16),
-              ...collection.availableStats.map(
-                (stats) => Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: StatsVerificationWidget(
-                    gameMode: stats.mode,
-                    stats: stats,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ]),
-          ),
+          _buildStatsContent(),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatsContent() {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        const SizedBox(height: 16),
+        ...collection.availableStats.map(
+          (stats) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: StatsVerificationWidget(gameMode: stats.mode, stats: stats),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ]),
     );
   }
 }
