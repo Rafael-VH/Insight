@@ -4,20 +4,20 @@ import 'package:insight/stats/domain/entities/stats_collection.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_state.dart';
-import 'package:insight/stats/presentation/pages/stats_detail_screen.dart';
+import 'package:insight/stats/presentation/pages/Detail/stats_detail_page.dart';
+import 'package:insight/stats/presentation/pages/History/widget/empty_state_widget.dart';
+import 'package:insight/stats/presentation/pages/History/widget/error_state_widget.dart';
+import 'package:insight/stats/presentation/pages/History/widget/stats_collection_card.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
-import 'package:insight/stats/presentation/widgets/empty_state_widget.dart';
-import 'package:insight/stats/presentation/widgets/error_state_widget.dart';
-import 'package:insight/stats/presentation/widgets/stats_collection_card.dart';
 
-class StatsHistoryScreen extends StatefulWidget {
-  const StatsHistoryScreen({super.key});
+class StatsHistoryPage extends StatefulWidget {
+  const StatsHistoryPage({super.key});
 
   @override
-  State<StatsHistoryScreen> createState() => _StatsHistoryScreenState();
+  State<StatsHistoryPage> createState() => _StatsHistoryPageState();
 }
 
-class _StatsHistoryScreenState extends State<StatsHistoryScreen> {
+class _StatsHistoryPageState extends State<StatsHistoryPage> {
   @override
   void initState() {
     super.initState();
@@ -124,7 +124,7 @@ class _StatsHistoryScreenState extends State<StatsHistoryScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StatsDetailScreen(collection: collection),
+        builder: (context) => StatsDetailPage(collection: collection),
       ),
     );
   }

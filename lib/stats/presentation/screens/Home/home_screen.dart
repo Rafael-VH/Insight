@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+//
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
-import 'package:insight/stats/presentation/pages/stats_history_screen.dart';
-import 'package:insight/stats/presentation/pages/stats_upload_screen.dart';
+//
+import 'package:insight/stats/presentation/pages/History/stats_history_page.dart';
+import 'package:insight/stats/presentation/pages/Upload/stats_upload_page.dart';
+//
+import 'package:insight/stats/presentation/screens/Home/widget/info_banner.dart';
+import 'package:insight/stats/presentation/screens/Home/widget/stats_upload_button.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
-import 'package:insight/stats/presentation/widgets/info_banner.dart';
-import 'package:insight/stats/presentation/widgets/stats_upload_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -117,7 +120,7 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StatsUploadScreen(uploadType: uploadType),
+        builder: (context) => StatsUploadPage(uploadType: uploadType),
       ),
     );
   }
@@ -125,7 +128,7 @@ class HomeScreen extends StatelessWidget {
   void _navigateToHistory(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const StatsHistoryScreen()),
+      MaterialPageRoute(builder: (context) => const StatsHistoryPage()),
     );
   }
 }

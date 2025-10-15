@@ -1,0 +1,432 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/core/utils/stats_validator.dart';
+//
+import 'package:insight/stats/domain/entities/game_mode.dart';
+import 'package:insight/stats/domain/entities/image_source_type.dart';
+import 'package:insight/stats/domain/entities/stats_upload_type.dart';
+//
+import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
+import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
+import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
+import 'package:insight/stats/presentation/bloc/ocr_event.dart';
+import 'package:insight/stats/presentation/bloc/ocr_state.dart';
+//
+import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
+//
+import 'package:insight/stats/presentation/pages/Upload/widget/image_upload_card.dart';
+//
+import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
+import 'package:insight/stats/presentation/widgets/validation_result_dialog.dart';
+
+class StatsUploadPage extends StatefulWidget {
+  const StatsUploadPage({super.key, required this.uploadType});
+
+  final StatsUploadType uploadType;
+
+  @override
+  State<StatsUploadPage> createState() => _StatsUploadPageState();
+}
+
+class _StatsUploadPageState extends State<StatsUploadPage> {
+  late final StatsUploadController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = StatsUploadController(uploadType: widget.uploadType);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<OcrBloc, OcrState>(
+      listener: _handleOcrState,
+      child: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, child) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(widget.uploadType.appBarTitle),
+              actions: [
+                if (_controller.hasAnyParsedStats)
+                  IconButton(
+                    icon: const Icon(Icons.info_outline),
+                    onPressed: _showValidationSummary,
+                    tooltip: 'Ver resumen de validación',
+                  ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ..._buildImageUploadCards(),
+                  const SizedBox(height: 16),
+                  if (_controller.hasAnyParsedStats) ...[
+                    _buildStatsSection(),
+                    const SizedBox(height: 16),
+                    _buildSaveButton(),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _handleOcrState(BuildContext context, OcrState state) {
+    if (state is OcrSuccess) {
+      // Procesar con diagnóstico completo
+      final result = _controller.handleOcrSuccessWithDiagnostics(
+        state.result.recognizedText,
+        state.result.imagePath,
+      );
+
+      final mode = _controller.currentProcessingMode;
+
+      if (result.hasValidStats && result.validation != null) {
+        // Mostrar diálogo de validación
+        _showValidationDialog(result.validation!, mode);
+      } else {
+        _showErrorSnackBar(
+          'No se pudieron extraer las estadísticas. Por favor, verifica la imagen.',
+        );
+        _showExtractionLogDialog(result.extractionLog);
+      }
+    } else if (state is OcrError) {
+      _controller.handleOcrError();
+      _showErrorSnackBar('Error: ${state.message}');
+    }
+  }
+
+  void _showValidationDialog(ValidationResult validation, GameMode? mode) {
+    ValidationResultDialog.show(
+      context: context,
+      result: validation,
+      onRetry: () {
+        if (mode != null) {
+          _retryImageCapture(mode);
+        }
+      },
+      onAccept: () {
+        if (validation.isValid) {
+          _showSuccessSnackBar(_controller.getSuccessMessage(mode!));
+        } else {
+          _showWarningSnackBar('Estadísticas guardadas con datos incompletos');
+        }
+      },
+    );
+  }
+
+  void _retryImageCapture(GameMode mode) {
+    _controller.removeStats(mode);
+    // Aquí podrías abrir automáticamente el selector de imagen
+    _showSuccessSnackBar('Por favor, vuelve a capturar la imagen');
+  }
+
+  void _showExtractionLogDialog(List<String> log) {
+    if (log.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log de Extracción'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: log.length,
+            itemBuilder: (context, index) {
+              final entry = log[index];
+              final isError = entry.contains('ERROR') || entry.contains('✗');
+              final isSuccess = entry.contains('✓');
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  entry,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    color: isError
+                        ? Colors.red
+                        : isSuccess
+                        ? Colors.green
+                        : Colors.black87,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showValidationSummary() {
+    final buffer = StringBuffer();
+    buffer.writeln('Resumen de Validación\n');
+
+    for (final mode in _controller.availableModes) {
+      final validation = _controller.getValidationResult(mode);
+      if (validation != null) {
+        buffer.writeln('${mode.name}:');
+        buffer.writeln('  ${validation.summary}');
+        buffer.writeln(
+          '  Completitud: ${validation.completionPercentage.toStringAsFixed(1)}%',
+        );
+        buffer.writeln();
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resumen de Validación'),
+        content: SingleChildScrollView(child: Text(buffer.toString())),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildImageUploadCards() {
+    return _controller.availableModes.map((mode) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Stack(
+          children: [
+            ImageUploadCard(
+              key: ValueKey(mode),
+              gameMode: mode,
+              imagePath: _controller.uploadedImages[mode],
+              isProcessing: _controller.isProcessing[mode] ?? false,
+              onUploadPressed: (source) => _onImageUploadPressed(source, mode),
+            ),
+            // Badge de validación
+            if (_controller.validationResults[mode] != null)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: _buildValidationBadge(
+                  _controller.validationResults[mode]!,
+                  mode,
+                ),
+              ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _buildValidationBadge(ValidationResult validation, GameMode mode) {
+    final IconData icon;
+    final Color color;
+
+    if (validation.isValid && validation.warningFields.isEmpty) {
+      icon = Icons.check_circle;
+      color = Colors.green;
+    } else if (validation.isValid) {
+      icon = Icons.warning;
+      color = Colors.orange;
+    } else {
+      icon = Icons.error;
+      color = Colors.red;
+    }
+
+    return GestureDetector(
+      onTap: () => _showValidationDialog(validation, mode),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: color, size: 24),
+      ),
+    );
+  }
+
+  Widget _buildStatsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Estadísticas extraídas:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            if (_controller.hasInvalidStats())
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.warning_amber,
+                      size: 16,
+                      color: Colors.orange[900],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Datos incompletos',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange[900],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ..._buildVerificationWidgets(),
+      ],
+    );
+  }
+
+  List<Widget> _buildVerificationWidgets() {
+    return _controller.parsedStats.entries
+        .where((entry) => entry.value != null)
+        .map((entry) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: StatsVerificationWidget(
+              gameMode: entry.key,
+              stats: entry.value!,
+            ),
+          );
+        })
+        .toList();
+  }
+
+  Widget _buildSaveButton() {
+    final hasInvalid = _controller.hasInvalidStats();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasInvalid)
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.orange[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange[200]!),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.orange[700], size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Algunos datos están incompletos. Puedes guardar de todos modos o reintentar la captura.',
+                    style: TextStyle(fontSize: 13, color: Colors.orange[900]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ElevatedButton(
+          onPressed: _saveStats,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: hasInvalid
+                ? Colors.orange
+                : const Color(0xFF059669),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          child: Text(
+            hasInvalid
+                ? 'Guardar con Datos Incompletos'
+                : 'Guardar Estadísticas',
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _onImageUploadPressed(ImageSourceType source, GameMode mode) {
+    _controller.startProcessing(mode);
+    context.read<OcrBloc>().add(ProcessImageEvent(source));
+  }
+
+  void _saveStats() {
+    final collection = _controller.createCollection();
+    context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
+
+    _showSuccessSnackBar('Estadísticas guardadas correctamente');
+    Navigator.pop(context);
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showWarningSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+}
