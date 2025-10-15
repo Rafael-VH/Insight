@@ -7,6 +7,7 @@ class ValidationResult {
   final List<String> warningFields;
   final int totalFields;
   final int validFields;
+  final Map<String, dynamic> extractedValues; // NUEVO: Valores extraídos
 
   const ValidationResult({
     required this.isValid,
@@ -14,6 +15,7 @@ class ValidationResult {
     required this.warningFields,
     required this.totalFields,
     required this.validFields,
+    this.extractedValues = const {}, // NUEVO
   });
 
   double get completionPercentage => (validFields / totalFields) * 100;
@@ -35,6 +37,7 @@ class StatsValidator {
   static ValidationResult validate(PlayerStats stats) {
     final List<String> missingFields = [];
     final List<String> warningFields = [];
+    final Map<String, dynamic> extractedValues = {}; // NUEVO
     int totalFields = 0;
     int validFields = 0;
 
@@ -44,12 +47,17 @@ class StatsValidator {
       missingFields.add('Partidas Totales');
     } else {
       validFields++;
+      extractedValues['Partidas Totales'] = stats.totalGames;
     }
 
     if (stats.winRate == 0.0) {
       missingFields.add('Tasa de Victorias');
+      // NUEVO: Agregar sugerencia específica
+      extractedValues['Tasa de Victorias (sugerencia)'] =
+          'Verifica que el porcentaje sea visible en la imagen';
     } else {
       validFields++;
+      extractedValues['Tasa de Victorias'] = '${stats.winRate}%';
     }
 
     if (stats.mvpCount == 0) {
@@ -57,6 +65,7 @@ class StatsValidator {
       validFields++; // No es crítico
     } else {
       validFields++;
+      extractedValues['MVP'] = stats.mvpCount;
     }
 
     // Validar estadísticas de rendimiento (IMPORTANTES)
@@ -65,24 +74,29 @@ class StatsValidator {
       missingFields.add('KDA');
     } else {
       validFields++;
+      extractedValues['KDA'] = stats.kda;
     }
 
     if (stats.teamFightParticipation == 0.0) {
       missingFields.add('Participación en Equipo');
     } else {
       validFields++;
+      extractedValues['Participación en Equipo'] =
+          '${stats.teamFightParticipation}%';
     }
 
     if (stats.goldPerMin == 0) {
       missingFields.add('Oro/Min');
     } else {
       validFields++;
+      extractedValues['Oro/Min'] = stats.goldPerMin;
     }
 
     if (stats.heroDamagePerMin == 0) {
       missingFields.add('DAÑO a Héroe/Min');
     } else {
       validFields++;
+      extractedValues['DAÑO a Héroe/Min'] = stats.heroDamagePerMin;
     }
 
     if (stats.deathsPerGame == 0.0) {
@@ -90,6 +104,7 @@ class StatsValidator {
       validFields++;
     } else {
       validFields++;
+      extractedValues['Muertes/Partida'] = stats.deathsPerGame;
     }
 
     if (stats.towerDamagePerGame == 0) {
@@ -97,6 +112,7 @@ class StatsValidator {
       validFields++;
     } else {
       validFields++;
+      extractedValues['Daño a Torre/Partida'] = stats.towerDamagePerGame;
     }
 
     // Validar logros (OPCIONALES - pueden ser 0 legítimamente)
@@ -121,6 +137,14 @@ class StatsValidator {
       if (achievement.$2 == 0) {
         // Los logros pueden ser 0, pero vale la pena notarlo
         warningFields.add(achievement.$1);
+
+        // NUEVO: Agregar sugerencia específica para Daño Causado
+        if (achievement.$1 == 'Daño Causado Máx./min') {
+          extractedValues['Daño Causado Máx./min (sugerencia)'] =
+              'Este campo es importante. Verifica que el número sea visible en la imagen.';
+        }
+      } else {
+        extractedValues[achievement.$1] = achievement.$2;
       }
       validFields++; // Siempre contamos como válido
     }
@@ -134,6 +158,7 @@ class StatsValidator {
       warningFields: warningFields,
       totalFields: totalFields,
       validFields: validFields,
+      extractedValues: extractedValues, // NUEVO
     );
   }
 
@@ -145,6 +170,13 @@ class StatsValidator {
       buffer.writeln('❌ DATOS FALTANTES (${result.missingFields.length}):');
       for (var field in result.missingFields) {
         buffer.writeln('  • $field');
+
+        // NUEVO: Agregar sugerencias específicas
+        if (field == 'Tasa de Victorias') {
+          buffer.writeln(
+            '    💡 Asegúrate de que el porcentaje (ej: 59.29%) sea visible',
+          );
+        }
       }
     }
 
@@ -153,8 +185,14 @@ class StatsValidator {
       buffer.writeln('⚠️ ADVERTENCIAS (${result.warningFields.length}):');
       buffer.writeln('Los siguientes campos están en 0:');
       for (var field in result.warningFields.take(5)) {
-        // Mostrar solo los primeros 5
         buffer.writeln('  • $field');
+
+        // NUEVO: Sugerencias específicas para campos importantes
+        if (field == 'Daño Causado Máx./min') {
+          buffer.writeln(
+            '    💡 Verifica que el número de 4-5 dígitos sea visible',
+          );
+        }
       }
       if (result.warningFields.length > 5) {
         buffer.writeln('  ... y ${result.warningFields.length - 5} más');
@@ -183,6 +221,19 @@ class StatsValidator {
       recommendations.add(
         '🔍 Verifica que el texto sea legible y no esté borroso',
       );
+
+      // NUEVO: Recomendaciones específicas
+      if (result.missingFields.contains('Tasa de Victorias')) {
+        recommendations.add(
+          '🎯 Tasa de Victorias: Asegúrate de que el porcentaje esté completo (ej: 59.29%)',
+        );
+      }
+    }
+
+    if (result.warningFields.contains('Daño Causado Máx./min')) {
+      recommendations.add(
+        '⚔️ Daño Causado: Verifica que el número de 4-5 dígitos sea claramente visible',
+      );
     }
 
     if (result.completionPercentage < 50) {
@@ -192,5 +243,40 @@ class StatsValidator {
     }
 
     return recommendations;
+  }
+
+  /// NUEVO: Método para obtener un informe completo de depuración
+  static String getDebugReport(ValidationResult result) {
+    final buffer = StringBuffer();
+
+    buffer.writeln('=== REPORTE DE DEPURACIÓN ===\n');
+    buffer.writeln('Validez: ${result.isValid ? "✓ VÁLIDO" : "✗ INVÁLIDO"}');
+    buffer.writeln(
+      'Completitud: ${result.completionPercentage.toStringAsFixed(1)}%',
+    );
+    buffer.writeln(
+      'Campos válidos: ${result.validFields}/${result.totalFields}\n',
+    );
+
+    buffer.writeln('--- VALORES EXTRAÍDOS ---');
+    result.extractedValues.forEach((key, value) {
+      buffer.writeln('$key: $value');
+    });
+
+    if (result.missingFields.isNotEmpty) {
+      buffer.writeln('\n--- CAMPOS FALTANTES ---');
+      for (var field in result.missingFields) {
+        buffer.writeln('✗ $field');
+      }
+    }
+
+    if (result.warningFields.isNotEmpty) {
+      buffer.writeln('\n--- ADVERTENCIAS ---');
+      for (var field in result.warningFields) {
+        buffer.writeln('⚠ $field');
+      }
+    }
+
+    return buffer.toString();
   }
 }

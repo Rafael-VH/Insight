@@ -237,25 +237,55 @@ class StatsParser {
   static double _extractWinRate(String text) {
     _log('Intentando extraer Tasa de Victorias con múltiples patrones...');
 
-    // Lista de patrones posibles para Tasa de Victorias
+    // MEJORA: Patrones más permisivos con espacios y variaciones
     final patterns = [
-      r'(\d+\.?\d*)\s*%?\s*Tasa\s*de\s*Victorias', // 55.3% Tasa de Victorias
-      r'Tasa\s*de\s*Victorias\s*(\d+\.?\d*)\s*%?', // Tasa de Victorias 55.3%
-      r'(\d+\.?\d*)\s*%\s*Tasa', // 55.3 % Tasa
-      r'Victorias?\s*(\d+\.?\d*)\s*%', // Victorias 55.3%
-      r'Win\s*Rate\s*(\d+\.?\d*)\s*%?', // Win Rate 55.3 (por si está en inglés)
+      // Patrón 1: Porcentaje seguido de "Tasa de Victorias" (con/sin espacios)
+      r'(\d+\.?\d*)\s*%?\s*Tasa\s*de\s*Victorias',
+
+      // Patrón 2: "Tasa de Victorias" seguido de porcentaje
+      r'Tasa\s*de\s*Victorias\s*[:\s]*(\d+\.?\d*)\s*%?',
+
+      // Patrón 3: Solo el número cerca de "Tasa" (más flexible)
+      r'(\d+\.\d+)\s*%.*?[Tt]asa',
+
+      // Patrón 4: Buscar porcentaje seguido de palabra "Tasa" en cualquier variante
+      r'(\d+\.?\d+)\s*%\s*[Tt]asa',
+
+      // Patrón 5: Buscar número decimal seguido de % cerca de "Victorias"
+      r'(\d+\.\d+)\s*%.*?[Vv]ictorias?',
+
+      // Patrón 6: En inglés (fallback)
+      r'Win\s*Rate\s*[:\s]*(\d+\.?\d*)\s*%?',
+
+      // Patrón 7: Buscar cualquier porcentaje decimal entre 0-100 cerca de "Victorias"
+      r'([0-5]?\d\.\d{1,2})\s*%',
     ];
 
     for (int i = 0; i < patterns.length; i++) {
       try {
-        final regex = RegExp(patterns[i], caseSensitive: false);
-        final match = regex.firstMatch(text);
+        final regex = RegExp(
+          patterns[i],
+          caseSensitive: false,
+          multiLine: true,
+        );
+        final matches = regex.allMatches(text);
 
-        if (match != null && match.groupCount > 0) {
-          final value = double.parse(match.group(1)!);
-          _log('✓ Tasa de Victorias: $value% (patrón ${i + 1})');
-          _rawMatches['Tasa de Victorias'] = value;
-          return value;
+        for (var match in matches) {
+          if (match.groupCount > 0) {
+            final valueStr = match.group(1)!.trim();
+            final value = double.parse(valueStr);
+
+            // Validar que sea un porcentaje razonable (0-100)
+            if (value >= 0 && value <= 100) {
+              _log('✓ Tasa de Victorias: $value% (patrón ${i + 1})');
+              _rawMatches['Tasa de Victorias'] = value;
+              return value;
+            } else {
+              _log(
+                '⚠ Valor fuera de rango descartado: $value (patrón ${i + 1})',
+              );
+            }
+          }
         }
       } catch (e) {
         _log('Patrón ${i + 1} falló: $e');
