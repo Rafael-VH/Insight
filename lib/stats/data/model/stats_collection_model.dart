@@ -22,29 +22,31 @@ class StatsCollectionModel extends StatsCollection {
 
   Map<String, dynamic> toJson() {
     return {
-      'totalStats': totalStats?.toJson(),
-      'rankedStats': rankedStats?.toJson(),
-      'classicStats': classicStats?.toJson(),
-      'brawlStats': brawlStats?.toJson(),
+      // CORREGIDO: Verificar que no sea nulo antes de llamar a toJson()
+      'totalStats': totalStats != null ? totalStats!.toJson() : null,
+      'rankedStats': rankedStats != null ? rankedStats!.toJson() : null,
+      'classicStats': classicStats != null ? classicStats!.toJson() : null,
+      'brawlStats': brawlStats != null ? brawlStats!.toJson() : null,
       'createdAt': createdAt.toIso8601String(),
     };
   }
 
   factory StatsCollectionModel.fromJson(Map<String, dynamic> json) {
     return StatsCollectionModel(
+      // CORREGIDO: Manejar correctamente valores nulos
       totalStats: json['totalStats'] != null
-          ? PlayerStats.fromJson(json['totalStats'])
+          ? PlayerStats.fromJson(json['totalStats'] as Map<String, dynamic>)
           : null,
       rankedStats: json['rankedStats'] != null
-          ? PlayerStats.fromJson(json['rankedStats'])
+          ? PlayerStats.fromJson(json['rankedStats'] as Map<String, dynamic>)
           : null,
       classicStats: json['classicStats'] != null
-          ? PlayerStats.fromJson(json['classicStats'])
+          ? PlayerStats.fromJson(json['classicStats'] as Map<String, dynamic>)
           : null,
       brawlStats: json['brawlStats'] != null
-          ? PlayerStats.fromJson(json['brawlStats'])
+          ? PlayerStats.fromJson(json['brawlStats'] as Map<String, dynamic>)
           : null,
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 }

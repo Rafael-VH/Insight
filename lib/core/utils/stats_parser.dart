@@ -237,27 +237,13 @@ class StatsParser {
   static double _extractWinRate(String text) {
     _log('Intentando extraer Tasa de Victorias con múltiples patrones...');
 
-    // MEJORA: Patrones más permisivos con espacios y variaciones
     final patterns = [
-      // Patrón 1: Porcentaje seguido de "Tasa de Victorias" (con/sin espacios)
       r'(\d+\.?\d*)\s*%?\s*Tasa\s*de\s*Victorias',
-
-      // Patrón 2: "Tasa de Victorias" seguido de porcentaje
       r'Tasa\s*de\s*Victorias\s*[:\s]*(\d+\.?\d*)\s*%?',
-
-      // Patrón 3: Solo el número cerca de "Tasa" (más flexible)
       r'(\d+\.\d+)\s*%.*?[Tt]asa',
-
-      // Patrón 4: Buscar porcentaje seguido de palabra "Tasa" en cualquier variante
       r'(\d+\.?\d+)\s*%\s*[Tt]asa',
-
-      // Patrón 5: Buscar número decimal seguido de % cerca de "Victorias"
       r'(\d+\.\d+)\s*%.*?[Vv]ictorias?',
-
-      // Patrón 6: En inglés (fallback)
       r'Win\s*Rate\s*[:\s]*(\d+\.?\d*)\s*%?',
-
-      // Patrón 7: Buscar cualquier porcentaje decimal entre 0-100 cerca de "Victorias"
       r'([0-5]?\d\.\d{1,2})\s*%',
     ];
 
@@ -275,7 +261,6 @@ class StatsParser {
             final valueStr = match.group(1)!.trim();
             final value = double.parse(valueStr);
 
-            // Validar que sea un porcentaje razonable (0-100)
             if (value >= 0 && value <= 100) {
               _log('✓ Tasa de Victorias: $value% (patrón ${i + 1})');
               _rawMatches['Tasa de Victorias'] = value;
@@ -297,16 +282,32 @@ class StatsParser {
     return 0.0;
   }
 
-  /// NUEVO: Método especializado para extraer Daño Causado Máx
+  /// MEJORADO: Método especializado para extraer Daño Causado Máx - CORREGIDO PARA TOTAL
   static int _extractMaxDamageDealt(String text) {
     _log('Intentando extraer Daño Causado Máx./min con múltiples patrones...');
 
     final patterns = [
-      r'Daño\s*Causado\s*Máx[.\s]*/?\s*min\s*(\d+)', // Daño Causado Máx./min 1500
-      r'Daño\s*Causado\s*Máx[.\s]*(\d+)', // Daño Causado Máx. 1500
-      r'Causado\s*Máx[.\s]*/?\s*min\s*(\d+)', // Causado Máx./min 1500
-      r'Max\s*Damage\s*Dealt[/\s]*min\s*(\d+)', // Max Damage Dealt/min 1500
-      r'DMG\s*Dealt\s*Max[/\s]*min\s*(\d+)', // DMG Dealt Max/min 1500
+      // Patrón para "Daño Causado Máx./min" con números de 4-5 dígitos
+      r'Daño\s*Causado\s*Máx[.\s]*/?\s*min\s*[:\s]*(\d+)',
+
+      // Variante sin "min"
+      r'Daño\s*Causado\s*Máx[.\s]*[:/\s]*(\d{4,5})',
+
+      // Búsqueda genérica: número de 4-5 dígitos después de "Daño Causado"
+      r'Daño\s*Causado[^0-9]*(\d{4,5})',
+
+      // Patrón más específico: buscar "10134" o similar después de "Causado"
+      r'Causado[^0-9]*(\d{4,5})',
+
+      // Fallback: buscar cualquier número grande después de "Daño"
+      r'Daño\s+[^0-9]*[Mm]áx[^0-9]*(\d{4,5})',
+
+      // En inglés (fallback)
+      r'Max\s*Damage\s*Dealt[/\s]*min\s*(\d+)',
+      r'DMG\s*Dealt\s*Max[/\s]*min\s*(\d+)',
+
+      // NUEVO: Búsqueda sin etiqueta, solo número entre 1000-99999
+      r'(?:Máx|Max)[.\s]*/?\s*min\s*[:\s]*(\d{4,5})',
     ];
 
     for (int i = 0; i < patterns.length; i++) {
@@ -317,9 +318,15 @@ class StatsParser {
         if (match != null && match.groupCount > 0) {
           final numberStr = match.group(1)!.replaceAll(',', '');
           final value = int.parse(numberStr);
-          _log('✓ Daño Causado Máx./min: $value (patrón ${i + 1})');
-          _rawMatches['Daño Causado Máx./min'] = value;
-          return value;
+
+          // Validar que sea un número razonable (1000-99999)
+          if (value >= 1000 && value <= 99999) {
+            _log('✓ Daño Causado Máx./min: $value (patrón ${i + 1})');
+            _rawMatches['Daño Causado Máx./min'] = value;
+            return value;
+          } else {
+            _log('⚠ Valor fuera de rango descartado: $value (patrón ${i + 1})');
+          }
         }
       } catch (e) {
         _log('Patrón ${i + 1} falló: $e');
@@ -336,12 +343,12 @@ class StatsParser {
     _log('Intentando extraer Daño Tomado Máx./min con múltiples patrones...');
 
     final patterns = [
-      r'Daño\s*[Tt]omado\s*Máx[.\s]*/?\s*min\s*(\d+)', // Daño tomado Máx./min 800
-      r'Daño\s*[Tt]omado\s*Máx[.\s]*(\d+)', // Daño tomado Máx. 800
-      r'[Tt]omado\s*Máx[.\s]*/?\s*min\s*(\d+)', // tomado Máx./min 800
-      r'Max\s*Damage\s*Taken[/\s]*min\s*(\d+)', // Max Damage Taken/min 800
-      r'DMG\s*Taken\s*Max[/\s]*min\s*(\d+)', // DMG Taken Max/min 800
-      r'Daño\s*recibido\s*Máx[.\s]*/?\s*min\s*(\d+)', // Daño recibido Máx./min 800
+      r'Daño\s*[Tt]omado\s*Máx[.\s]*/?\s*min\s*(\d+)',
+      r'Daño\s*[Tt]omado\s*Máx[.\s]*(\d+)',
+      r'[Tt]omado\s*Máx[.\s]*/?\s*min\s*(\d+)',
+      r'Max\s*Damage\s*Taken[/\s]*min\s*(\d+)',
+      r'DMG\s*Taken\s*Max[/\s]*min\s*(\d+)',
+      r'Daño\s*recibido\s*Máx[.\s]*/?\s*min\s*(\d+)',
     ];
 
     for (int i = 0; i < patterns.length; i++) {
@@ -371,10 +378,10 @@ class StatsParser {
     _log('Intentando extraer Oro Máx./min con múltiples patrones...');
 
     final patterns = [
-      r'Oro\s*Máx[.\s]*/?\s*min\s*(\d+)', // Oro Máx./min 650
-      r'Oro\s*Máx[.\s]*(\d+)', // Oro Máx. 650
-      r'Max\s*Gold[/\s]*min\s*(\d+)', // Max Gold/min 650
-      r'Gold\s*Max[/\s]*min\s*(\d+)', // Gold Max/min 650
+      r'Oro\s*Máx[.\s]*/?\s*min\s*(\d+)',
+      r'Oro\s*Máx[.\s]*(\d+)',
+      r'Max\s*Gold[/\s]*min\s*(\d+)',
+      r'Gold\s*Max[/\s]*min\s*(\d+)',
     ];
 
     for (int i = 0; i < patterns.length; i++) {
@@ -417,7 +424,7 @@ class StatsParser {
     }
 
     _log('No se detectó modo específico, usando Total por defecto');
-    return GameMode.total; // Default
+    return GameMode.total;
   }
 
   static int _extractNumberWithLog(
@@ -499,69 +506,22 @@ class StatsParser {
     }
   }
 
-  // Métodos legacy para compatibilidad
-  static int _extractNumber(String text, String pattern) {
-    try {
-      final regex = RegExp(pattern, caseSensitive: false);
-      final match = regex.firstMatch(text);
-      if (match != null && match.groupCount > 0) {
-        final numberStr = match.group(1)!.replaceAll(',', '');
-        return int.parse(numberStr);
-      }
-    } catch (e) {
-      print('Error extracting number with pattern $pattern: $e');
-    }
-    return 0;
-  }
-
-  static double _extractDecimal(String text, String pattern) {
-    try {
-      final regex = RegExp(pattern, caseSensitive: false);
-      final match = regex.firstMatch(text);
-      if (match != null && match.groupCount > 0) {
-        return double.parse(match.group(1)!);
-      }
-    } catch (e) {
-      print('Error extracting decimal with pattern $pattern: $e');
-    }
-    return 0.0;
-  }
-
-  static double _extractPercentage(String text, String pattern) {
-    try {
-      final regex = RegExp(pattern, caseSensitive: false);
-      final match = regex.firstMatch(text);
-      if (match != null && match.groupCount > 0) {
-        return double.parse(match.group(1)!);
-      }
-    } catch (e) {
-      print('Error extracting percentage with pattern $pattern: $e');
-    }
-    return 0.0;
-  }
-
   static void _log(String message) {
     _extractionLog.add(message);
     print('[StatsParser] $message');
   }
 
-  /// Genera una lista de campos para verificación visual
   static List<StatField> getFieldsForVerification(PlayerStats stats) {
     return [
-      // Estadísticas principales
       StatField('Partidas Totales', stats.totalGames.toString()),
       StatField('Tasa de Victorias', '${stats.winRate}%'),
       StatField('MVP', stats.mvpCount.toString()),
-
-      // Detalles
       StatField('KDA', stats.kda.toString()),
       StatField('Participación en Equipo', '${stats.teamFightParticipation}%'),
       StatField('Oro/Min', stats.goldPerMin.toString()),
       StatField('DAÑO a Héroe/Min', stats.heroDamagePerMin.toString()),
       StatField('Muertes/Partida', stats.deathsPerGame.toString()),
       StatField('Daño a Torre/Partida', stats.towerDamagePerGame.toString()),
-
-      // Logros
       StatField('Legendario', stats.legendary.toString()),
       StatField('Savage', stats.savage.toString()),
       StatField('Maniac', stats.maniac.toString()),
@@ -578,12 +538,10 @@ class StatsParser {
     ];
   }
 
-  /// Obtiene el log de extracción
   static List<String> getExtractionLog() {
     return [..._extractionLog];
   }
 
-  /// Limpia el log de extracción
   static void clearLog() {
     _extractionLog.clear();
     _rawMatches.clear();
