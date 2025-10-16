@@ -25,14 +25,41 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     SaveStatsCollectionEvent event,
     Emitter<MLStatsState> emit,
   ) async {
-    emit(MLStatsLoading());
+    try {
+      // Validar que haya al menos una estadística
+      if (!event.collection.hasAnyStats) {
+        emit(
+          const MLStatsError(
+            'No hay estadísticas para guardar',
+            errorDetails:
+                'Debes cargar al menos una estadística antes de guardar.',
+          ),
+        );
+        return;
+      }
 
-    final result = await saveStatsCollection(event.collection);
+      emit(const MLStatsSaving('Guardando estadísticas...'));
 
-    result.fold(
-      (failure) => emit(MLStatsError(failure.message)),
-      (_) => emit(const MLStatsSaved('Estadísticas guardadas correctamente')),
-    );
+      final result = await saveStatsCollection(event.collection);
+
+      result.fold(
+        (failure) {
+          emit(
+            MLStatsError(
+              'Error al guardar estadísticas',
+              errorDetails: failure.message,
+            ),
+          );
+        },
+        (_) {
+          emit(const MLStatsSaved('Estadísticas guardadas correctamente'));
+          // Recargar las colecciones después de guardar
+          add(LoadAllStatsCollectionsEvent());
+        },
+      );
+    } catch (e) {
+      emit(MLStatsError('Error inesperado', errorDetails: e.toString()));
+    }
   }
 
   Future<void> _onLoadAllStatsCollections(
@@ -44,7 +71,12 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     final result = await getAllStatsCollections(NoParams());
 
     result.fold(
-      (failure) => emit(MLStatsError(failure.message)),
+      (failure) => emit(
+        MLStatsError(
+          'Error al cargar estadísticas',
+          errorDetails: failure.message,
+        ),
+      ),
       (collections) => emit(MLStatsCollectionsLoaded(collections)),
     );
   }
@@ -58,7 +90,12 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     final result = await getLatestStatsCollection(NoParams());
 
     result.fold(
-      (failure) => emit(MLStatsError(failure.message)),
+      (failure) => emit(
+        MLStatsError(
+          'Error al cargar últimas estadísticas',
+          errorDetails: failure.message,
+        ),
+      ),
       (collection) => emit(MLLatestStatsLoaded(collection)),
     );
   }

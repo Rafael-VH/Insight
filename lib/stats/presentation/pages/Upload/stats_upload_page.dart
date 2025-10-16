@@ -8,6 +8,7 @@ import 'package:insight/stats/domain/entities/stats_upload_type.dart';
 //
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
+import 'package:insight/stats/presentation/bloc/ml_stats_state.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_state.dart';
@@ -15,6 +16,7 @@ import 'package:insight/stats/presentation/bloc/ocr_state.dart';
 import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
 //
 import 'package:insight/stats/presentation/pages/Upload/widget/image_upload_card.dart';
+import 'package:insight/stats/presentation/widgets/save_stats_dialog.dart';
 //
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/stats/presentation/widgets/validation_result_dialog.dart';
@@ -30,6 +32,7 @@ class StatsUploadPage extends StatefulWidget {
 
 class _StatsUploadPageState extends State<StatsUploadPage> {
   late final StatsUploadController _controller;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -47,42 +50,46 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   Widget build(BuildContext context) {
     return BlocListener<OcrBloc, OcrState>(
       listener: _handleOcrState,
-      child: ListenableBuilder(
-        listenable: _controller,
-        builder: (context, child) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(widget.uploadType.appBarTitle),
-              actions: [
-                if (_controller.hasAnyParsedStats)
-                  IconButton(
-                    icon: const Icon(Icons.info_outline),
-                    onPressed: _showValidationSummary,
-                    tooltip: 'Ver resumen de validación',
-                  ),
-              ],
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ..._buildImageUploadCards(),
-                  const SizedBox(height: 16),
-                  if (_controller.hasAnyParsedStats) ...[
-                    _buildStatsSection(),
-                    const SizedBox(height: 16),
-                    _buildSaveButton(),
-                  ],
+      child: BlocListener<MLStatsBloc, MLStatsState>(
+        listener: _handleMlStatsState,
+        child: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, child) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(widget.uploadType.appBarTitle),
+                actions: [
+                  if (_controller.hasAnyParsedStats)
+                    IconButton(
+                      icon: const Icon(Icons.info_outline),
+                      onPressed: _showValidationSummary,
+                      tooltip: 'Ver resumen de validación',
+                    ),
                 ],
               ),
-            ),
-          );
-        },
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ..._buildImageUploadCards(),
+                    const SizedBox(height: 16),
+                    if (_controller.hasAnyParsedStats) ...[
+                      _buildStatsSection(),
+                      const SizedBox(height: 16),
+                      _buildSaveButton(),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
+  /// Maneja los eventos de OCR (captura de imágenes)
   void _handleOcrState(BuildContext context, OcrState state) {
     if (state is OcrSuccess) {
       // Procesar con diagnóstico completo
@@ -108,107 +115,93 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     }
   }
 
-  void _showValidationDialog(ValidationResult validation, GameMode? mode) {
-    ValidationResultDialog.show(
-      context: context,
-      result: validation,
-      onRetry: () {
-        if (mode != null) {
-          _retryImageCapture(mode);
-        }
-      },
-      onAccept: () {
-        if (validation.isValid) {
-          _showSuccessSnackBar(_controller.getSuccessMessage(mode!));
-        } else {
-          _showWarningSnackBar('Estadísticas guardadas con datos incompletos');
-        }
-      },
-    );
-  }
+  /// Maneja los eventos de guardación de estadísticas
+  void _handleMlStatsState(BuildContext context, MLStatsState state) {
+    if (state is MLStatsSaving) {
+      // El diálogo de carga ya está mostrado
+      setState(() => _isSaving = true);
+    } else if (state is MLStatsSaved) {
+      setState(() => _isSaving = false);
 
-  void _retryImageCapture(GameMode mode) {
-    _controller.removeStats(mode);
-    // Aquí podrías abrir automáticamente el selector de imagen
-    _showSuccessSnackBar('Por favor, vuelve a capturar la imagen');
-  }
-
-  void _showExtractionLogDialog(List<String> log) {
-    if (log.isEmpty) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Log de Extracción'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: log.length,
-            itemBuilder: (context, index) {
-              final entry = log[index];
-              final isError = entry.contains('ERROR') || entry.contains('✗');
-              final isSuccess = entry.contains('✓');
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                  entry,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                    color: isError
-                        ? Colors.red
-                        : isSuccess
-                        ? Colors.green
-                        : Colors.black87,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showValidationSummary() {
-    final buffer = StringBuffer();
-    buffer.writeln('Resumen de Validación\n');
-
-    for (final mode in _controller.availableModes) {
-      final validation = _controller.getValidationResult(mode);
-      if (validation != null) {
-        buffer.writeln('${mode.name}:');
-        buffer.writeln('  ${validation.summary}');
-        buffer.writeln(
-          '  Completitud: ${validation.completionPercentage.toStringAsFixed(1)}%',
-        );
-        buffer.writeln();
+      // Cerrar cualquier diálogo abierto
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context, rootNavigator: true).pop();
       }
+
+      // Mostrar diálogo de éxito
+      SaveStatsDialog.showSuccess(
+        context,
+        message: state.message,
+        onClose: () {
+          if (mounted) {
+            _showSuccessSnackBar(
+              'Estadísticas guardadas. Volviendo a la pantalla principal...',
+            );
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+            });
+          }
+        },
+      );
+    } else if (state is MLStatsError) {
+      setState(() => _isSaving = false);
+
+      // Cerrar diálogo de carga si está abierto
+      if (mounted && Navigator.canPop(context)) {
+        try {
+          Navigator.of(context, rootNavigator: true).pop();
+        } catch (e) {
+          // Ignorar si no hay diálogo abierto
+        }
+      }
+
+      // Mostrar diálogo de error
+      SaveStatsDialog.showError(
+        context,
+        title: 'Error al Guardar',
+        message: state.message,
+        errorDetails: state.errorDetails,
+        onRetry: _isSaving ? null : _saveStats,
+      );
+    }
+  }
+
+  /// Valida y guarda las estadísticas
+  void _saveStats() {
+    final collection = _controller.createCollection();
+
+    // Validar que haya al menos una estadística
+    if (!collection.hasAnyStats) {
+      SaveStatsDialog.showError(
+        context,
+        title: 'Sin Estadísticas',
+        message: 'Por favor carga al menos una estadística antes de guardar.',
+        errorDetails:
+            'Debes cargar imágenes y extraer las estadísticas correctamente.',
+      );
+      return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Resumen de Validación'),
-        content: SingleChildScrollView(child: Text(buffer.toString())),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
+    // Prevenir múltiples guardaciones simultáneas
+    if (_isSaving) {
+      _showWarningSnackBar('Ya se está guardando. Espera a que termine...');
+      return;
+    }
+
+    // Mostrar diálogo de cargando
+    SaveStatsDialog.showSaving(context);
+
+    // Emitir evento de guardación después de un pequeño delay para asegurar que el diálogo se muestre
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
+      }
+    });
   }
 
+  /// Construye las tarjetas de carga de imágenes
   List<Widget> _buildImageUploadCards() {
     return _controller.availableModes.map((mode) {
       return Padding(
@@ -238,6 +231,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     }).toList();
   }
 
+  /// Construye el badge de validación
   Widget _buildValidationBadge(ValidationResult validation, GameMode mode) {
     final IconData icon;
     final Color color;
@@ -273,6 +267,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
+  /// Construye la sección de estadísticas extraídas
   Widget _buildStatsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,6 +317,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
+  /// Construye los widgets de verificación de estadísticas
   List<Widget> _buildVerificationWidgets() {
     return _controller.parsedStats.entries
         .where((entry) => entry.value != null)
@@ -337,6 +333,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         .toList();
   }
 
+  /// Construye el botón de guardar
   Widget _buildSaveButton() {
     final hasInvalid = _controller.hasInvalidStats();
 
@@ -366,37 +363,154 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
             ),
           ),
         ElevatedButton(
-          onPressed: _saveStats,
+          onPressed: _isSaving ? null : _saveStats,
           style: ElevatedButton.styleFrom(
-            backgroundColor: hasInvalid
+            backgroundColor: _isSaving
+                ? Colors.grey
+                : hasInvalid
                 ? Colors.orange
                 : const Color(0xFF059669),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
+            disabledBackgroundColor: Colors.grey,
           ),
-          child: Text(
-            hasInvalid
-                ? 'Guardar con Datos Incompletos'
-                : 'Guardar Estadísticas',
-          ),
+          child: _isSaving
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Guardando...'),
+                  ],
+                )
+              : Text(
+                  hasInvalid
+                      ? 'Guardar con Datos Incompletos'
+                      : 'Guardar Estadísticas',
+                ),
         ),
       ],
     );
   }
 
+  /// Maneja la presión en los botones de carga de imagen
   void _onImageUploadPressed(ImageSourceType source, GameMode mode) {
     _controller.startProcessing(mode);
     context.read<OcrBloc>().add(ProcessImageEvent(source));
   }
 
-  void _saveStats() {
-    final collection = _controller.createCollection();
-    context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
-
-    _showSuccessSnackBar('Estadísticas guardadas correctamente');
-    Navigator.pop(context);
+  /// Muestra el diálogo de validación
+  void _showValidationDialog(ValidationResult validation, GameMode? mode) {
+    ValidationResultDialog.show(
+      context: context,
+      result: validation,
+      onRetry: () {
+        if (mode != null) {
+          _retryImageCapture(mode);
+        }
+      },
+      onAccept: () {
+        if (validation.isValid) {
+          _showSuccessSnackBar(_controller.getSuccessMessage(mode!));
+        } else {
+          _showWarningSnackBar('Estadísticas guardadas con datos incompletos');
+        }
+      },
+    );
   }
 
+  /// Reintentar captura de imagen
+  void _retryImageCapture(GameMode mode) {
+    _controller.removeStats(mode);
+    _showSuccessSnackBar('Por favor, vuelve a capturar la imagen');
+  }
+
+  /// Muestra el log de extracción
+  void _showExtractionLogDialog(List<String> log) {
+    if (log.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log de Extracción'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: log.length,
+            itemBuilder: (context, index) {
+              final entry = log[index];
+              final isError = entry.contains('ERROR') || entry.contains('✗');
+              final isSuccess = entry.contains('✓');
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(
+                  entry,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    color: isError
+                        ? Colors.red
+                        : isSuccess
+                        ? Colors.green
+                        : Colors.black87,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Muestra el resumen de validación
+  void _showValidationSummary() {
+    final buffer = StringBuffer();
+    buffer.writeln('Resumen de Validación\n');
+
+    for (final mode in _controller.availableModes) {
+      final validation = _controller.getValidationResult(mode);
+      if (validation != null) {
+        buffer.writeln('${mode.name}:');
+        buffer.writeln('  ${validation.summary}');
+        buffer.writeln(
+          '  Completitud: ${validation.completionPercentage.toStringAsFixed(1)}%',
+        );
+        buffer.writeln();
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resumen de Validación'),
+        content: SingleChildScrollView(child: Text(buffer.toString())),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Muestra SnackBar de éxito
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -408,6 +522,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
+  /// Muestra SnackBar de advertencia
   void _showWarningSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -419,6 +534,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
+  /// Muestra SnackBar de error
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

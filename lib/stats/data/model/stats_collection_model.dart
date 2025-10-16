@@ -22,7 +22,7 @@ class StatsCollectionModel extends StatsCollection {
 
   Map<String, dynamic> toJson() {
     return {
-      // CORREGIDO: Verificar que no sea nulo antes de llamar a toJson()
+      // MEJORADO: Verificar null antes de convertir
       'totalStats': totalStats != null ? totalStats!.toJson() : null,
       'rankedStats': rankedStats != null ? rankedStats!.toJson() : null,
       'classicStats': classicStats != null ? classicStats!.toJson() : null,
@@ -33,7 +33,7 @@ class StatsCollectionModel extends StatsCollection {
 
   factory StatsCollectionModel.fromJson(Map<String, dynamic> json) {
     return StatsCollectionModel(
-      // CORREGIDO: Manejar correctamente valores nulos
+      // MEJORADO: Verificar null correctamente
       totalStats: json['totalStats'] != null
           ? PlayerStats.fromJson(json['totalStats'] as Map<String, dynamic>)
           : null,

@@ -12,6 +12,14 @@ class MLStatsInitial extends MLStatsState {}
 
 class MLStatsLoading extends MLStatsState {}
 
+class MLStatsSaving extends MLStatsState {
+  final String message;
+  const MLStatsSaving(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class MLStatsSaved extends MLStatsState {
   final String message;
 
@@ -41,11 +49,12 @@ class MLLatestStatsLoaded extends MLStatsState {
 
 class MLStatsError extends MLStatsState {
   final String message;
+  final String? errorDetails;
 
-  const MLStatsError(this.message);
+  const MLStatsError(this.message, {this.errorDetails});
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message, errorDetails];
 }
 
 class MLStatsDeleted extends MLStatsState {

@@ -22,12 +22,24 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<void> saveStatsCollection(StatsCollection collection) async {
     try {
+      // CORRECCIÓN: Obtener todas las colecciones existentes
       final collections = await getAllStatsCollections();
+
+      // CORRECCIÓN: Agregar la nueva colección
       collections.add(collection);
 
-      final jsonList = collections
-          .map((c) => StatsCollectionModel.fromEntity(c).toJson())
-          .toList();
+      // CORRECCIÓN: Convertir a modelos y luego a JSON
+      final jsonList = collections.map((c) {
+        // Convertir StatsCollection a StatsCollectionModel
+        final model = StatsCollectionModel(
+          totalStats: c.totalStats,
+          rankedStats: c.rankedStats,
+          classicStats: c.classicStats,
+          brawlStats: c.brawlStats,
+          createdAt: c.createdAt,
+        );
+        return model.toJson();
+      }).toList();
 
       final jsonString = json.encode(jsonList);
       final success = await sharedPreferences.setString(
@@ -57,10 +69,12 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
 
       final jsonList = json.decode(jsonString) as List;
 
+      // Convertir JSON a StatsCollectionModel y luego a StatsCollection
       return jsonList
           .map(
             (jsonMap) =>
-                StatsCollectionModel.fromJson(jsonMap as Map<String, dynamic>),
+                StatsCollectionModel.fromJson(jsonMap as Map<String, dynamic>)
+                    as StatsCollection,
           )
           .toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -94,9 +108,16 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
             createdAt.millisecondsSinceEpoch,
       );
 
-      final jsonList = collections
-          .map((c) => StatsCollectionModel.fromEntity(c).toJson())
-          .toList();
+      final jsonList = collections.map((c) {
+        final model = StatsCollectionModel(
+          totalStats: c.totalStats,
+          rankedStats: c.rankedStats,
+          classicStats: c.classicStats,
+          brawlStats: c.brawlStats,
+          createdAt: c.createdAt,
+        );
+        return model.toJson();
+      }).toList();
 
       final jsonString = json.encode(jsonList);
       final success = await sharedPreferences.setString(
