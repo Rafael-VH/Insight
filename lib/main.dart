@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart' as di;
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
+import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
+import 'package:insight/stats/presentation/config/theme_config.dart';
 import 'package:insight/stats/presentation/screens/Home/home_screen.dart';
 
 void main() async {
@@ -18,37 +20,65 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Bloc de estadísticas
         BlocProvider<MLStatsBloc>(create: (context) => di.sl<MLStatsBloc>()),
+        // Bloc de OCR
         BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
-      ],
-      child: MaterialApp(
-        title: 'ML Stats OCR',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF059669),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-          cardTheme: CardThemeData(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
+        // Bloc de temas
+        BlocProvider<ThemeBloc>(
+          create: (context) => di.sl<ThemeBloc>()..add(LoadTheme()),
         ),
-        darkTheme: ThemeData.dark(useMaterial3: true),
-        themeMode: ThemeMode.light,
-        home: const HomeScreen(),
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          // Mientras carga el tema, mostrar splash
+          if (themeState is ThemeLoading || themeState is ThemeInitial) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          }
+
+          // Si hay error, usar tema por defecto
+          if (themeState is ThemeError) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'ML Stats OCR',
+              theme: ThemeData.light(useMaterial3: true),
+              darkTheme: ThemeData.dark(useMaterial3: true),
+              themeMode: ThemeMode.system,
+              home: const HomeScreen(),
+            );
+          }
+
+          // Tema cargado correctamente
+          if (themeState is ThemeLoaded) {
+            final appTheme = themeState.currentTheme;
+            final themeMode = themeState.themeMode.flutterThemeMode;
+
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'ML Stats OCR',
+
+              // Temas personalizados
+              theme: ThemeConfig.buildLightTheme(appTheme),
+              darkTheme: ThemeConfig.buildDarkTheme(appTheme),
+              themeMode: themeMode,
+
+              home: const HomeScreen(),
+            );
+          }
+
+          // Fallback
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'ML Stats OCR',
+            theme: ThemeData.light(useMaterial3: true),
+            home: const HomeScreen(),
+          );
+        },
       ),
     );
   }

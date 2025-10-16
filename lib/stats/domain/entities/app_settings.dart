@@ -8,10 +8,23 @@ enum AppThemeMode {
   const AppThemeMode(this.displayName, this.icon);
   final String displayName;
   final IconData icon;
+
+  // Convertir a ThemeMode de Flutter
+  ThemeMode get flutterThemeMode {
+    switch (this) {
+      case AppThemeMode.light:
+        return ThemeMode.light;
+      case AppThemeMode.dark:
+        return ThemeMode.dark;
+      case AppThemeMode.system:
+        return ThemeMode.system;
+    }
+  }
 }
 
 class AppSettings {
   final AppThemeMode themeMode;
+  final String selectedThemeId; // NUEVO: ID del tema seleccionado
   final bool enableNotifications;
   final bool enableHapticFeedback;
   final bool autoSaveStats;
@@ -19,6 +32,7 @@ class AppSettings {
 
   const AppSettings({
     this.themeMode = AppThemeMode.system,
+    this.selectedThemeId = 'emerald', // NUEVO: Tema por defecto
     this.enableNotifications = true,
     this.enableHapticFeedback = true,
     this.autoSaveStats = true,
@@ -27,6 +41,7 @@ class AppSettings {
 
   AppSettings copyWith({
     AppThemeMode? themeMode,
+    String? selectedThemeId,
     bool? enableNotifications,
     bool? enableHapticFeedback,
     bool? autoSaveStats,
@@ -34,6 +49,7 @@ class AppSettings {
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
+      selectedThemeId: selectedThemeId ?? this.selectedThemeId,
       enableNotifications: enableNotifications ?? this.enableNotifications,
       enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
       autoSaveStats: autoSaveStats ?? this.autoSaveStats,
@@ -44,6 +60,7 @@ class AppSettings {
   Map<String, dynamic> toJson() {
     return {
       'themeMode': themeMode.name,
+      'selectedThemeId': selectedThemeId,
       'enableNotifications': enableNotifications,
       'enableHapticFeedback': enableHapticFeedback,
       'autoSaveStats': autoSaveStats,
@@ -57,10 +74,11 @@ class AppSettings {
         (e) => e.name == json['themeMode'],
         orElse: () => AppThemeMode.system,
       ),
-      enableNotifications: json['enableNotifications'] ?? true,
-      enableHapticFeedback: json['enableHapticFeedback'] ?? true,
-      autoSaveStats: json['autoSaveStats'] ?? true,
-      language: json['language'] ?? 'es',
+      selectedThemeId: json['selectedThemeId'] as String? ?? 'emerald',
+      enableNotifications: json['enableNotifications'] as bool? ?? true,
+      enableHapticFeedback: json['enableHapticFeedback'] as bool? ?? true,
+      autoSaveStats: json['autoSaveStats'] as bool? ?? true,
+      language: json['language'] as String? ?? 'es',
     );
   }
 

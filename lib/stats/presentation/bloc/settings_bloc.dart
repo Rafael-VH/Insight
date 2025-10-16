@@ -22,6 +22,15 @@ class UpdateThemeMode extends SettingsEvent {
   List<Object> get props => [themeMode];
 }
 
+class UpdateSelectedTheme extends SettingsEvent {
+  final String themeId;
+
+  const UpdateSelectedTheme(this.themeId);
+
+  @override
+  List<Object> get props => [themeId];
+}
+
 class UpdateNotifications extends SettingsEvent {
   final bool enabled;
 
@@ -89,6 +98,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc({required this.repository}) : super(SettingsInitial()) {
     on<LoadSettings>(_onLoadSettings);
     on<UpdateThemeMode>(_onUpdateThemeMode);
+    on<UpdateSelectedTheme>(_onUpdateSelectedTheme);
     on<UpdateNotifications>(_onUpdateNotifications);
     on<UpdateHapticFeedback>(_onUpdateHapticFeedback);
     on<UpdateAutoSave>(_onUpdateAutoSave);
@@ -115,6 +125,16 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     final updatedSettings = _currentSettings.copyWith(
       themeMode: event.themeMode,
+    );
+    await _saveAndEmit(updatedSettings, emit);
+  }
+
+  Future<void> _onUpdateSelectedTheme(
+    UpdateSelectedTheme event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final updatedSettings = _currentSettings.copyWith(
+      selectedThemeId: event.themeId,
     );
     await _saveAndEmit(updatedSettings, emit);
   }

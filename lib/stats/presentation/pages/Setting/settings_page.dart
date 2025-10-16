@@ -2,10 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/stats/domain/entities/app_settings.dart';
 import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
+import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
+import 'package:insight/stats/presentation/widgets/theme_selector_widget.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Cargar configuración al iniciar
+    context.read<SettingsBloc>().add(LoadSettings());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +88,45 @@ class SettingsPage extends StatelessWidget {
 
         // Sección: Apariencia
         _buildSectionHeader('Apariencia'),
-        _buildThemeSelector(context, settings),
+        const SizedBox(height: 12),
+
+        // Selector de modo de tema (Claro/Oscuro/Sistema)
+        _buildThemeModeSelector(context, settings),
+        const SizedBox(height: 16),
+
+        // Selector de tema (Colores)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.color_lens_outlined,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'Tema de Color',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const ThemeSelectorWidget(),
+                ],
+              ),
+            ),
+          ),
+        ),
+
         const Divider(height: 32),
 
         // Sección: General
@@ -123,7 +175,6 @@ class SettingsPage extends StatelessWidget {
           title: 'Reportar un problema',
           subtitle: 'Ayúdanos a mejorar la app',
           onTap: () {
-            // TODO: Implementar reporte de problemas
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Función en desarrollo')),
             );
@@ -165,53 +216,69 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context, AppSettings settings) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+  Widget _buildThemeModeSelector(BuildContext context, AppSettings settings) {
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        if (themeState is! ThemeLoaded) {
+          return const SizedBox.shrink();
+        }
+
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.palette_outlined,
-                  color: Theme.of(context).primaryColor,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.brightness_6_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Modo de Tema',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Tema',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                const SizedBox(height: 16),
+                Row(
+                  children: AppThemeMode.values.map((mode) {
+                    final isSelected = themeState.themeMode == mode;
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: _buildThemeModeOption(
+                          context: context,
+                          mode: mode,
+                          isSelected: isSelected,
+                          onTap: () {
+                            context.read<ThemeBloc>().add(
+                              ChangeThemeMode(mode),
+                            );
+                            context.read<SettingsBloc>().add(
+                              UpdateThemeMode(mode),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: AppThemeMode.values.map((mode) {
-                final isSelected = settings.themeMode == mode;
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: _buildThemeOption(
-                      context: context,
-                      mode: mode,
-                      isSelected: isSelected,
-                      onTap: () {
-                        context.read<SettingsBloc>().add(UpdateThemeMode(mode));
-                      },
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildThemeOption({
+  Widget _buildThemeModeOption({
     required BuildContext context,
     required AppThemeMode mode,
     required bool isSelected,
@@ -317,6 +384,7 @@ class SettingsPage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               context.read<SettingsBloc>().add(ResetSettings());
+              context.read<ThemeBloc>().add(LoadTheme());
               Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
