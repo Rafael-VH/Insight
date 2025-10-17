@@ -22,15 +22,32 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<void> saveStatsCollection(StatsCollection collection) async {
     try {
-      // CORRECCIÓN: Obtener todas las colecciones existentes
-      final collections = await getAllStatsCollections();
+      // MEJORADO: Obtener colecciones existentes primero
+      List<StatsCollection> collections = [];
+      try {
+        collections = await getAllStatsCollections();
+      } catch (e) {
+        // Si hay error al obtener, comenzar con lista vacía
+        print('Advertencia: Error al obtener colecciones previas: $e');
+        collections = [];
+      }
 
-      // CORRECCIÓN: Agregar la nueva colección
-      collections.add(collection);
+      // VALIDACIÓN: Evitar colecciones duplicadas
+      // Buscar si ya existe una colección con la misma fecha (misma sesión)
+      final duplicateIndex = collections.indexWhere(
+        (c) => c.createdAt.difference(collection.createdAt).inMinutes < 1,
+      );
 
-      // CORRECCIÓN: Convertir a modelos y luego a JSON
+      if (duplicateIndex != -1) {
+        // Reemplazar la existente en lugar de agregar duplicada
+        collections[duplicateIndex] = collection;
+      } else {
+        // Agregar la nueva colección
+        collections.add(collection);
+      }
+
+      // CONVERSIÓN: A modelo y JSON
       final jsonList = collections.map((c) {
-        // Convertir StatsCollection a StatsCollectionModel
         final model = StatsCollectionModel(
           totalStats: c.totalStats,
           rankedStats: c.rankedStats,
@@ -42,6 +59,8 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       }).toList();
 
       final jsonString = json.encode(jsonList);
+
+      // GUARDADO: Con validación
       final success = await sharedPreferences.setString(
         _collectionsKey,
         jsonString,
@@ -63,21 +82,37 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     try {
       final jsonString = sharedPreferences.getString(_collectionsKey);
 
-      if (jsonString == null) {
+      if (jsonString == null || jsonString.isEmpty) {
         return [];
       }
 
-      final jsonList = json.decode(jsonString) as List;
+      // VALIDACIÓN: JSON válido antes de parsear
+      List jsonList;
+      try {
+        jsonList = json.decode(jsonString) as List;
+      } catch (e) {
+        print('Error al decodificar JSON: $e');
+        return [];
+      }
 
-      // Convertir JSON a StatsCollectionModel y luego a StatsCollection
-      return jsonList
-          .map(
-            (jsonMap) =>
-                StatsCollectionModel.fromJson(jsonMap as Map<String, dynamic>)
-                    as StatsCollection,
-          )
-          .toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      // CONVERSIÓN: Con manejo de errores individual
+      final collections = <StatsCollection>[];
+      for (final item in jsonList) {
+        try {
+          final collection =
+              StatsCollectionModel.fromJson(item as Map<String, dynamic>)
+                  as StatsCollection;
+          collections.add(collection);
+        } catch (e) {
+          print('Error al convertir colección: $e');
+          // Continuar con la siguiente en lugar de fallar completamente
+          continue;
+        }
+      }
+
+      // ORDENAMIENTO: Más recientes primero
+      collections.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return collections;
     } catch (e) {
       throw FileSystemFailure('Error loading stats: ${e.toString()}');
     }
@@ -102,12 +137,21 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   Future<void> deleteStatsCollection(DateTime createdAt) async {
     try {
       final collections = await getAllStatsCollections();
+
+      // ✅ BÚSQUEDA: Usando comparación de milisegundos
+      final originalLength = collections.length;
       collections.removeWhere(
         (c) =>
             c.createdAt.millisecondsSinceEpoch ==
             createdAt.millisecondsSinceEpoch,
       );
 
+      // VALIDACIÓN: Verificar que se eliminó algo
+      if (collections.length == originalLength) {
+        throw const FileSystemFailure('Stats collection not found');
+      }
+
+      // GUARDADO: Actualizar storage
       final jsonList = collections.map((c) {
         final model = StatsCollectionModel(
           totalStats: c.totalStats,

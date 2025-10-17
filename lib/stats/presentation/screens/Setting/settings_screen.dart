@@ -120,6 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  // CORREGIDO: ThemeSelectorWidget ahora funciona correctamente
                   const ThemeSelectorWidget(),
                 ],
               ),
@@ -216,65 +217,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // MEJORADO: Selector de modo de tema sin BlocBuilder conflictivo
   Widget _buildThemeModeSelector(BuildContext context, AppSettings settings) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, themeState) {
-        if (themeState is! ThemeLoaded) {
-          return const SizedBox.shrink();
-        }
-
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.brightness_6_outlined,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Modo de Tema',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                Icon(
+                  Icons.brightness_6_outlined,
+                  color: Theme.of(context).primaryColor,
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: AppThemeMode.values.map((mode) {
-                    final isSelected = themeState.themeMode == mode;
-                    return Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _buildThemeModeOption(
-                          context: context,
-                          mode: mode,
-                          isSelected: isSelected,
-                          onTap: () {
-                            context.read<ThemeBloc>().add(
-                              ChangeThemeMode(mode),
-                            );
-                            context.read<SettingsBloc>().add(
-                              UpdateThemeMode(mode),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                const SizedBox(width: 12),
+                const Text(
+                  'Modo de Tema',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 16),
+            Row(
+              children: AppThemeMode.values.map((mode) {
+                final isSelected = settings.themeMode == mode;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: _buildThemeModeOption(
+                      context: context,
+                      mode: mode,
+                      isSelected: isSelected,
+                      onTap: () {
+                        // Actualizar en SettingsBloc
+                        context.read<SettingsBloc>().add(UpdateThemeMode(mode));
+                        // Actualizar en ThemeBloc
+                        context.read<ThemeBloc>().add(ChangeThemeMode(mode));
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

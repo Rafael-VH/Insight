@@ -29,17 +29,20 @@ class OcrProcessingResult {
 class StatsUploadController extends ChangeNotifier {
   final StatsUploadType uploadType;
 
+  // MEJORADO: Inicialización lazy para evitar problemas de memoria
+  late final Map<GameMode, String?> _uploadedImages;
+  late final Map<GameMode, PlayerStats?> _parsedStats;
+  late final Map<GameMode, ValidationResult?> _validationResults;
+  late final Map<GameMode, bool> _isProcessing;
+  late final Map<GameMode, List<String>> _extractionLogs;
+  GameMode? _currentProcessingMode;
+
+  // NUEVO: Control de dispose
+  bool _isDisposed = false;
+
   StatsUploadController({required this.uploadType}) {
     _initializeState();
   }
-
-  // Estado
-  final Map<GameMode, String?> _uploadedImages = {};
-  final Map<GameMode, PlayerStats?> _parsedStats = {};
-  final Map<GameMode, ValidationResult?> _validationResults = {};
-  final Map<GameMode, bool> _isProcessing = {};
-  final Map<GameMode, List<String>> _extractionLogs = {};
-  GameMode? _currentProcessingMode;
 
   // Getters
   Map<GameMode, String?> get uploadedImages =>
@@ -68,10 +71,17 @@ class StatsUploadController extends ChangeNotifier {
 
   /// Obtiene el log de extracción para un modo específico
   List<String> getExtractionLog(GameMode mode) {
-    return _extractionLogs[mode] ?? [];
+    return List.unmodifiable(_extractionLogs[mode] ?? []);
   }
 
+  /// MEJORADO: Inicialización de estado
   void _initializeState() {
+    _uploadedImages = {};
+    _parsedStats = {};
+    _validationResults = {};
+    _isProcessing = {};
+    _extractionLogs = {};
+
     for (final mode in availableModes) {
       _isProcessing[mode] = false;
       _uploadedImages[mode] = null;
@@ -81,17 +91,24 @@ class StatsUploadController extends ChangeNotifier {
     }
   }
 
+  /// MEJORADO: Iniciar procesamiento con validación
   void startProcessing(GameMode mode) {
+    _assertNotDisposed();
+    if (!availableModes.contains(mode)) {
+      throw ArgumentError('Mode $mode not available for this upload type');
+    }
     _currentProcessingMode = mode;
     _isProcessing[mode] = true;
     notifyListeners();
   }
 
-  /// Procesa el resultado de OCR con diagnóstico completo
+  /// MEJORADO: Procesa el resultado de OCR con diagnóstico completo
   OcrProcessingResult handleOcrSuccessWithDiagnostics(
     String text,
     String? imagePath,
   ) {
+    _assertNotDisposed();
+
     final mode = _currentProcessingMode;
     if (mode == null) {
       return const OcrProcessingResult(
@@ -102,34 +119,48 @@ class StatsUploadController extends ChangeNotifier {
       );
     }
 
-    // Limpiar logs anteriores
-    StatsParser.clearLog();
+    try {
+      // Limpiar logs anteriores
+      StatsParser.clearLog();
 
-    // Usar el parser mejorado con diagnóstico
-    final parseResult = StatsParser.parseStatsWithDiagnostics(text, mode);
+      // Usar el parser mejorado con diagnóstico
+      final parseResult = StatsParser.parseStatsWithDiagnostics(text, mode);
 
-    // Validar las estadísticas si se pudieron extraer
-    ValidationResult? validation;
-    if (parseResult.stats != null) {
-      validation = StatsValidator.validate(parseResult.stats!);
+      // Validar las estadísticas si se pudieron extraer
+      ValidationResult? validation;
+      if (parseResult.stats != null) {
+        validation = StatsValidator.validate(parseResult.stats!);
+      }
+
+      // MEJORADO: Guardar los resultados de forma segura
+      _uploadedImages[mode] = imagePath;
+      _parsedStats[mode] = parseResult.stats;
+      _validationResults[mode] = validation;
+      _extractionLogs[mode] = List.from(parseResult.extractionLog);
+      _isProcessing[mode] = false;
+      _currentProcessingMode = null;
+
+      notifyListeners();
+
+      return OcrProcessingResult(
+        stats: parseResult.stats,
+        validation: validation,
+        imagePath: imagePath,
+        extractionLog: parseResult.extractionLog,
+      );
+    } catch (e) {
+      print('Error en handleOcrSuccessWithDiagnostics: $e');
+      _isProcessing[mode] = false;
+      _currentProcessingMode = null;
+      notifyListeners();
+
+      return OcrProcessingResult(
+        stats: null,
+        validation: null,
+        imagePath: null,
+        extractionLog: ['ERROR: ${e.toString()}'],
+      );
     }
-
-    // Guardar los resultados
-    _uploadedImages[mode] = imagePath;
-    _parsedStats[mode] = parseResult.stats;
-    _validationResults[mode] = validation;
-    _extractionLogs[mode] = parseResult.extractionLog;
-    _isProcessing[mode] = false;
-    _currentProcessingMode = null;
-
-    notifyListeners();
-
-    return OcrProcessingResult(
-      stats: parseResult.stats,
-      validation: validation,
-      imagePath: imagePath,
-      extractionLog: parseResult.extractionLog,
-    );
   }
 
   /// Método legacy para compatibilidad
@@ -137,7 +168,10 @@ class StatsUploadController extends ChangeNotifier {
     handleOcrSuccessWithDiagnostics(text, imagePath);
   }
 
+  /// MEJORADO: Manejo de errores de OCR
   void handleOcrError() {
+    _assertNotDisposed();
+
     final mode = _currentProcessingMode;
     if (mode == null) return;
 
@@ -147,7 +181,10 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// MEJORADO: Remover estadísticas con limpieza completa
   void removeStats(GameMode mode) {
+    _assertNotDisposed();
+
     _uploadedImages[mode] = null;
     _parsedStats[mode] = null;
     _validationResults[mode] = null;
@@ -161,7 +198,10 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// MEJORADO: Crear colección con validación
   StatsCollection createCollection() {
+    _assertNotDisposed();
+
     return StatsCollection(
       totalStats: _parsedStats[GameMode.total],
       rankedStats: _parsedStats[GameMode.ranked],
@@ -171,6 +211,7 @@ class StatsUploadController extends ChangeNotifier {
     );
   }
 
+  /// Obtener mensaje de éxito personalizado
   String getSuccessMessage(GameMode mode) {
     final validation = _validationResults[mode];
     if (validation == null) {
@@ -218,8 +259,28 @@ class StatsUploadController extends ChangeNotifier {
     return buffer.toString();
   }
 
+  /// NUEVO: Método para verificar si el controlador ha sido liberado
+  void _assertNotDisposed() {
+    if (_isDisposed) {
+      throw StateError('StatsUploadController has been disposed');
+    }
+  }
+
+  /// MEJORADO: Dispose con limpieza completa de memoria
   @override
   void dispose() {
+    _assertNotDisposed();
+
+    // Limpiar todas las referencias
+    _uploadedImages.clear();
+    _parsedStats.clear();
+    _validationResults.clear();
+    _isProcessing.clear();
+    _extractionLogs.clear();
+    _currentProcessingMode = null;
+
+    _isDisposed = true;
+
     super.dispose();
   }
 }
