@@ -23,6 +23,7 @@ import 'package:insight/stats/domain/usecases/pick_image_and_recognize_text.dart
 import 'package:insight/stats/domain/usecases/save_stats_collection.dart';
 // Blocs
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
+import 'package:insight/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
@@ -31,11 +32,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  //! Features - Theme (NUEVO)
   // Bloc
   sl.registerFactory(
     () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
   );
+
+  // Bloc
+  sl.registerFactory(() => NavigationBloc());
 
   // Repository
   sl.registerLazySingleton<ThemeRepository>(

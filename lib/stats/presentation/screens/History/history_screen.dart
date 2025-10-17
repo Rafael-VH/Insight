@@ -5,9 +5,9 @@ import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/stats/presentation/bloc/ml_stats_state.dart';
 import 'package:insight/stats/presentation/pages/Detail/stats_detail_page.dart';
-import 'package:insight/stats/presentation/pages/History/widget/empty_state_widget.dart';
-import 'package:insight/stats/presentation/pages/History/widget/error_state_widget.dart';
-import 'package:insight/stats/presentation/pages/History/widget/stats_collection_card.dart';
+import 'package:insight/stats/presentation/screens/History/widget/empty_state_widget.dart';
+import 'package:insight/stats/presentation/screens/History/widget/error_state_widget.dart';
+import 'package:insight/stats/presentation/screens/History/widget/stats_collection_card.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
 
 class StatsHistoryPage extends StatefulWidget {

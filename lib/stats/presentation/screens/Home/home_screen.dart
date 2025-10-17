@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 //
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
-//
-import 'package:insight/stats/presentation/pages/History/stats_history_page.dart';
 import 'package:insight/stats/presentation/pages/Upload/stats_upload_page.dart';
+//
+import 'package:insight/stats/presentation/screens/History/history_screen.dart';
 //
 import 'package:insight/stats/presentation/screens/Home/widget/info_banner.dart';
 import 'package:insight/stats/presentation/screens/Home/widget/stats_upload_button.dart';
@@ -38,13 +38,7 @@ class HomeScreen extends StatelessWidget {
             hasScrollBody: false,
             child: Container(
               padding: const EdgeInsets.all(24.0),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFF9FAFB), Colors.white],
-                ),
-              ),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

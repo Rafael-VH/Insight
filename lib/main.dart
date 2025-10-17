@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+//
 import 'package:insight/core/injection/injection_container.dart' as di;
+//
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
+import 'package:insight/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
+//
 import 'package:insight/stats/presentation/config/theme_config.dart';
-import 'package:insight/stats/presentation/screens/Home/home_screen.dart';
+import 'package:insight/stats/presentation/screens/Main/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,11 +26,18 @@ class MyApp extends StatelessWidget {
       providers: [
         // Bloc de estadísticas
         BlocProvider<MLStatsBloc>(create: (context) => di.sl<MLStatsBloc>()),
+
         // Bloc de OCR
         BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
+
         // Bloc de temas
         BlocProvider<ThemeBloc>(
           create: (context) => di.sl<ThemeBloc>()..add(LoadTheme()),
+        ),
+
+        // Bloc de navegación (NUEVO)
+        BlocProvider<NavigationBloc>(
+          create: (context) => di.sl<NavigationBloc>(),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
@@ -49,7 +60,7 @@ class MyApp extends StatelessWidget {
               theme: ThemeData.light(useMaterial3: true),
               darkTheme: ThemeData.dark(useMaterial3: true),
               themeMode: ThemeMode.system,
-              home: const HomeScreen(),
+              home: const MainScreen(),
             );
           }
 
@@ -67,7 +78,7 @@ class MyApp extends StatelessWidget {
               darkTheme: ThemeConfig.buildDarkTheme(appTheme),
               themeMode: themeMode,
 
-              home: const HomeScreen(),
+              home: const MainScreen(),
             );
           }
 
@@ -76,7 +87,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'ML Stats OCR',
             theme: ThemeData.light(useMaterial3: true),
-            home: const HomeScreen(),
+            home: const MainScreen(),
           );
         },
       ),

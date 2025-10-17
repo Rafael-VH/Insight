@@ -6,14 +6,14 @@ import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/stats/presentation/widgets/theme_selector_widget.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();

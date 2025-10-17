@@ -38,6 +38,7 @@ dependencies:
 
   # Permissions (if needed for camera)
   permission_handler: ^12.0.1
+  salomon_bottom_bar: ^3.3.2
 
 dev_dependencies:
   flutter_test:
