@@ -41,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
         title: 'Historial',
         icon: Icons.history_rounded,
         color: const Color(0xFF059669),
-        page: const StatsHistoryPage(),
+        page: const HistoryScreen(),
       ),
       NavigationItem(
         title: 'Configuración',

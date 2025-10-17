@@ -123,7 +123,7 @@ class HomeScreen extends StatelessWidget {
   void _navigateToHistory(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const StatsHistoryPage()),
+      MaterialPageRoute(builder: (context) => const HistoryScreen()),
     );
   }
 }

@@ -6,4 +6,19 @@ enum GameMode {
 
   const GameMode(this.displayName);
   final String displayName;
+
+  String get shortName {
+    switch (this) {
+      case GameMode.total:
+        return 'Total';
+      case GameMode.ranked:
+        return 'Ranked';
+      case GameMode.classic:
+        return 'Classic';
+      case GameMode.brawl:
+        return 'Coliseo';
+      default:
+        return name;
+    }
+  }
 }
