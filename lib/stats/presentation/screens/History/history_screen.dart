@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
@@ -22,6 +24,25 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  static const int _pageSize = 10;
+  List<StatsCollection> _allCollections = [];
+  List<StatsCollection> _displayedCollections = [];
+  int _currentPage = 0;
+
+  void _loadMoreCollections() {
+    final startIndex = _currentPage * _pageSize;
+    final endIndex = min(startIndex + _pageSize, _allCollections.length);
+
+    if (startIndex < _allCollections.length) {
+      setState(() {
+        _displayedCollections.addAll(
+          _allCollections.sublist(startIndex, endIndex),
+        );
+        _currentPage++;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -34,22 +55,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          AppSliverBar(
-            title: 'Historial de Estadísticas',
-            colors: const [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: _loadCollections,
-                tooltip: 'Actualizar',
-              ),
-            ],
-          ),
-          _buildContent(),
-        ],
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollInfo) {
+        if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          _loadMoreCollections();
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            AppSliverBar(
+              title: 'Historial de Estadísticas',
+              colors: const [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _loadCollections,
+                  tooltip: 'Actualizar',
+                ),
+              ],
+            ),
+            _buildContent(),
+          ],
+        ),
       ),
     );
   }

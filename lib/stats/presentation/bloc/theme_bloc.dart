@@ -116,7 +116,31 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     on<DeleteCustomTheme>(_onDeleteCustomTheme);
   }
 
+  // Caché en memoria
+  AppTheme? _cachedTheme;
+  List<AppTheme>? _cachedAvailableThemes;
+
   Future<void> _onLoadTheme(LoadTheme event, Emitter<ThemeState> emit) async {
+    // Usar caché si está disponible
+    if (_cachedTheme != null && _cachedAvailableThemes != null) {
+      final settingsResult = await settingsRepository.getSettings();
+
+      await settingsResult.fold(
+        (failure) async => emit(ThemeError(failure.message)),
+        (settings) async {
+          emit(
+            ThemeLoaded(
+              currentTheme: _cachedTheme!,
+              themeMode: settings.themeMode,
+              availableThemes: _cachedAvailableThemes!,
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    // Cargar desde repositorio si no hay caché
     emit(ThemeLoading());
 
     try {

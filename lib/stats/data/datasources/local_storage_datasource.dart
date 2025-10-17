@@ -86,31 +86,41 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
         return [];
       }
 
-      // VALIDACIÓN: JSON válido antes de parsear
-      List jsonList;
+      dynamic decoded;
       try {
-        jsonList = json.decode(jsonString) as List;
+        decoded = json.decode(jsonString);
       } catch (e) {
-        print('Error al decodificar JSON: $e');
+        print('❌ JSON inválido: $e');
+        // Limpiar datos corruptos
+        await sharedPreferences.remove(_collectionsKey);
         return [];
       }
 
-      // CONVERSIÓN: Con manejo de errores individual
+      // Validar que sea una lista
+      if (decoded is! List) {
+        print(
+          '❌ Formato inválido: esperaba List, recibió ${decoded.runtimeType}',
+        );
+        await sharedPreferences.remove(_collectionsKey);
+        return [];
+      }
+
       final collections = <StatsCollection>[];
-      for (final item in jsonList) {
+      for (final item in decoded) {
+        if (item is! Map<String, dynamic>) {
+          print('⚠️ Item inválido saltado: $item');
+          continue;
+        }
+
         try {
-          final collection =
-              StatsCollectionModel.fromJson(item as Map<String, dynamic>)
-                  as StatsCollection;
+          final collection = StatsCollectionModel.fromJson(item);
           collections.add(collection);
         } catch (e) {
-          print('Error al convertir colección: $e');
-          // Continuar con la siguiente en lugar de fallar completamente
+          print('⚠️ Error al convertir colección: $e');
           continue;
         }
       }
 
-      // ORDENAMIENTO: Más recientes primero
       collections.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return collections;
     } catch (e) {

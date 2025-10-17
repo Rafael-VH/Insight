@@ -176,36 +176,34 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   }
 
   /// Valida y guarda las estadísticas
-  void _saveStats() {
+  Future<void> _saveStats() async {
+    if (_isSaving) {
+      _showWarningSnackBar('Ya se está guardando...');
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
     final collection = _controller.createCollection();
 
-    // Validar que haya al menos una estadística
     if (!collection.hasAnyStats) {
+      setState(() => _isSaving = false);
       SaveStatsDialog.showError(
         context,
         title: 'Sin Estadísticas',
-        message: 'Por favor carga al menos una estadística antes de guardar.',
-        errorDetails:
-            'Debes cargar imágenes y extraer las estadísticas correctamente.',
+        message: 'Carga al menos una estadística.',
       );
       return;
     }
 
-    // Prevenir múltiples guardaciones simultáneas
-    if (_isSaving) {
-      _showWarningSnackBar('Ya se está guardando. Espera a que termine...');
-      return;
-    }
-
-    // Mostrar diálogo de cargando
     SaveStatsDialog.showSaving(context);
 
-    // Emitir evento de guardación después de un pequeño delay para asegurar que el diálogo se muestre
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
-      }
-    });
+    // Esperar que el diálogo se muestre completamente
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    if (mounted) {
+      context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
+    }
   }
 
   /// Construye las tarjetas de carga de imágenes

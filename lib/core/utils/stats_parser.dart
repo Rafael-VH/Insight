@@ -21,6 +21,20 @@ class StatsParser {
   /// Mapa para almacenar las coincidencias encontradas
   static final Map<String, dynamic> _rawMatches = {};
 
+  // Compilar RegExp una sola vez
+  static final _winRatePatterns = [
+    RegExp(r'(\d+\.?\d*)\s*%?\s*Tasa\s*de\s*Victorias', caseSensitive: false),
+    RegExp(
+      r'Tasa\s*de\s*Victorias\s*[:\s]*(\d+\.?\d*)\s*%?',
+      caseSensitive: false,
+    ),
+    RegExp(r'(\d+\.\d+)\s*%.*?[Tt]asa', caseSensitive: false),
+    RegExp(r'(\d+\.?\d+)\s*%\s*[Tt]asa', caseSensitive: false),
+    RegExp(r'(\d+\.\d+)\s*%.*?[Vv]ictorias?', caseSensitive: false),
+    RegExp(r'Win\s*Rate\s*[:\s]*(\d+\.?\d*)\s*%?', caseSensitive: false),
+    RegExp(r'([0-5]?\d\.\d{1,2})\s*%', caseSensitive: false),
+  ];
+
   /// Método principal para parsear stats con un modo específico
   static PlayerStats? parseStats(String text, GameMode mode) {
     if (text.isEmpty) return null;
@@ -235,49 +249,24 @@ class StatsParser {
 
   /// NUEVO: Método especializado para extraer Tasa de Victorias
   static double _extractWinRate(String text) {
-    _log('Intentando extraer Tasa de Victorias con múltiples patrones...');
+    for (int i = 0; i < _winRatePatterns.length; i++) {
+      final matches = _winRatePatterns[i].allMatches(text);
 
-    final patterns = [
-      r'(\d+\.?\d*)\s*%?\s*Tasa\s*de\s*Victorias',
-      r'Tasa\s*de\s*Victorias\s*[:\s]*(\d+\.?\d*)\s*%?',
-      r'(\d+\.\d+)\s*%.*?[Tt]asa',
-      r'(\d+\.?\d+)\s*%\s*[Tt]asa',
-      r'(\d+\.\d+)\s*%.*?[Vv]ictorias?',
-      r'Win\s*Rate\s*[:\s]*(\d+\.?\d*)\s*%?',
-      r'([0-5]?\d\.\d{1,2})\s*%',
-    ];
+      for (var match in matches) {
+        if (match.groupCount > 0) {
+          final valueStr = match.group(1)!.trim();
+          final value = double.tryParse(valueStr);
 
-    for (int i = 0; i < patterns.length; i++) {
-      try {
-        final regex = RegExp(
-          patterns[i],
-          caseSensitive: false,
-          multiLine: true,
-        );
-        final matches = regex.allMatches(text);
-
-        for (var match in matches) {
-          if (match.groupCount > 0) {
-            final valueStr = match.group(1)!.trim();
-            final value = double.parse(valueStr);
-
-            if (value >= 0 && value <= 100) {
-              _log('✓ Tasa de Victorias: $value% (patrón ${i + 1})');
-              _rawMatches['Tasa de Victorias'] = value;
-              return value;
-            } else {
-              _log(
-                '⚠ Valor fuera de rango descartado: $value (patrón ${i + 1})',
-              );
-            }
+          if (value != null && value >= 0 && value <= 100) {
+            _log('✓ Tasa de Victorias: $value% (patrón ${i + 1})');
+            _rawMatches['Tasa de Victorias'] = value;
+            return value;
           }
         }
-      } catch (e) {
-        _log('Patrón ${i + 1} falló: $e');
       }
     }
 
-    _log('✗ Tasa de Victorias: No se encontró con ningún patrón');
+    _log('✗ Tasa de Victorias: No encontrada');
     _rawMatches['Tasa de Victorias'] = 0.0;
     return 0.0;
   }

@@ -272,17 +272,17 @@ class StatsUploadController extends ChangeNotifier {
   /// MEJORADO: Dispose con limpieza completa de memoria
   @override
   void dispose() {
-    _assertNotDisposed();
+    if (_isDisposed) return;
 
-    // Limpiar todas las referencias
+    _isDisposed = true;
+
+    // Limpiar mapas
     _uploadedImages.clear();
     _parsedStats.clear();
     _validationResults.clear();
     _isProcessing.clear();
     _extractionLogs.clear();
     _currentProcessingMode = null;
-
-    _isDisposed = true;
 
     super.dispose();
   }
