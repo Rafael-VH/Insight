@@ -6,6 +6,7 @@ import 'package:insight/core/injection/injection_container.dart' as di;
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
+import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
 //
 import 'package:insight/stats/presentation/config/theme_config.dart';
@@ -24,21 +25,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // Bloc de estadísticas
-        BlocProvider<MLStatsBloc>(create: (context) => di.sl<MLStatsBloc>()),
-
-        // Bloc de OCR
-        BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
-
-        // Bloc de temas
+        // ========== THEME BLOC (DEBE SER PRIMERO) ==========
         BlocProvider<ThemeBloc>(
           create: (context) => di.sl<ThemeBloc>()..add(LoadTheme()),
         ),
 
-        // Bloc de navegación (NUEVO)
+        // ========== SETTINGS BLOC (DEPENDE DE THEME) ==========
+        BlocProvider<SettingsBloc>(
+          create: (context) => di.sl<SettingsBloc>()..add(LoadSettings()),
+        ),
+
+        // ========== NAVIGATION BLOC ==========
         BlocProvider<NavigationBloc>(
           create: (context) => di.sl<NavigationBloc>(),
         ),
+
+        // ========== ML STATS BLOC ==========
+        BlocProvider<MLStatsBloc>(create: (context) => di.sl<MLStatsBloc>()),
+
+        // ========== OCR BLOC ==========
+        BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {

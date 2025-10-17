@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+//
 import 'package:insight/core/utils/stats_validator.dart';
 //
 import 'package:insight/stats/domain/entities/game_mode.dart';
@@ -16,8 +17,8 @@ import 'package:insight/stats/presentation/bloc/ocr_state.dart';
 import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
 //
 import 'package:insight/stats/presentation/pages/Upload/widget/image_upload_card.dart';
-import 'package:insight/stats/presentation/widgets/save_stats_dialog.dart';
 //
+import 'package:insight/stats/presentation/widgets/save_stats_dialog.dart';
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/stats/presentation/widgets/validation_result_dialog.dart';
 
@@ -34,6 +35,9 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   late final StatsUploadController _controller;
   bool _isSaving = false;
 
+  // NUEVO: Variable para rastrear el modo actual en validación
+  GameMode? _currentValidatingMode;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   @override
   void dispose() {
     _controller.dispose();
+    _currentValidatingMode = null;
     super.dispose();
   }
 
@@ -101,6 +106,8 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
       final mode = _controller.currentProcessingMode;
 
       if (result.hasValidStats && result.validation != null) {
+        // MEJORADO: Guardar el modo actual para validación
+        _currentValidatingMode = mode;
         // Mostrar diálogo de validación
         _showValidationDialog(result.validation!, mode);
       } else {
@@ -408,19 +415,30 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
 
   /// Muestra el diálogo de validación
   void _showValidationDialog(ValidationResult validation, GameMode? mode) {
+    // MEJORADO: Guardar el modo si no está guardado
+    if (mode != null) {
+      _currentValidatingMode = mode;
+    }
+
     ValidationResultDialog.show(
       context: context,
       result: validation,
       onRetry: () {
-        if (mode != null) {
-          _retryImageCapture(mode);
+        if (_currentValidatingMode != null) {
+          _retryImageCapture(_currentValidatingMode!);
         }
       },
       onAccept: () {
-        if (validation.isValid) {
-          _showSuccessSnackBar(_controller.getSuccessMessage(mode!));
-        } else {
-          _showWarningSnackBar('Estadísticas guardadas con datos incompletos');
+        if (_currentValidatingMode != null) {
+          if (validation.isValid) {
+            _showSuccessSnackBar(
+              _controller.getSuccessMessage(_currentValidatingMode!),
+            );
+          } else {
+            _showWarningSnackBar(
+              'Estadísticas guardadas con datos incompletos',
+            );
+          }
         }
       },
     );
@@ -429,6 +447,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   /// Reintentar captura de imagen
   void _retryImageCapture(GameMode mode) {
     _controller.removeStats(mode);
+    _currentValidatingMode = null;
     _showSuccessSnackBar('Por favor, vuelve a capturar la imagen');
   }
 

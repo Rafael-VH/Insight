@@ -32,40 +32,82 @@ import 'package:shared_preferences/shared_preferences.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Bloc
-  sl.registerFactory(
-    () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
-  );
+  // ==================== SHARED PREFERENCES ====================
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
 
-  // Bloc
-  sl.registerFactory(() => NavigationBloc());
+  // ==================== THEME SETUP ====================
+  // Data source
+  sl.registerLazySingleton<ThemeDataSource>(
+    () => ThemeDataSourceImpl(sharedPreferences: sl()),
+  );
 
   // Repository
   sl.registerLazySingleton<ThemeRepository>(
     () => ThemeRepositoryImpl(dataSource: sl()),
   );
 
+  // ==================== SETTINGS SETUP ====================
   // Data source
-  sl.registerLazySingleton<ThemeDataSource>(
-    () => ThemeDataSourceImpl(sharedPreferences: sl()),
+  sl.registerLazySingleton<SettingsDataSource>(
+    () => SettingsDataSourceImpl(sharedPreferences: sl()),
   );
-
-  //! Features - Settings (ACTUALIZADO)
-  // Bloc
-  sl.registerFactory(() => SettingsBloc(repository: sl()));
 
   // Repository
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(dataSource: sl()),
   );
 
-  // Data source
-  sl.registerLazySingleton<SettingsDataSource>(
-    () => SettingsDataSourceImpl(sharedPreferences: sl()),
+  // ==================== ML STATS SETUP ====================
+  // Data sources
+  sl.registerLazySingleton<LocalStorageDataSource>(
+    () => LocalStorageDataSourceImpl(sharedPreferences: sl()),
   );
 
-  //! Features - ML Stats
-  // Bloc
+  // Repository
+  sl.registerLazySingleton<StatsRepository>(
+    () => StatsRepositoryImpl(localDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => SaveStatsCollection(sl()));
+  sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
+  sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
+
+  // ==================== OCR SETUP ====================
+  // Data sources
+  sl.registerLazySingleton<OcrDataSource>(
+    () => OcrDataSourceImpl(imagePicker: sl(), textRecognizer: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<OcrRepository>(
+    () => OcrRepositoryImpl(dataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => PickImageAndRecognizeText(sl()));
+  sl.registerLazySingleton(() => CopyTextToClipboard(sl()));
+
+  // ==================== EXTERNAL DEPENDENCIES ====================
+  sl.registerLazySingleton(() => ImagePicker());
+  sl.registerLazySingleton(
+    () => TextRecognizer(script: TextRecognitionScript.latin),
+  );
+
+  // ==================== BLOCS (FACTORY - SE CREAN NUEVOS CADA VEZ) ====================
+  // MEJORADO: Registrar SettingsBloc como Factory
+  sl.registerFactory(() => SettingsBloc(repository: sl()));
+
+  // ThemeBloc - CRÍTICO PARA SETTINGS
+  sl.registerFactory(
+    () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
+  );
+
+  // Navigation Bloc
+  sl.registerFactory(() => NavigationBloc());
+
+  // ML Stats Bloc
   sl.registerFactory(
     () => MLStatsBloc(
       saveStatsCollection: sl(),
@@ -74,48 +116,8 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
-  sl.registerLazySingleton(() => SaveStatsCollection(sl()));
-  sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
-  sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
-
-  // Repository
-  sl.registerLazySingleton<StatsRepository>(
-    () => StatsRepositoryImpl(localDataSource: sl()),
-  );
-
-  // Data sources
-  sl.registerLazySingleton<LocalStorageDataSource>(
-    () => LocalStorageDataSourceImpl(sharedPreferences: sl()),
-  );
-
-  //! Features - OCR
-  // Bloc
+  // OCR Bloc
   sl.registerFactory(
     () => OcrBloc(pickImageAndRecognizeText: sl(), copyTextToClipboard: sl()),
   );
-
-  // Use cases
-  sl.registerLazySingleton(() => PickImageAndRecognizeText(sl()));
-  sl.registerLazySingleton(() => CopyTextToClipboard(sl()));
-
-  // Repository
-  sl.registerLazySingleton<OcrRepository>(
-    () => OcrRepositoryImpl(dataSource: sl()),
-  );
-
-  // Data sources
-  sl.registerLazySingleton<OcrDataSource>(
-    () => OcrDataSourceImpl(imagePicker: sl(), textRecognizer: sl()),
-  );
-
-  //! External
-  sl.registerLazySingleton(() => ImagePicker());
-  sl.registerLazySingleton(
-    () => TextRecognizer(script: TextRecognitionScript.latin),
-  );
-
-  // SharedPreferences
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+//
 import 'package:insight/core/utils/stats_parser.dart';
 import 'package:insight/core/utils/stats_validator.dart';
+//
 import 'package:insight/stats/domain/entities/game_mode.dart';
 import 'package:insight/stats/domain/entities/player_stats.dart';
 import 'package:insight/stats/domain/entities/stats_collection.dart';
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
+//
 import 'package:insight/stats/presentation/utils/game_mode_extensions.dart';
 
 /// Resultado del procesamiento de OCR con validación

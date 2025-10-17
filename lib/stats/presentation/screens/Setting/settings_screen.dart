@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+//
 import 'package:insight/stats/domain/entities/app_settings.dart';
+//
 import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
+//
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/stats/presentation/widgets/theme_selector_widget.dart';
 
@@ -17,8 +20,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargar configuración al iniciar
-    context.read<SettingsBloc>().add(LoadSettings());
+    // MEJORADO: Cargar configuración al iniciar
+    _loadSettings();
+  }
+
+  void _loadSettings() {
+    if (mounted) {
+      context.read<SettingsBloc>().add(LoadSettings());
+    }
   }
 
   @override
@@ -31,15 +40,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             colors: const [Color(0xFF7C3AED), Color(0xFF9333EA)],
             icon: Icons.settings,
           ),
+          // MEJORADO: Solo un BlocBuilder para SettingsBloc
           BlocBuilder<SettingsBloc, SettingsState>(
-            builder: (context, state) {
-              if (state is SettingsLoading) {
+            builder: (context, settingsState) {
+              if (settingsState is SettingsLoading) {
                 return const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              if (state is SettingsError) {
+              if (settingsState is SettingsError) {
                 return SliverFillRemaining(
                   child: Center(
                     child: Column(
@@ -60,15 +70,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(state.message),
+                        Text(settingsState.message),
                       ],
                     ),
                   ),
                 );
               }
 
-              if (state is SettingsLoaded) {
-                return _buildSettingsList(context, state.settings);
+              if (settingsState is SettingsLoaded) {
+                return _buildSettingsList(context, settingsState.settings);
               }
 
               return const SliverFillRemaining(
@@ -120,7 +130,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // CORREGIDO: ThemeSelectorWidget ahora funciona correctamente
+                  // MEJORADO: ThemeSelectorWidget se actualiza correctamente
                   const ThemeSelectorWidget(),
                 ],
               ),
@@ -217,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // MEJORADO: Selector de modo de tema sin BlocBuilder conflictivo
+  // MEJORADO: Selector de modo de tema sin conflictos
   Widget _buildThemeModeSelector(BuildContext context, AppSettings settings) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -251,10 +261,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mode: mode,
                       isSelected: isSelected,
                       onTap: () {
-                        // Actualizar en SettingsBloc
-                        context.read<SettingsBloc>().add(UpdateThemeMode(mode));
-                        // Actualizar en ThemeBloc
-                        context.read<ThemeBloc>().add(ChangeThemeMode(mode));
+                        // MEJORADO: Actualizar ambos blocs de forma sincronizada
+                        _updateThemeMode(context, mode);
                       },
                     ),
                   ),
@@ -265,6 +273,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  // NUEVO: Método para actualizar el modo de tema
+  void _updateThemeMode(BuildContext context, AppThemeMode mode) {
+    if (mounted) {
+      // Primero actualizar SettingsBloc
+      context.read<SettingsBloc>().add(UpdateThemeMode(mode));
+
+      // Luego actualizar ThemeBloc
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          context.read<ThemeBloc>().add(ChangeThemeMode(mode));
+        }
+      });
+    }
   }
 
   Widget _buildThemeModeOption({
@@ -372,8 +395,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
+              // MEJORADO: Resetear ambos blocs correctamente
               context.read<SettingsBloc>().add(ResetSettings());
-              context.read<ThemeBloc>().add(LoadTheme());
+
+              // Pequeño delay para asegurar que SettingsBloc se actualiza primero
+              Future.delayed(const Duration(milliseconds: 100), () {
+                if (mounted) {
+                  context.read<ThemeBloc>().add(LoadTheme());
+                }
+              });
+
               Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
