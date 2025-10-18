@@ -13,11 +13,12 @@ import 'package:insight/stats/presentation/bloc/ml_stats_state.dart';
 import 'package:insight/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/stats/presentation/bloc/ocr_event.dart';
 import 'package:insight/stats/presentation/bloc/ocr_state.dart';
+import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
 //
 import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
+import 'package:insight/stats/presentation/services/dialog_service.dart';
 //
 import 'package:insight/stats/presentation/widgets/image_upload_card.dart';
-import 'package:insight/stats/presentation/widgets/save_stats_dialog.dart';
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/stats/presentation/widgets/validation_result_dialog.dart';
 
@@ -93,8 +94,14 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
-  /// Maneja los eventos de OCR (captura de imágenes)
+  /// Maneja OCR Success con el servicio de diálogos
   void _handleOcrState(BuildContext context, OcrState state) {
+    // Obtener configuración de diálogos
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
     if (state is OcrSuccess) {
       // Procesar con diagnóstico completo
       final result = _controller.handleOcrSuccessWithDiagnostics(
@@ -105,27 +112,51 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
       final mode = _controller.currentProcessingMode;
 
       if (result.hasValidStats && result.validation != null) {
-        // MEJORADO: Guardar el modo actual para validación
         _currentValidatingMode = mode;
         // Mostrar diálogo de validación
         _showValidationDialog(result.validation!, mode);
       } else {
-        _showErrorSnackBar(
-          'No se pudieron extraer las estadísticas. Por favor, verifica la imagen.',
+        // Usar DialogService para mostrar error
+        DialogService.showError(
+          context,
+          title: 'Error en Extracción',
+          message:
+              'No se pudieron extraer las estadísticas. Por favor, verifica la imagen.',
+          useAwesome: useAwesome,
         );
         _showExtractionLogDialog(result.extractionLog);
       }
     } else if (state is OcrError) {
       _controller.handleOcrError();
-      _showErrorSnackBar('Error: ${state.message}');
+
+      // Usar DialogService para mostrar error
+      DialogService.showError(
+        context,
+        title: 'Error OCR',
+        message: 'Error: ${state.message}',
+        useAwesome: useAwesome,
+      );
     }
   }
 
   /// Maneja los eventos de guardación de estadísticas
   void _handleMlStatsState(BuildContext context, MLStatsState state) {
+    // Obtener configuración de diálogos
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
     if (state is MLStatsSaving) {
       print('💾 Estado: Guardando...');
       setState(() => _isSaving = true);
+
+      // Mostrar diálogo de cargando usando el servicio
+      DialogService.showLoading(
+        context,
+        message: 'Guardando estadísticas...',
+        useAwesome: useAwesome,
+      );
     } else if (state is MLStatsSaved) {
       print('✅ Estado: Guardado exitoso');
       setState(() => _isSaving = false);
@@ -139,10 +170,11 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         }
       }
 
-      // Mostrar diálogo de éxito
-      SaveStatsDialog.showSuccess(
+      // Mostrar diálogo de éxito usando el servicio
+      DialogService.showSuccess(
         context,
         message: state.message,
+        useAwesome: useAwesome,
         onClose: () {
           if (mounted) {
             print('🏠 Volviendo a pantalla principal...');
@@ -156,7 +188,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
             // Esperar un momento y volver
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                // Volver a la pantalla principal (cerrar todas las pantallas de upload)
+                // Volver a la pantalla principal
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             });
@@ -176,12 +208,13 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         }
       }
 
-      // Mostrar diálogo de error
-      SaveStatsDialog.showError(
+      // Mostrar diálogo de error usando el servicio
+      DialogService.showError(
         context,
         title: 'Error al Guardar',
         message: state.message,
         errorDetails: state.errorDetails,
+        useAwesome: useAwesome,
         onRetry: _isSaving ? null : _saveStats,
       );
     }
@@ -200,15 +233,34 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
 
     if (!collection.hasAnyStats) {
       setState(() => _isSaving = false);
-      SaveStatsDialog.showError(
+
+      // Obtener configuración de diálogos
+      final settingsState = context.read<SettingsBloc>().state;
+      final useAwesome = settingsState is SettingsLoaded
+          ? settingsState.settings.useAwesomeSnackbar
+          : true;
+
+      DialogService.showError(
         context,
         title: 'Sin Estadísticas',
         message: 'Carga al menos una estadística.',
+        useAwesome: useAwesome,
       );
       return;
     }
 
-    SaveStatsDialog.showSaving(context);
+    // Obtener configuración de diálogos
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
+    // Mostrar diálogo de cargando
+    DialogService.showLoading(
+      context,
+      message: 'Guardando estadísticas...',
+      useAwesome: useAwesome,
+    );
 
     // Esperar que el diálogo se muestre completamente
     await Future.delayed(const Duration(milliseconds: 100));
@@ -423,9 +475,13 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     context.read<OcrBloc>().add(ProcessImageEvent(source));
   }
 
-  /// Muestra el diálogo de validación
+  /// Método mejorado para mostrar diálogo de validación
   void _showValidationDialog(ValidationResult validation, GameMode? mode) {
-    // MEJORADO: Guardar el modo si no está guardado
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
     if (mode != null) {
       _currentValidatingMode = mode;
     }
@@ -433,6 +489,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     ValidationResultDialog.show(
       context: context,
       result: validation,
+      useAwesome: useAwesome,
       onRetry: () {
         if (_currentValidatingMode != null) {
           _retryImageCapture(_currentValidatingMode!);
@@ -539,39 +596,75 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
     );
   }
 
-  /// Muestra SnackBar de éxito
+  /// Muestra notificaciones con SnackBar mejorados
   void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
+    if (useAwesome) {
+      DialogService.showSuccess(context, message: message, useAwesome: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   /// Muestra SnackBar de advertencia
   void _showWarningSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
+    if (useAwesome) {
+      DialogService.showWarning(
+        context,
+        message: message,
+        title: '⚠️ Advertencia',
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   /// Muestra SnackBar de error
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    final settingsState = context.read<SettingsBloc>().state;
+    final useAwesome = settingsState is SettingsLoaded
+        ? settingsState.settings.useAwesomeSnackbar
+        : true;
+
+    if (useAwesome) {
+      DialogService.showError(
+        context,
+        title: 'Error',
+        message: message,
+        useAwesome: true,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }

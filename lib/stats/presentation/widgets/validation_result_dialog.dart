@@ -9,14 +9,25 @@ class ValidationResultDialog extends StatelessWidget {
     required this.result,
     required this.onRetry,
     required this.onAccept,
+    this.useAwesome = true, // NUEVO
   });
 
   final ValidationResult result;
   final VoidCallback onRetry;
   final VoidCallback onAccept;
+  final bool useAwesome; // NUEVO
 
   @override
   Widget build(BuildContext context) {
+    if (useAwesome) {
+      return _buildAwesomeDialog(context);
+    } else {
+      return _buildClassicDialog(context);
+    }
+  }
+
+  /// Construcción del diálogo clásico original
+  Widget _buildClassicDialog(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -49,11 +60,131 @@ class ValidationResultDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            _buildActions(context),
+            _buildClassicActions(context),
           ],
         ),
       ),
     );
+  }
+
+  /// NUEVO: Construcción del diálogo con Awesome Snackbar
+  Widget _buildAwesomeDialog(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 380, maxHeight: 550),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header mejorado
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    _getHeaderColor().withOpacity(0.1),
+                    _getHeaderColor().withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(_getHeaderIcon(), size: 56, color: _getHeaderColor()),
+                  const SizedBox(height: 12),
+                  Text(
+                    _getHeaderTitle(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: _getHeaderColor(),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // Contenido
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildCompletionIndicator(),
+                    const SizedBox(height: 16),
+                    if (result.missingFields.isNotEmpty) ...[
+                      _buildAwesomeMissingFields(),
+                      const SizedBox(height: 12),
+                    ],
+                    if (result.warningFields.isNotEmpty) ...[
+                      _buildAwesomeWarnings(),
+                      const SizedBox(height: 12),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+
+            // Botones mejorados
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: _buildAwesomeActions(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Obtiene el color del header según el estado
+  Color _getHeaderColor() {
+    if (result.isValid && result.warningFields.isEmpty) {
+      return Colors.green;
+    } else if (result.isValid) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
+  }
+
+  /// Obtiene el icono del header
+  IconData _getHeaderIcon() {
+    if (result.isValid && result.warningFields.isEmpty) {
+      return Icons.check_circle_outline;
+    } else if (result.isValid) {
+      return Icons.warning_amber_rounded;
+    } else {
+      return Icons.error_outline;
+    }
+  }
+
+  /// Obtiene el título del header
+  String _getHeaderTitle() {
+    if (result.isValid && result.warningFields.isEmpty) {
+      return 'Extracción Exitosa';
+    } else if (result.isValid) {
+      return 'Extracción con Advertencias';
+    } else {
+      return 'Extracción Incompleta';
+    }
   }
 
   Widget _buildHeader() {
@@ -146,6 +277,146 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
+  /// NUEVO: Sección de campos faltantes con estilo Awesome
+  Widget _buildAwesomeMissingFields() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.close, color: Colors.red[700], size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Datos Faltantes (${result.missingFields.length})',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red[900],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...result.missingFields
+              .take(4)
+              .map(
+                (field) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.fiber_manual_record,
+                        size: 6,
+                        color: Colors.red[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          field,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.red[900],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          if (result.missingFields.length > 4)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '... y ${result.missingFields.length - 4} más',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.red[700],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// NUEVO: Sección de advertencias con estilo Awesome
+  Widget _buildAwesomeWarnings() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orange[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.orange[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.orange[700], size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Campos en 0 (${result.warningFields.length})',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange[900],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...result.warningFields
+              .take(3)
+              .map(
+                (field) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.fiber_manual_record,
+                        size: 6,
+                        color: Colors.orange[700],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          field,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.orange[900],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          if (result.warningFields.length > 3)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '... y ${result.warningFields.length - 3} más',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.orange[700],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMissingFieldsSection() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -195,7 +466,6 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildWarningsSection() {
-    // Mostrar solo los primeros 6 warnings
     final displayWarnings = result.warningFields.take(6).toList();
     final hasMore = result.warningFields.length > 6;
 
@@ -329,7 +599,7 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(BuildContext context) {
+  Widget _buildClassicActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -372,12 +642,59 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
+  /// NUEVO: Acciones con estilo Awesome
+  Widget _buildAwesomeActions(BuildContext context) {
+    return Row(
+      children: [
+        if (!result.isValid) ...[
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onRetry();
+              },
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Reintentar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: result.isValid
+              ? ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onAccept();
+                  },
+                  icon: const Icon(Icons.check, size: 18),
+                  label: const Text('Aceptar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                )
+              : TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancelar'),
+                ),
+        ),
+      ],
+    );
+  }
+
   /// Método estático para mostrar el diálogo
   static Future<void> show({
     required BuildContext context,
     required ValidationResult result,
     required VoidCallback onRetry,
     required VoidCallback onAccept,
+    bool useAwesome = true, // NUEVO
   }) {
     return showDialog(
       context: context,
@@ -386,6 +703,7 @@ class ValidationResultDialog extends StatelessWidget {
         result: result,
         onRetry: onRetry,
         onAccept: onAccept,
+        useAwesome: useAwesome,
       ),
     );
   }

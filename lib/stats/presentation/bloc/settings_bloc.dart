@@ -5,7 +5,7 @@ import 'package:insight/stats/data/repositories/settings_repository.dart';
 //
 import 'package:insight/stats/domain/entities/app_settings.dart';
 
-// Events
+// ========== EVENTS ==========
 abstract class SettingsEvent extends Equatable {
   const SettingsEvent();
 
@@ -60,9 +60,19 @@ class UpdateAutoSave extends SettingsEvent {
   List<Object> get props => [enabled];
 }
 
+// NUEVO: Evento para cambiar estilo de diálogos
+class UpdateAwesomeSnackbar extends SettingsEvent {
+  final bool enabled;
+
+  const UpdateAwesomeSnackbar(this.enabled);
+
+  @override
+  List<Object> get props => [enabled];
+}
+
 class ResetSettings extends SettingsEvent {}
 
-// States
+// ========== STATES ==========
 abstract class SettingsState extends Equatable {
   const SettingsState();
 
@@ -92,7 +102,7 @@ class SettingsError extends SettingsState {
   List<Object> get props => [message];
 }
 
-// BLoC
+// ========== BLOC ==========
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsRepository repository;
   AppSettings _currentSettings = const AppSettings();
@@ -104,6 +114,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateNotifications>(_onUpdateNotifications);
     on<UpdateHapticFeedback>(_onUpdateHapticFeedback);
     on<UpdateAutoSave>(_onUpdateAutoSave);
+    on<UpdateAwesomeSnackbar>(_onUpdateAwesomeSnackbar); // NUEVO
     on<ResetSettings>(_onResetSettings);
   }
 
@@ -167,6 +178,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     final updatedSettings = _currentSettings.copyWith(
       autoSaveStats: event.enabled,
+    );
+    await _saveAndEmit(updatedSettings, emit);
+  }
+
+  // NUEVO: Manejador para cambiar estilo de diálogos
+  Future<void> _onUpdateAwesomeSnackbar(
+    UpdateAwesomeSnackbar event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final updatedSettings = _currentSettings.copyWith(
+      useAwesomeSnackbar: event.enabled,
     );
     await _saveAndEmit(updatedSettings, emit);
   }

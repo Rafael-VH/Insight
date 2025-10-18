@@ -130,7 +130,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // MEJORADO: ThemeSelectorWidget se actualiza correctamente
                   const ThemeSelectorWidget(),
                 ],
               ),
@@ -172,6 +171,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context.read<SettingsBloc>().add(UpdateAutoSave(value));
           },
         ),
+
+        // NUEVO: Switch para estilo de diálogos
+        _buildSwitchTile(
+          context: context,
+          icon: Icons.chat_bubble_outline,
+          title: 'Diálogos Mejorados',
+          subtitle: 'Usar estilo Awesome Snackbar para notificaciones',
+          value: settings.useAwesomeSnackbar,
+          onChanged: (value) {
+            context.read<SettingsBloc>().add(UpdateAwesomeSnackbar(value));
+
+            // Mostrar preview del nuevo estilo
+            _showStylePreview(context, value);
+          },
+        ),
+
         const Divider(height: 32),
 
         // Sección: Acerca de
@@ -209,6 +224,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 32),
       ]),
+    );
+  }
+
+  // NUEVO: Método para mostrar preview del estilo seleccionado
+  void _showStylePreview(BuildContext context, bool useAwesome) {
+    if (useAwesome) {
+      _showAwesomePreview(context);
+    } else {
+      _showClassicPreview(context);
+    }
+  }
+
+  // NUEVO: Preview del estilo Awesome
+  void _showAwesomePreview(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        duration: const Duration(seconds: 4),
+        content: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Estilo Awesome Activado',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Disfrutarás de notificaciones más modernas',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // NUEVO: Preview del estilo clásico
+  void _showClassicPreview(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Usando diálogos clásicos'),
+        backgroundColor: Colors.blue,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 

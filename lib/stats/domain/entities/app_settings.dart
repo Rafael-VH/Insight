@@ -9,7 +9,6 @@ enum AppThemeMode {
   final String displayName;
   final IconData icon;
 
-  // Convertir a ThemeMode de Flutter
   ThemeMode get flutterThemeMode {
     switch (this) {
       case AppThemeMode.light:
@@ -24,19 +23,21 @@ enum AppThemeMode {
 
 class AppSettings {
   final AppThemeMode themeMode;
-  final String selectedThemeId; // NUEVO: ID del tema seleccionado
+  final String selectedThemeId;
   final bool enableNotifications;
   final bool enableHapticFeedback;
   final bool autoSaveStats;
   final String language;
+  final bool useAwesomeSnackbar; // NUEVO: Control de diálogos
 
   const AppSettings({
     this.themeMode = AppThemeMode.system,
-    this.selectedThemeId = 'emerald', // NUEVO: Tema por defecto
+    this.selectedThemeId = 'emerald',
     this.enableNotifications = true,
     this.enableHapticFeedback = true,
     this.autoSaveStats = true,
     this.language = 'es',
+    this.useAwesomeSnackbar = true, // NUEVO: Habilitado por defecto
   });
 
   AppSettings copyWith({
@@ -46,6 +47,7 @@ class AppSettings {
     bool? enableHapticFeedback,
     bool? autoSaveStats,
     String? language,
+    bool? useAwesomeSnackbar, // NUEVO
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
@@ -54,6 +56,7 @@ class AppSettings {
       enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
       autoSaveStats: autoSaveStats ?? this.autoSaveStats,
       language: language ?? this.language,
+      useAwesomeSnackbar: useAwesomeSnackbar ?? this.useAwesomeSnackbar,
     );
   }
 
@@ -65,6 +68,7 @@ class AppSettings {
       'enableHapticFeedback': enableHapticFeedback,
       'autoSaveStats': autoSaveStats,
       'language': language,
+      'useAwesomeSnackbar': useAwesomeSnackbar,
     };
   }
 
@@ -79,6 +83,7 @@ class AppSettings {
       enableHapticFeedback: json['enableHapticFeedback'] as bool? ?? true,
       autoSaveStats: json['autoSaveStats'] as bool? ?? true,
       language: json['language'] as String? ?? 'es',
+      useAwesomeSnackbar: json['useAwesomeSnackbar'] as bool? ?? true,
     );
   }
 
