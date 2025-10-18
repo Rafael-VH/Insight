@@ -24,12 +24,60 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  final ScrollController _scrollController = ScrollController();
   static const int _pageSize = 10;
+
+  // Variables de estado local
   List<StatsCollection> _allCollections = [];
   List<StatsCollection> _displayedCollections = [];
   int _currentPage = 0;
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeScreen();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Inicializa la pantalla cargando los datos
+  void _initializeScreen() {
+    // Cargar datos del BLoC
+    _loadCollections();
+
+    // Configurar listener de scroll para paginación
+    _scrollController.addListener(_onScroll);
+  }
+
+  /// Listener para detectar cuando llegar al final del scroll
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      _loadMoreCollections();
+    }
+  }
+
+  /// Carga las colecciones desde el BLoC
+  void _loadCollections() {
+    if (mounted) {
+      context.read<MLStatsBloc>().add(LoadAllStatsCollectionsEvent());
+    }
+  }
+
+  /// Carga más colecciones (paginación)
   void _loadMoreCollections() {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
     final startIndex = _currentPage * _pageSize;
     final endIndex = min(startIndex + _pageSize, _allCollections.length);
 
@@ -39,31 +87,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _allCollections.sublist(startIndex, endIndex),
         );
         _currentPage++;
+        _isLoadingMore = false;
+        _hasMoreData = endIndex < _allCollections.length;
+      });
+    } else {
+      setState(() {
+        _isLoadingMore = false;
+        _hasMoreData = false;
       });
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCollections();
-  }
+  /// Actualiza los datos cuando el BLoC emite un nuevo estado
+  void _updateCollections(List<StatsCollection> collections) {
+    setState(() {
+      _allCollections = collections;
+      _displayedCollections.clear();
+      _currentPage = 0;
+      _hasMoreData = collections.isNotEmpty;
+    });
 
-  void _loadCollections() {
-    context.read<MLStatsBloc>().add(LoadAllStatsCollectionsEvent());
+    // Cargar la primera página
+    if (collections.isNotEmpty) {
+      _loadMoreCollections();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollInfo) {
-        if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-          _loadMoreCollections();
+    return BlocListener<MLStatsBloc, MLStatsState>(
+      listener: (context, state) {
+        if (state is MLStatsCollectionsLoaded) {
+          _updateCollections(state.collections);
         }
-        return true;
       },
       child: Scaffold(
         body: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             AppSliverBar(
               title: 'Historial de Estadísticas',
@@ -86,13 +146,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildContent() {
     return BlocBuilder<MLStatsBloc, MLStatsState>(
       builder: (context, state) {
-        if (state is MLStatsLoading) {
+        // Estado de carga inicial
+        if (state is MLStatsLoading && _displayedCollections.isEmpty) {
           return const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           );
         }
 
-        if (state is MLStatsError) {
+        // Estado de error
+        if (state is MLStatsError && _displayedCollections.isEmpty) {
           return SliverFillRemaining(
             child: ErrorStateWidget(
               title: 'Error al cargar estadísticas',
@@ -102,73 +164,71 @@ class _HistoryScreenState extends State<HistoryScreen> {
           );
         }
 
-        if (state is MLStatsCollectionsLoaded) {
-          if (state.collections.isEmpty) {
-            return SliverFillRemaining(
-              child: EmptyStateWidget(
-                icon: Icons.analytics_outlined,
-                title: 'No hay estadísticas guardadas',
-                subtitle:
-                    'Carga tus primeras estadísticas desde la pantalla principal',
-                actionButton: ElevatedButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Cargar Estadísticas'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059669),
-                    foregroundColor: Colors.white,
-                  ),
+        // Estado vacío
+        if (_allCollections.isEmpty && state is! MLStatsLoading) {
+          return SliverFillRemaining(
+            child: EmptyStateWidget(
+              icon: Icons.analytics_outlined,
+              title: 'No hay estadísticas guardadas',
+              subtitle:
+                  'Carga tus primeras estadísticas desde la pantalla principal',
+              actionButton: ElevatedButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Cargar Estadísticas'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
                 ),
               ),
-            );
-          }
-
-          return _buildCollectionsWithLatest(state.collections);
+            ),
+          );
         }
 
-        return const SliverFillRemaining(
-          child: Center(child: Text('No hay datos disponibles')),
-        );
+        // Mostrar colecciones
+        return _buildCollectionsWithLatest();
       },
     );
   }
 
-  // NUEVO: Construye la vista con Latest en la parte superior
-  Widget _buildCollectionsWithLatest(List<StatsCollection> collections) {
-    // La primera es la más reciente (ya están ordenadas)
-    final latestCollection = collections.isNotEmpty ? collections.first : null;
+  Widget _buildCollectionsWithLatest() {
+    if (_displayedCollections.isEmpty) {
+      return const SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    // El resto son el historial
-    final historyCollections = collections.length > 1
-        ? collections.sublist(1)
+    final latestCollection = _displayedCollections.first;
+    final historyCollections = _displayedCollections.length > 1
+        ? _displayedCollections.sublist(1)
         : <StatsCollection>[];
 
     return SliverList(
       delegate: SliverChildListDelegate([
-        // ========== SECCIÓN: ÚLTIMA ESTADÍSTICA ==========
-        if (latestCollection != null) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              'Última Estadística',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF059669),
-              ),
+        // ========== ÚLTIMA ESTADÍSTICA ==========
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            'Última Estadística',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF059669),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: _buildLatestStatsCard(latestCollection),
-          ),
-          // Divider
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: _buildLatestStatsCard(latestCollection),
+        ),
+
+        // Divider
+        if (historyCollections.isNotEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Divider(height: 32, thickness: 2),
           ),
-        ],
 
-        // ========== SECCIÓN: HISTORIAL COMPLETO ==========
+        // ========== HISTORIAL COMPLETO ==========
         if (historyCollections.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -192,7 +252,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${historyCollections.length}',
+                    '${_allCollections.length - 1}',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -204,9 +264,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           ..._buildHistoryList(historyCollections),
-          const SizedBox(height: 16),
-        ] else if (latestCollection != null) ...[
-          // Si no hay historial adicional
+
+          // Indicador de carga para paginación
+          if (_isLoadingMore)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+
+          // Mensaje de fin de datos
+          if (!_hasMoreData && historyCollections.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: Text(
+                  'No hay más estadísticas',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
+        ] else
           Padding(
             padding: const EdgeInsets.all(16),
             child: Center(
@@ -220,12 +301,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ),
-        ],
+
+        const SizedBox(height: 16),
       ]),
     );
   }
 
-  // NUEVO: Construye la tarjeta destacada de última estadística
   Widget _buildLatestStatsCard(StatsCollection collection) {
     return GestureDetector(
       onTap: () => _showStatsDetail(collection),
@@ -265,10 +346,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: const [
                     Icon(Icons.star, size: 16, color: Colors.white),
-                    const SizedBox(width: 4),
-                    const Text(
+                    SizedBox(width: 4),
+                    Text(
                       'MÁS RECIENTE',
                       style: TextStyle(
                         fontSize: 11,
@@ -285,7 +366,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
               // Fecha y hora
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 18, color: Colors.white),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     _formatDate(collection.createdAt),
@@ -352,30 +437,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // Construye la lista de historial
   List<Widget> _buildHistoryList(List<StatsCollection> collections) {
     return List.generate(collections.length, (index) {
       final collection = collections[index];
+      final totalIndex = index + 1; // +1 porque el primero es el "latest"
+
       return Padding(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          index == 0 ? 0 : 8,
-          16,
-          index == collections.length - 1 ? 8 : 8,
-        ),
+        padding: EdgeInsets.fromLTRB(16, index == 0 ? 0 : 8, 16, 8),
         child: StatsCollectionCard(
           collection: collection,
           onTap: () => _showStatsDetail(collection),
-          // NUEVO: Badge con número de orden
-          badge: '${collections.length - index}',
+          badge: '${_allCollections.length - totalIndex}',
         ),
       );
-    }).toList();
+    });
   }
 
-  // Construye un chip de modo de juego
   Widget _buildModeChip(dynamic mode) {
-    final modeColor = _getModeColor(mode);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -394,16 +472,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // Obtiene el color del modo de juego
-  Color _getModeColor(dynamic mode) {
-    final modeString = mode.toString().toLowerCase();
-    if (modeString.contains('ranked')) return const Color(0xFFDC2626);
-    if (modeString.contains('classic')) return const Color(0xFF2563EB);
-    if (modeString.contains('brawl')) return const Color(0xFF7C3AED);
-    return const Color(0xFF059669);
-  }
-
-  // Formatea la fecha y hora
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);

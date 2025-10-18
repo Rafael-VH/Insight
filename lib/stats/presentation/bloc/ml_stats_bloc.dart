@@ -26,8 +26,13 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     Emitter<MLStatsState> emit,
   ) async {
     try {
+      print('\n🚀 INICIANDO GUARDADO DE ESTADÍSTICAS');
+      print('📅 Fecha de creación: ${event.collection.createdAt}');
+      print('📊 Modos disponibles: ${event.collection.availableStats.length}');
+
       // Validar que haya al menos una estadística
       if (!event.collection.hasAnyStats) {
+        print('❌ No hay estadísticas para guardar');
         emit(
           const MLStatsError(
             'No hay estadísticas para guardar',
@@ -42,8 +47,9 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
 
       final result = await saveStatsCollection(event.collection);
 
-      result.fold(
-        (failure) {
+      await result.fold(
+        (failure) async {
+          print('❌ ERROR al guardar: ${failure.message}');
           emit(
             MLStatsError(
               'Error al guardar estadísticas',
@@ -51,13 +57,20 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
             ),
           );
         },
-        (_) {
+        (_) async {
+          print('✅ Estadísticas guardadas exitosamente');
           emit(const MLStatsSaved('Estadísticas guardadas correctamente'));
-          // Recargar las colecciones después de guardar
+
+          // CRÍTICO: Esperar un momento antes de recargar
+          await Future.delayed(const Duration(milliseconds: 300));
+
+          // Recargar las colecciones automáticamente
+          print('🔄 Recargando colecciones...');
           add(LoadAllStatsCollectionsEvent());
         },
       );
     } catch (e) {
+      print('❌ ERROR INESPERADO: $e');
       emit(MLStatsError('Error inesperado', errorDetails: e.toString()));
     }
   }
@@ -66,18 +79,37 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     LoadAllStatsCollectionsEvent event,
     Emitter<MLStatsState> emit,
   ) async {
-    emit(MLStatsLoading());
+    print('\n📚 CARGANDO TODAS LAS COLECCIONES');
+
+    // Solo mostrar loading si no hay estado previo
+    if (state is! MLStatsCollectionsLoaded) {
+      emit(MLStatsLoading());
+    }
 
     final result = await getAllStatsCollections(NoParams());
 
     result.fold(
-      (failure) => emit(
-        MLStatsError(
-          'Error al cargar estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
-      (collections) => emit(MLStatsCollectionsLoaded(collections)),
+      (failure) {
+        print('❌ Error al cargar: ${failure.message}');
+        emit(
+          MLStatsError(
+            'Error al cargar estadísticas',
+            errorDetails: failure.message,
+          ),
+        );
+      },
+      (collections) {
+        print('✅ Colecciones cargadas: ${collections.length}');
+
+        // Imprimir detalles de cada colección
+        for (int i = 0; i < collections.length; i++) {
+          print(
+            '  [$i] ${collections[i].createdAt} - ${collections[i].availableStats.length} modos',
+          );
+        }
+
+        emit(MLStatsCollectionsLoaded(collections));
+      },
     );
   }
 
@@ -85,18 +117,30 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
     LoadLatestStatsCollectionEvent event,
     Emitter<MLStatsState> emit,
   ) async {
+    print('\n🔍 CARGANDO ÚLTIMA COLECCIÓN');
+
     emit(MLStatsLoading());
 
     final result = await getLatestStatsCollection(NoParams());
 
     result.fold(
-      (failure) => emit(
-        MLStatsError(
-          'Error al cargar últimas estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
-      (collection) => emit(MLLatestStatsLoaded(collection)),
+      (failure) {
+        print('❌ Error al cargar última: ${failure.message}');
+        emit(
+          MLStatsError(
+            'Error al cargar últimas estadísticas',
+            errorDetails: failure.message,
+          ),
+        );
+      },
+      (collection) {
+        if (collection != null) {
+          print('✅ Última colección cargada: ${collection.createdAt}');
+        } else {
+          print('ℹ No hay colecciones');
+        }
+        emit(MLLatestStatsLoaded(collection));
+      },
     );
   }
 }

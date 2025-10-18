@@ -125,14 +125,19 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
   /// Maneja los eventos de guardación de estadísticas
   void _handleMlStatsState(BuildContext context, MLStatsState state) {
     if (state is MLStatsSaving) {
-      // El diálogo de carga ya está mostrado
+      print('💾 Estado: Guardando...');
       setState(() => _isSaving = true);
     } else if (state is MLStatsSaved) {
+      print('✅ Estado: Guardado exitoso');
       setState(() => _isSaving = false);
 
-      // Cerrar cualquier diálogo abierto
+      // Cerrar diálogo de carga si está abierto
       if (mounted && Navigator.canPop(context)) {
-        Navigator.of(context, rootNavigator: true).pop();
+        try {
+          Navigator.of(context, rootNavigator: true).pop();
+        } catch (e) {
+          print('⚠ No hay diálogo para cerrar');
+        }
       }
 
       // Mostrar diálogo de éxito
@@ -141,11 +146,18 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         message: state.message,
         onClose: () {
           if (mounted) {
-            _showSuccessSnackBar(
-              'Estadísticas guardadas. Volviendo a la pantalla principal...',
-            );
+            print('🏠 Volviendo a pantalla principal...');
+
+            // Cerrar diálogo de éxito
+            Navigator.of(context).pop();
+
+            // CRÍTICO: Recargar historial antes de volver
+            context.read<MLStatsBloc>().add(LoadAllStatsCollectionsEvent());
+
+            // Esperar un momento y volver
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
+                // Volver a la pantalla principal (cerrar todas las pantallas de upload)
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             });
@@ -153,6 +165,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         },
       );
     } else if (state is MLStatsError) {
+      print('❌ Estado: Error - ${state.message}');
       setState(() => _isSaving = false);
 
       // Cerrar diálogo de carga si está abierto
@@ -160,7 +173,7 @@ class _StatsUploadPageState extends State<StatsUploadPage> {
         try {
           Navigator.of(context, rootNavigator: true).pop();
         } catch (e) {
-          // Ignorar si no hay diálogo abierto
+          print('⚠ No hay diálogo para cerrar');
         }
       }
 

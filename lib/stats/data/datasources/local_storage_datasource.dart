@@ -22,31 +22,44 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<void> saveStatsCollection(StatsCollection collection) async {
     try {
-      // MEJORADO: Obtener colecciones existentes primero
+      print('📥 Guardando nueva colección...');
+
+      // Obtener colecciones existentes
       List<StatsCollection> collections = [];
       try {
         collections = await getAllStatsCollections();
+        print('✓ Colecciones existentes: ${collections.length}');
       } catch (e) {
-        // Si hay error al obtener, comenzar con lista vacía
-        print('Advertencia: Error al obtener colecciones previas: $e');
+        print('⚠ Error al obtener colecciones previas: $e');
         collections = [];
       }
 
-      // VALIDACIÓN: Evitar colecciones duplicadas
-      // Buscar si ya existe una colección con la misma fecha (misma sesión)
-      final duplicateIndex = collections.indexWhere(
-        (c) => c.createdAt.difference(collection.createdAt).inMinutes < 1,
+      // CORRECCIÓN: Verificar duplicado SOLO si es exactamente el mismo timestamp
+      // (mismo milisegundo = misma instancia)
+      final exactDuplicateIndex = collections.indexWhere(
+        (c) =>
+            c.createdAt.millisecondsSinceEpoch ==
+            collection.createdAt.millisecondsSinceEpoch,
       );
 
-      if (duplicateIndex != -1) {
-        // Reemplazar la existente en lugar de agregar duplicada
-        collections[duplicateIndex] = collection;
+      if (exactDuplicateIndex != -1) {
+        // Solo reemplazar si es EXACTAMENTE el mismo timestamp
+        print('⚠ Encontrado duplicado exacto, reemplazando...');
+        collections[exactDuplicateIndex] = collection;
       } else {
-        // Agregar la nueva colección
+        // Siempre agregar si no es el mismo timestamp
+        print('✓ Agregando nueva colección');
         collections.add(collection);
       }
 
-      // CONVERSIÓN: A modelo y JSON
+      print(
+        '📊 Total de colecciones después de guardar: ${collections.length}',
+      );
+
+      // Ordenar por fecha (más reciente primero)
+      collections.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Convertir a JSON
       final jsonList = collections.map((c) {
         final model = StatsCollectionModel(
           totalStats: c.totalStats,
@@ -59,8 +72,9 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       }).toList();
 
       final jsonString = json.encode(jsonList);
+      print('💾 Guardando ${jsonString.length} caracteres en storage');
 
-      // GUARDADO: Con validación
+      // Guardar
       final success = await sharedPreferences.setString(
         _collectionsKey,
         jsonString,
@@ -69,7 +83,10 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       if (!success) {
         throw const FileSystemFailure('Failed to save stats collection');
       }
+
+      print('✅ Colección guardada exitosamente');
     } catch (e) {
+      print('❌ Error en saveStatsCollection: $e');
       if (e is FileSystemFailure) {
         rethrow;
       }
@@ -80,11 +97,16 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<List<StatsCollection>> getAllStatsCollections() async {
     try {
+      print('📖 Cargando todas las colecciones...');
+
       final jsonString = sharedPreferences.getString(_collectionsKey);
 
       if (jsonString == null || jsonString.isEmpty) {
+        print('ℹ No hay colecciones guardadas');
         return [];
       }
+
+      print('📄 JSON encontrado: ${jsonString.length} caracteres');
 
       dynamic decoded;
       try {
@@ -105,25 +127,35 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
         return [];
       }
 
+      print('📋 Encontradas ${decoded.length} colecciones en JSON');
+
       final collections = <StatsCollection>[];
-      for (final item in decoded) {
+      for (int i = 0; i < decoded.length; i++) {
+        final item = decoded[i];
+
         if (item is! Map<String, dynamic>) {
-          print('⚠️ Item inválido saltado: $item');
+          print('⚠️ Item $i inválido saltado: $item');
           continue;
         }
 
         try {
           final collection = StatsCollectionModel.fromJson(item);
           collections.add(collection);
+          print('✓ Colección $i cargada: ${collection.createdAt}');
         } catch (e) {
-          print('⚠️ Error al convertir colección: $e');
+          print('⚠️ Error al convertir colección $i: $e');
           continue;
         }
       }
 
+      // Ordenar por fecha (más reciente primero)
       collections.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      print('✅ Total colecciones cargadas: ${collections.length}');
+
       return collections;
     } catch (e) {
+      print('❌ Error en getAllStatsCollections: $e');
       throw FileSystemFailure('Error loading stats: ${e.toString()}');
     }
   }
@@ -131,14 +163,19 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<StatsCollection?> getLatestStatsCollection() async {
     try {
+      print('🔍 Buscando última colección...');
+
       final collections = await getAllStatsCollections();
 
       if (collections.isEmpty) {
+        print('ℹ No hay colecciones');
         return null;
       }
 
+      print('✅ Última colección encontrada: ${collections.first.createdAt}');
       return collections.first;
     } catch (e) {
+      print('❌ Error en getLatestStatsCollection: $e');
       throw FileSystemFailure('Error loading latest stats: ${e.toString()}');
     }
   }
@@ -146,9 +183,11 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<void> deleteStatsCollection(DateTime createdAt) async {
     try {
-      final collections = await getAllStatsCollections();
+      print('🗑️ Eliminando colección: $createdAt');
 
-      // ✅ BÚSQUEDA: Usando comparación de milisegundos
+      final collections = await getAllStatsCollections();
+      print('📊 Colecciones antes de eliminar: ${collections.length}');
+
       final originalLength = collections.length;
       collections.removeWhere(
         (c) =>
@@ -156,12 +195,14 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
             createdAt.millisecondsSinceEpoch,
       );
 
-      // VALIDACIÓN: Verificar que se eliminó algo
       if (collections.length == originalLength) {
+        print('❌ Colección no encontrada');
         throw const FileSystemFailure('Stats collection not found');
       }
 
-      // GUARDADO: Actualizar storage
+      print('✓ Colección eliminada. Total ahora: ${collections.length}');
+
+      // Guardar actualización
       final jsonList = collections.map((c) {
         final model = StatsCollectionModel(
           totalStats: c.totalStats,
@@ -182,7 +223,10 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       if (!success) {
         throw const FileSystemFailure('Failed to delete stats collection');
       }
+
+      print('✅ Eliminación completada');
     } catch (e) {
+      print('❌ Error en deleteStatsCollection: $e');
       if (e is FileSystemFailure) {
         rethrow;
       }
@@ -193,12 +237,17 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   @override
   Future<void> clearAllStats() async {
     try {
+      print('🧹 Limpiando todas las estadísticas...');
+
       final success = await sharedPreferences.remove(_collectionsKey);
 
       if (!success) {
         throw const FileSystemFailure('Failed to clear all stats');
       }
+
+      print('✅ Todas las estadísticas eliminadas');
     } catch (e) {
+      print('❌ Error en clearAllStats: $e');
       throw FileSystemFailure('Error clearing stats: ${e.toString()}');
     }
   }
