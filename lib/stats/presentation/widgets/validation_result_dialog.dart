@@ -9,13 +9,13 @@ class ValidationResultDialog extends StatelessWidget {
     required this.result,
     required this.onRetry,
     required this.onAccept,
-    this.useAwesome = true, // NUEVO
+    this.useAwesome = true,
   });
 
   final ValidationResult result;
   final VoidCallback onRetry;
   final VoidCallback onAccept;
-  final bool useAwesome; // NUEVO
+  final bool useAwesome;
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +26,14 @@ class ValidationResultDialog extends StatelessWidget {
     }
   }
 
-  /// Construcción del diálogo clásico original
+  /// Construcción del diálogo clásico
   Widget _buildClassicDialog(BuildContext context) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: colorScheme.surface, // Adaptado
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
         padding: const EdgeInsets.all(24),
@@ -37,9 +41,9 @@ class ValidationResultDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             const SizedBox(height: 16),
-            _buildCompletionIndicator(),
+            _buildCompletionIndicator(context),
             const SizedBox(height: 24),
             Flexible(
               child: SingleChildScrollView(
@@ -47,14 +51,14 @@ class ValidationResultDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (result.missingFields.isNotEmpty) ...[
-                      _buildMissingFieldsSection(),
+                      _buildMissingFieldsSection(context),
                       const SizedBox(height: 16),
                     ],
                     if (result.warningFields.isNotEmpty) ...[
-                      _buildWarningsSection(),
+                      _buildWarningsSection(context),
                       const SizedBox(height: 16),
                     ],
-                    _buildRecommendations(),
+                    _buildRecommendations(context),
                   ],
                 ),
               ),
@@ -67,8 +71,12 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  /// NUEVO: Construcción del diálogo con Awesome Snackbar
+  /// Construcción del diálogo con Awesome Snackbar
   Widget _buildAwesomeDialog(BuildContext context) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
@@ -76,11 +84,11 @@ class ValidationResultDialog extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 380, maxHeight: 550),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface, // Adaptado
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.4 : 0.2),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -95,8 +103,8 @@ class ValidationResultDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    _getHeaderColor().withOpacity(0.1),
-                    _getHeaderColor().withOpacity(0.05),
+                    _getHeaderColor().withOpacity(isDark ? 0.3 : 0.1),
+                    _getHeaderColor().withOpacity(isDark ? 0.15 : 0.05),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -128,14 +136,14 @@ class ValidationResultDialog extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildCompletionIndicator(),
+                    _buildCompletionIndicator(context),
                     const SizedBox(height: 16),
                     if (result.missingFields.isNotEmpty) ...[
-                      _buildAwesomeMissingFields(),
+                      _buildAwesomeMissingFields(context),
                       const SizedBox(height: 12),
                     ],
                     if (result.warningFields.isNotEmpty) ...[
-                      _buildAwesomeWarnings(),
+                      _buildAwesomeWarnings(context),
                       const SizedBox(height: 12),
                     ],
                   ],
@@ -154,7 +162,6 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  /// Obtiene el color del header según el estado
   Color _getHeaderColor() {
     if (result.isValid && result.warningFields.isEmpty) {
       return Colors.green;
@@ -165,7 +172,6 @@ class ValidationResultDialog extends StatelessWidget {
     }
   }
 
-  /// Obtiene el icono del header
   IconData _getHeaderIcon() {
     if (result.isValid && result.warningFields.isEmpty) {
       return Icons.check_circle_outline;
@@ -176,7 +182,6 @@ class ValidationResultDialog extends StatelessWidget {
     }
   }
 
-  /// Obtiene el título del header
   String _getHeaderTitle() {
     if (result.isValid && result.warningFields.isEmpty) {
       return 'Extracción Exitosa';
@@ -187,7 +192,7 @@ class ValidationResultDialog extends StatelessWidget {
     }
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     final IconData icon;
     final Color color;
     final String title;
@@ -223,7 +228,10 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildCompletionIndicator() {
+  Widget _buildCompletionIndicator(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final percentage = result.completionPercentage;
     final Color color;
 
@@ -245,7 +253,7 @@ class ValidationResultDialog extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: colorScheme.onSurface, // Adaptado
               ),
             ),
             Text(
@@ -264,41 +272,52 @@ class ValidationResultDialog extends StatelessWidget {
           child: LinearProgressIndicator(
             value: percentage / 100,
             minHeight: 12,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: isDark
+                ? colorScheme.surfaceContainerHighest
+                : Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
         const SizedBox(height: 8),
         Text(
           '${result.validFields} de ${result.totalFields} campos detectados',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(
+            fontSize: 12,
+            color: colorScheme.onSurface.withOpacity(0.6), // Adaptado
+          ),
         ),
       ],
     );
   }
 
-  /// NUEVO: Sección de campos faltantes con estilo Awesome
-  Widget _buildAwesomeMissingFields() {
+  Widget _buildAwesomeMissingFields(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.red[50],
+        color: Colors.red[isDark ? 900 : 50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[200]!),
+        border: Border.all(color: Colors.red[isDark ? 700 : 200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.close, color: Colors.red[700], size: 18),
+              Icon(
+                Icons.close,
+                color: Colors.red[isDark ? 300 : 700],
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Datos Faltantes (${result.missingFields.length})',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red[900],
+                  color: Colors.red[isDark ? 300 : 900],
                 ),
               ),
             ],
@@ -314,7 +333,7 @@ class ValidationResultDialog extends StatelessWidget {
                       Icon(
                         Icons.fiber_manual_record,
                         size: 6,
-                        color: Colors.red[700],
+                        color: Colors.red[isDark ? 300 : 700],
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -322,7 +341,7 @@ class ValidationResultDialog extends StatelessWidget {
                           field,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.red[900],
+                            color: Colors.red[isDark ? 200 : 900],
                           ),
                         ),
                       ),
@@ -338,7 +357,7 @@ class ValidationResultDialog extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontStyle: FontStyle.italic,
-                  color: Colors.red[700],
+                  color: Colors.red[isDark ? 300 : 700],
                 ),
               ),
             ),
@@ -347,28 +366,34 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  /// NUEVO: Sección de advertencias con estilo Awesome
-  Widget _buildAwesomeWarnings() {
+  Widget _buildAwesomeWarnings(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        color: Colors.orange[isDark ? 900 : 50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange[200]!),
+        border: Border.all(color: Colors.orange[isDark ? 700 : 200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.orange[700], size: 18),
+              Icon(
+                Icons.info_outline,
+                color: Colors.orange[isDark ? 300 : 700],
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Campos en 0 (${result.warningFields.length})',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: Colors.orange[900],
+                  color: Colors.orange[isDark ? 300 : 900],
                 ),
               ),
             ],
@@ -384,7 +409,7 @@ class ValidationResultDialog extends StatelessWidget {
                       Icon(
                         Icons.fiber_manual_record,
                         size: 6,
-                        color: Colors.orange[700],
+                        color: Colors.orange[isDark ? 300 : 700],
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -392,7 +417,7 @@ class ValidationResultDialog extends StatelessWidget {
                           field,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.orange[900],
+                            color: Colors.orange[isDark ? 200 : 900],
                           ),
                         ),
                       ),
@@ -408,7 +433,7 @@ class ValidationResultDialog extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontStyle: FontStyle.italic,
-                  color: Colors.orange[700],
+                  color: Colors.orange[isDark ? 300 : 700],
                 ),
               ),
             ),
@@ -417,27 +442,34 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildMissingFieldsSection() {
+  Widget _buildMissingFieldsSection(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red[50],
+        color: Colors.red[isDark ? 900 : 50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[200]!),
+        border: Border.all(color: Colors.red[isDark ? 700 : 200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.red[700], size: 20),
+              Icon(
+                Icons.error_outline,
+                color: Colors.red[isDark ? 300 : 700],
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Datos Faltantes (${result.missingFields.length})',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red[900],
+                  color: Colors.red[isDark ? 300 : 900],
                 ),
               ),
             ],
@@ -448,12 +480,19 @@ class ValidationResultDialog extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
                 children: [
-                  Icon(Icons.close, size: 16, color: Colors.red[700]),
+                  Icon(
+                    Icons.close,
+                    size: 16,
+                    color: Colors.red[isDark ? 300 : 700],
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       field,
-                      style: TextStyle(fontSize: 13, color: Colors.red[900]),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.red[isDark ? 200 : 900],
+                      ),
                     ),
                   ),
                 ],
@@ -465,30 +504,36 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildWarningsSection() {
+  Widget _buildWarningsSection(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayWarnings = result.warningFields.take(6).toList();
     final hasMore = result.warningFields.length > 6;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        color: Colors.orange[isDark ? 900 : 50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange[200]!),
+        border: Border.all(color: Colors.orange[isDark ? 700 : 200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.orange[700], size: 20),
+              Icon(
+                Icons.info_outline,
+                color: Colors.orange[isDark ? 300 : 700],
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Campos en 0 (${result.warningFields.length})',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.orange[900],
+                  color: Colors.orange[isDark ? 300 : 900],
                 ),
               ),
             ],
@@ -496,7 +541,10 @@ class ValidationResultDialog extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Estos campos pueden ser legítimamente 0:',
-            style: TextStyle(fontSize: 12, color: Colors.orange[800]),
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.orange[isDark ? 200 : 800],
+            ),
           ),
           const SizedBox(height: 8),
           ...displayWarnings.map(
@@ -507,13 +555,16 @@ class ValidationResultDialog extends StatelessWidget {
                   Icon(
                     Icons.fiber_manual_record,
                     size: 8,
-                    color: Colors.orange[700],
+                    color: Colors.orange[isDark ? 300 : 700],
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       field,
-                      style: TextStyle(fontSize: 12, color: Colors.orange[900]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange[isDark ? 200 : 900],
+                      ),
                     ),
                   ),
                 ],
@@ -528,7 +579,7 @@ class ValidationResultDialog extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
-                  color: Colors.orange[700],
+                  color: Colors.orange[isDark ? 300 : 700],
                 ),
               ),
             ),
@@ -537,7 +588,9 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildRecommendations() {
+  Widget _buildRecommendations(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final recommendations = StatsValidator.getRecommendations(result);
 
     if (recommendations.isEmpty) {
@@ -547,23 +600,27 @@ class ValidationResultDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: Colors.blue[isDark ? 900 : 50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
+        border: Border.all(color: Colors.blue[isDark ? 700 : 200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb_outline, color: Colors.blue[700], size: 20),
+              Icon(
+                Icons.lightbulb_outline,
+                color: Colors.blue[isDark ? 300 : 700],
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Recomendaciones',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue[900],
+                  color: Colors.blue[isDark ? 300 : 900],
                 ),
               ),
             ],
@@ -579,7 +636,7 @@ class ValidationResultDialog extends StatelessWidget {
                     '•',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.blue[700],
+                      color: Colors.blue[isDark ? 300 : 700],
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -587,7 +644,10 @@ class ValidationResultDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       rec,
-                      style: TextStyle(fontSize: 13, color: Colors.blue[900]),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue[isDark ? 200 : 900],
+                      ),
                     ),
                   ),
                 ],
@@ -642,7 +702,6 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  /// NUEVO: Acciones con estilo Awesome
   Widget _buildAwesomeActions(BuildContext context) {
     return Row(
       children: [
@@ -688,13 +747,12 @@ class ValidationResultDialog extends StatelessWidget {
     );
   }
 
-  /// Método estático para mostrar el diálogo
   static Future<void> show({
     required BuildContext context,
     required ValidationResult result,
     required VoidCallback onRetry,
     required VoidCallback onAccept,
-    bool useAwesome = true, // NUEVO
+    bool useAwesome = true,
   }) {
     return showDialog(
       context: context,

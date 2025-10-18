@@ -20,6 +20,12 @@ class StatsUploadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CORRECCIÓN: Adaptar colores según tema
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? color.withOpacity(0.2) : color;
+    final gradientColor = isDark
+        ? color.withOpacity(0.3)
+        : color.withOpacity(0.8);
     return Material(
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
@@ -34,13 +40,13 @@ class StatsUploadButton extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [color, color.withOpacity(0.8)],
+              colors: [backgroundColor, gradientColor], // Colores adaptados
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(context),
               const SizedBox(height: 16),
               _buildDescription(),
             ],
@@ -50,7 +56,11 @@ class StatsUploadButton extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    // CORRECCIÓN: Texto adaptado al tema
+    final textColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.white;
     return Row(
       children: [
         Container(
@@ -59,7 +69,7 @@ class StatsUploadButton extends StatelessWidget {
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: Colors.white, size: 28),
+          child: Icon(icon, color: textColor, size: 28),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -68,8 +78,8 @@ class StatsUploadButton extends StatelessWidget {
             children: [
               Text(
                 uploadType.displayName,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -78,7 +88,7 @@ class StatsUploadButton extends StatelessWidget {
               Text(
                 '${uploadType.imageCount} imagen${uploadType.imageCount > 1 ? 'es' : ''}',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
+                  color: textColor.withOpacity(0.9),
                   fontSize: 14,
                 ),
               ),
@@ -87,7 +97,7 @@ class StatsUploadButton extends StatelessWidget {
         ),
         Icon(
           Icons.arrow_forward_ios,
-          color: Colors.white.withOpacity(0.8),
+          color: textColor.withOpacity(0.8),
           size: 16,
         ),
       ],
@@ -97,8 +107,8 @@ class StatsUploadButton extends StatelessWidget {
   Widget _buildDescription() {
     return Text(
       description,
-      style: TextStyle(
-        color: Colors.white.withOpacity(0.9),
+      style: const TextStyle(
+        color: Colors.white, // Siempre blanco sobre fondo de color
         fontSize: 14,
         height: 1.4,
       ),

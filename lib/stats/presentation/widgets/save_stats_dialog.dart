@@ -8,12 +8,16 @@ class SaveStatsDialog {
     required String message,
     VoidCallback? onClose,
   }) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface, // Adaptado
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -22,13 +26,13 @@ class SaveStatsDialog {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.green[100],
+                color: Colors.green[isDark ? 900 : 100],
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.check_circle,
                 size: 50,
-                color: Colors.green[700],
+                color: Colors.green[isDark ? 300 : 700],
               ),
             ),
             const SizedBox(height: 16),
@@ -38,7 +42,7 @@ class SaveStatsDialog {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.green[700],
+                color: Colors.green[isDark ? 300 : 700],
               ),
             ),
             const SizedBox(height: 12),
@@ -48,7 +52,7 @@ class SaveStatsDialog {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[700],
+                color: colorScheme.onSurface, // Adaptado
                 height: 1.5,
               ),
             ),
@@ -89,12 +93,16 @@ class SaveStatsDialog {
     String? errorDetails,
     VoidCallback? onRetry,
   }) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface, // Adaptado
         contentPadding: const EdgeInsets.all(24),
         content: SingleChildScrollView(
           child: Column(
@@ -105,13 +113,13 @@ class SaveStatsDialog {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.red[100],
+                  color: Colors.red[isDark ? 900 : 100],
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.error_outline,
                   size: 50,
-                  color: Colors.red[700],
+                  color: Colors.red[isDark ? 300 : 700],
                 ),
               ),
               const SizedBox(height: 16),
@@ -121,7 +129,7 @@ class SaveStatsDialog {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red[700],
+                  color: Colors.red[isDark ? 300 : 700],
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -132,7 +140,7 @@ class SaveStatsDialog {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[700],
+                  color: colorScheme.onSurface, // Adaptado
                   height: 1.5,
                 ),
               ),
@@ -143,9 +151,9 @@ class SaveStatsDialog {
                   width: double.maxFinite,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red[50],
+                    color: Colors.red[isDark ? 900 : 50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red[200]!),
+                    border: Border.all(color: Colors.red[isDark ? 700 : 200]!),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +163,7 @@ class SaveStatsDialog {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.red[700],
+                          color: Colors.red[isDark ? 300 : 700],
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -164,7 +172,7 @@ class SaveStatsDialog {
                         style: TextStyle(
                           fontSize: 11,
                           fontFamily: 'monospace',
-                          color: Colors.red[600],
+                          color: Colors.red[isDark ? 200 : 600],
                           height: 1.3,
                         ),
                       ),
@@ -224,31 +232,43 @@ class SaveStatsDialog {
 
   /// Muestra un diálogo de cargando
   static void showSaving(BuildContext context) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface, // Adaptado
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Indicador de carga
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF059669)),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                colorScheme.primary, // Adaptado
+              ),
             ),
             const SizedBox(height: 16),
             // Mensaje
-            const Text(
+            Text(
               'Guardando estadísticas...',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface, // Adaptado
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             // Subtítulo
             Text(
               'Por favor espera',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurface.withOpacity(0.6), // Adaptado
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -265,19 +285,30 @@ class SaveStatsDialog {
     String confirmButtonText = 'Guardar',
     String cancelButtonText = 'Cancelar',
   }) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface, // Adaptado
         title: Text(
           title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface, // Adaptado
+          ),
         ),
         content: Text(
           message,
-          style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
+          style: TextStyle(
+            fontSize: 14,
+            color: colorScheme.onSurface.withOpacity(0.8), // Adaptado
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
@@ -313,18 +344,29 @@ class SaveStatsDialog {
     required String message,
     String buttonText = 'Aceptar',
   }) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface, // Adaptado
         title: Text(
           title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface, // Adaptado
+          ),
         ),
         content: Text(
           message,
-          style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
+          style: TextStyle(
+            fontSize: 14,
+            color: colorScheme.onSurface.withOpacity(0.8), // Adaptado
+            height: 1.5,
+          ),
         ),
         actions: [
           ElevatedButton(

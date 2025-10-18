@@ -18,7 +18,9 @@ class StatsVerificationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fields = StatsParser.getFieldsForVerification(stats);
-
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -29,7 +31,7 @@ class StatsVerificationWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getGameModeColor().withOpacity(0.1),
+              color: _getGameModeColor().withOpacity(isDark ? 0.2 : 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -55,7 +57,7 @@ class StatsVerificationWidget extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green[100],
+                    color: Colors.green[isDark ? 900 : 100],
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -64,7 +66,7 @@ class StatsVerificationWidget extends StatelessWidget {
                       Icon(
                         Icons.check_circle_outline,
                         size: 16,
-                        color: Colors.green[700],
+                        color: Colors.green[isDark ? 300 : 700],
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -72,7 +74,7 @@ class StatsVerificationWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: Colors.green[700],
+                          color: Colors.green[isDark ? 300 : 700],
                         ),
                       ),
                     ],
@@ -87,42 +89,35 @@ class StatsVerificationWidget extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Estadísticas principales
-                _buildStatsSection('Estadísticas Principales', [
-                  fields[0], // Partidas Totales
-                  fields[1], // Tasa de Victorias
-                  fields[2], // MVP
+                _buildStatsSection(context, 'Estadísticas Principales', [
+                  fields[0],
+                  fields[1],
+                  fields[2],
                 ]),
-
                 const SizedBox(height: 16),
-
-                // Rendimiento
-                _buildStatsSection('Rendimiento', [
-                  fields[3], // KDA
-                  fields[4], // Participación en Equipo
-                  fields[5], // Oro/Min
-                  fields[6], // DAÑO a Héroe/Min
-                  fields[7], // Muertes/Partida
-                  fields[8], // Daño a Torre/Partida
+                _buildStatsSection(context, 'Rendimiento', [
+                  fields[3],
+                  fields[4],
+                  fields[5],
+                  fields[6],
+                  fields[7],
+                  fields[8],
                 ]),
-
                 const SizedBox(height: 16),
-
-                // Logros
-                _buildStatsSection('Logros y Récords', [
-                  fields[9], // Legendario
-                  fields[10], // Savage
-                  fields[11], // Maniac
-                  fields[12], // Asesinato Triple
-                  fields[13], // Asesinato Doble
-                  fields[14], // MVP Perdedor
-                  fields[15], // Asesinatos Máx.
-                  fields[16], // Asistencias Máx.
-                  fields[17], // Racha de Victorias Máx.
-                  fields[18], // Primera Sangre
-                  fields[19], // Daño Causado Máx./min
-                  fields[20], // Daño Tomado Máx./min
-                  fields[21], // Oro Máx./min
+                _buildStatsSection(context, 'Logros y Récords', [
+                  fields[9],
+                  fields[10],
+                  fields[11],
+                  fields[12],
+                  fields[13],
+                  fields[14],
+                  fields[15],
+                  fields[16],
+                  fields[17],
+                  fields[18],
+                  fields[19],
+                  fields[20],
+                  fields[21],
                 ]),
               ],
             ),
@@ -132,35 +127,53 @@ class StatsVerificationWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection(String title, List<StatField> fields) {
+  Widget _buildStatsSection(
+    BuildContext context,
+    String title,
+    List<StatField> fields,
+  ) {
+    // CORRECCIÓN: Colores adaptados
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: colorScheme.onSurface, // Adaptado
           ),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            // CORRECCIÓN: Fondo adaptado
+            color: isDark
+                ? colorScheme.surfaceContainerHighest
+                : Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(
+              color: isDark
+                  ? colorScheme.outline.withOpacity(0.3)
+                  : Colors.grey[200]!,
+            ),
           ),
           child: Column(
-            children: fields.map((field) => _buildStatRow(field)).toList(),
+            children: fields
+                .map((field) => _buildStatRow(context, field))
+                .toList(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatRow(StatField field) {
+  Widget _buildStatRow(BuildContext context, StatField field) {
+    // CORRECCIÓN: Colores de texto adaptados
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -170,17 +183,20 @@ class StatsVerificationWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               field.name,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 14,
+                color: colorScheme.onSurface, // Adaptado
+              ),
             ),
           ),
           Expanded(
             flex: 1,
             child: Text(
               field.value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.blue,
+                color: colorScheme.primary, // Adaptado
               ),
               textAlign: TextAlign.end,
             ),

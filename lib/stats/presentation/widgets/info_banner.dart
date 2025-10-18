@@ -20,10 +20,13 @@ class InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultBlue = Colors.blue[50]!;
-    final defaultBlueBorder = Colors.blue[200]!;
-    final defaultBlueIcon = Colors.blue[600]!;
-    final defaultBlueText = Colors.blue[700]!;
+    // CORRECCIÓN: Adaptar colores al tema
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final defaultBlue = isDark ? Colors.blue[900]! : Colors.blue[50]!;
+    final defaultBlueBorder = isDark ? Colors.blue[700]! : Colors.blue[200]!;
+    final defaultBlueIcon = isDark ? Colors.blue[300]! : Colors.blue[600]!;
+    final defaultBlueText = isDark ? Colors.blue[200]! : Colors.blue[700]!;
 
     return Container(
       padding: const EdgeInsets.all(16),

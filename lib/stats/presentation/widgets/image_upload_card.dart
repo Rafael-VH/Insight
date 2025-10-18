@@ -21,6 +21,9 @@ class ImageUploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CORRECCIÓN: Obtener colores del tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -31,7 +34,7 @@ class ImageUploadCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getGameModeColor().withOpacity(0.1),
+              color: _getGameModeColor().withOpacity(isDark ? 0.2 : 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -79,10 +82,16 @@ class ImageUploadCard extends StatelessWidget {
             height: 200,
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              // CORRECCIÓN: Fondo adaptado al tema
+              color: isDark
+                  ? colorScheme.surfaceContainerHighest
+                  : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.grey[300]!,
+                // CORRECCIÓN: Borde adaptado
+                color: isDark
+                    ? colorScheme.outline.withOpacity(0.5)
+                    : Colors.grey[300]!,
                 style: BorderStyle.solid,
                 width: 2,
               ),
@@ -97,6 +106,9 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   Widget _buildUploadArea(BuildContext context) {
+    // CORRECCIÓN: Colores de texto adaptados
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: isProcessing ? null : () => _showImageSourceDialog(context),
       borderRadius: BorderRadius.circular(12),
@@ -110,15 +122,21 @@ class ImageUploadCard extends StatelessWidget {
             if (isProcessing) ...[
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Procesando imagen...',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface, // Adaptado
+                ),
               ),
             ] else ...[
               Icon(
                 Icons.cloud_upload_outlined,
                 size: 48,
-                color: Colors.grey[400],
+                color: isDark
+                    ? colorScheme.onSurface.withOpacity(0.5)
+                    : Colors.grey[400],
               ),
               const SizedBox(height: 16),
               Text(
@@ -126,13 +144,20 @@ class ImageUploadCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
+                  color: isDark
+                      ? colorScheme.onSurface.withOpacity(0.8)
+                      : Colors.grey[600],
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Captura de ${_getDisplayName()}',
-                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? colorScheme.onSurface.withOpacity(0.6)
+                      : Colors.grey[500],
+                ),
               ),
             ],
           ],
@@ -175,8 +200,12 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   void _showImageSourceDialog(BuildContext context) {
+    // CORRECCIÓN: Colores adaptados al tema
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
+      backgroundColor: colorScheme.surface, // Adaptado
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -192,7 +221,7 @@ class ImageUploadCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    color: colorScheme.onSurface, // Adaptado
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -200,13 +229,24 @@ class ImageUploadCard extends StatelessWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: Colors.blue[isDark ? 900 : 50],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(Icons.camera_alt, color: Colors.blue[700]),
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Colors.blue[isDark ? 300 : 700],
+                    ),
                   ),
-                  title: const Text('Cámara'),
-                  subtitle: const Text('Tomar una foto nueva'),
+                  title: Text(
+                    'Cámara',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
+                  subtitle: Text(
+                    'Tomar una foto nueva',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
                     onUploadPressed(ImageSourceType.camera);
@@ -216,13 +256,24 @@ class ImageUploadCard extends StatelessWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.green[50],
+                      color: Colors.green[isDark ? 900 : 50],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(Icons.photo_library, color: Colors.green[700]),
+                    child: Icon(
+                      Icons.photo_library,
+                      color: Colors.green[isDark ? 300 : 700],
+                    ),
                   ),
-                  title: const Text('Galería'),
-                  subtitle: const Text('Elegir de la galería'),
+                  title: Text(
+                    'Galería',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
+                  subtitle: Text(
+                    'Elegir de la galería',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
                     onUploadPressed(ImageSourceType.gallery);
