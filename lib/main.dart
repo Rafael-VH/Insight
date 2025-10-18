@@ -10,7 +10,7 @@ import 'package:insight/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/stats/presentation/bloc/theme_bloc.dart';
 //
 import 'package:insight/stats/presentation/config/theme_config.dart';
-import 'package:insight/stats/presentation/screens/Main/main_screen.dart';
+import 'package:insight/stats/presentation/screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

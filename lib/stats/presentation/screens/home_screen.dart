@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 //
 import 'package:insight/stats/domain/entities/stats_upload_type.dart';
 //
-import 'package:insight/stats/presentation/pages/Upload/stats_upload_page.dart';
+import 'package:insight/stats/presentation/pages/stats_upload_page.dart';
 //
-import 'package:insight/stats/presentation/screens/History/history_screen.dart';
-//
-import 'package:insight/stats/presentation/screens/Home/widget/info_banner.dart';
-import 'package:insight/stats/presentation/screens/Home/widget/stats_upload_button.dart';
+import 'package:insight/stats/presentation/screens/history_screen.dart';
 import 'package:insight/stats/presentation/widgets/app_sliver_bar.dart';
+//
+import 'package:insight/stats/presentation/widgets/info_banner.dart';
+import 'package:insight/stats/presentation/widgets/stats_upload_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

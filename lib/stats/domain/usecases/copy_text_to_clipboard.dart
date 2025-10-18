@@ -1,6 +1,9 @@
 import 'package:dartz/dartz.dart';
+//
 import 'package:insight/core/errors/failures.dart';
+//
 import 'package:insight/stats/domain/repositories/ocr_repository.dart';
+//
 import 'package:insight/stats/domain/usecases/usecase.dart';
 
 class CopyTextToClipboard implements UseCase<void, String> {

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+//
 import 'package:insight/stats/data/repositories/settings_repository.dart';
+//
 import 'package:insight/stats/domain/entities/app_settings.dart';
 
 // Events

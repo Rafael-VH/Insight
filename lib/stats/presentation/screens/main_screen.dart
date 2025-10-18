@@ -7,10 +7,10 @@ import 'package:insight/stats/domain/entities/navigation_item.dart';
 import 'package:insight/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/stats/presentation/bloc/navigation_event.dart';
 import 'package:insight/stats/presentation/bloc/navigation_state.dart';
-import 'package:insight/stats/presentation/screens/History/history_screen.dart';
+import 'package:insight/stats/presentation/screens/history_screen.dart';
 //
-import 'package:insight/stats/presentation/screens/Home/home_screen.dart';
-import 'package:insight/stats/presentation/screens/Setting/settings_screen.dart';
+import 'package:insight/stats/presentation/screens/home_screen.dart';
+import 'package:insight/stats/presentation/screens/settings_screen.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class MainScreen extends StatefulWidget {

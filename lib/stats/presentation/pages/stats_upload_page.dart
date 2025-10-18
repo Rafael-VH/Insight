@@ -16,8 +16,7 @@ import 'package:insight/stats/presentation/bloc/ocr_state.dart';
 //
 import 'package:insight/stats/presentation/controllers/stats_upload_controller.dart';
 //
-import 'package:insight/stats/presentation/pages/Upload/widget/image_upload_card.dart';
-//
+import 'package:insight/stats/presentation/widgets/image_upload_card.dart';
 import 'package:insight/stats/presentation/widgets/save_stats_dialog.dart';
 import 'package:insight/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/stats/presentation/widgets/validation_result_dialog.dart';

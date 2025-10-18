@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+//
 import 'package:insight/stats/domain/entities/image_source_type.dart';
 
 abstract class OcrEvent extends Equatable {
