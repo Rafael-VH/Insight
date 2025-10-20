@@ -8,6 +8,7 @@ class StatsCollectionModel extends StatsCollection {
     super.classicStats,
     super.brawlStats,
     required super.createdAt,
+    super.name, // NUEVO
   });
 
   factory StatsCollectionModel.fromEntity(StatsCollection collection) {
@@ -17,6 +18,7 @@ class StatsCollectionModel extends StatsCollection {
       classicStats: collection.classicStats,
       brawlStats: collection.brawlStats,
       createdAt: collection.createdAt,
+      name: collection.name, // NUEVO
     );
   }
 
@@ -28,6 +30,7 @@ class StatsCollectionModel extends StatsCollection {
       'classicStats': classicStats != null ? classicStats!.toJson() : null,
       'brawlStats': brawlStats != null ? brawlStats!.toJson() : null,
       'createdAt': createdAt.toIso8601String(),
+      'name': name, // NUEVO
     };
   }
 
@@ -47,6 +50,9 @@ class StatsCollectionModel extends StatsCollection {
           ? PlayerStats.fromJson(json['brawlStats'] as Map<String, dynamic>)
           : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      name:
+          json['name'] as String? ??
+          '', // NUEVO: Compatibilidad con datos antiguos
     );
   }
 }

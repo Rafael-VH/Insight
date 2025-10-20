@@ -21,6 +21,7 @@ import 'package:insight/stats/domain/usecases/get_all_stats_collections.dart';
 import 'package:insight/stats/domain/usecases/get_latest_stats_collection.dart';
 import 'package:insight/stats/domain/usecases/pick_image_and_recognize_text.dart';
 import 'package:insight/stats/domain/usecases/save_stats_collection.dart';
+import 'package:insight/stats/domain/usecases/update_stats_collection_name.dart'; // NUEVO
 // Blocs
 import 'package:insight/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/stats/presentation/bloc/navigation_bloc.dart';
@@ -73,6 +74,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SaveStatsCollection(sl()));
   sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
   sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
+  sl.registerLazySingleton(() => UpdateStatsCollectionName(sl())); // NUEVO
 
   // ==================== OCR SETUP ====================
   // Data sources
@@ -107,12 +109,14 @@ Future<void> init() async {
   // Navigation Bloc
   sl.registerFactory(() => NavigationBloc());
 
-  // ML Stats Bloc
+  // ML Stats Bloc - ACTUALIZADO CON NUEVAS DEPENDENCIAS
   sl.registerFactory(
     () => MLStatsBloc(
       saveStatsCollection: sl(),
       getAllStatsCollections: sl(),
       getLatestStatsCollection: sl(),
+      updateStatsCollectionName: sl(),
+      statsRepository: sl(), // NUEVO: Para operaciones directas
     ),
   );
 

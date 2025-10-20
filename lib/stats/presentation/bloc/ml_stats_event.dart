@@ -32,3 +32,27 @@ class DeleteStatsCollectionEvent extends MLStatsEvent {
 }
 
 class ClearAllStatsEvent extends MLStatsEvent {}
+
+// ==================== NUEVOS EVENTOS ====================
+
+class UpdateStatsCollectionNameEvent extends MLStatsEvent {
+  final DateTime createdAt;
+  final String newName;
+
+  const UpdateStatsCollectionNameEvent({
+    required this.createdAt,
+    required this.newName,
+  });
+
+  @override
+  List<Object> get props => [createdAt, newName];
+}
+
+class GetStatsCollectionByDateEvent extends MLStatsEvent {
+  final DateTime createdAt;
+
+  const GetStatsCollectionByDateEvent(this.createdAt);
+
+  @override
+  List<Object> get props => [createdAt];
+}

@@ -75,3 +75,24 @@ class MLStatsCleared extends MLStatsState {
   @override
   List<Object> get props => [message];
 }
+
+// ==================== NUEVOS ESTADOS ====================
+
+class MLStatsNameUpdated extends MLStatsState {
+  final String message;
+  final String newName;
+
+  const MLStatsNameUpdated({required this.message, required this.newName});
+
+  @override
+  List<Object> get props => [message, newName];
+}
+
+class MLStatsCollectionByDateLoaded extends MLStatsState {
+  final StatsCollection? collection;
+
+  const MLStatsCollectionByDateLoaded(this.collection);
+
+  @override
+  List<Object?> get props => [collection];
+}

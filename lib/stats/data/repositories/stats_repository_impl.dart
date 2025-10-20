@@ -76,4 +76,37 @@ class StatsRepositoryImpl implements StatsRepository {
       return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
     }
   }
+
+  // ==================== NUEVOS MÉTODOS ====================
+
+  @override
+  Future<Either<Failure, void>> updateStatsCollectionName(
+    DateTime createdAt,
+    String newName,
+  ) async {
+    try {
+      await localDataSource.updateStatsCollectionName(createdAt, newName);
+      return const Right(null);
+    } on FileSystemFailure catch (e) {
+      return Left(FileSystemFailure(e.message));
+    } catch (e) {
+      return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(
+    DateTime createdAt,
+  ) async {
+    try {
+      final collection = await localDataSource.getStatsCollectionByDate(
+        createdAt,
+      );
+      return Right(collection);
+    } on FileSystemFailure catch (e) {
+      return Left(FileSystemFailure(e.message));
+    } catch (e) {
+      return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
+    }
+  }
 }

@@ -14,6 +14,10 @@ abstract class LocalStorageDataSource {
   Future<StatsCollection?> getLatestStatsCollection();
   Future<void> deleteStatsCollection(DateTime createdAt);
   Future<void> clearAllStats();
+
+  // NUEVOS MÉTODOS
+  Future<void> updateStatsCollectionName(DateTime createdAt, String newName);
+  Future<StatsCollection?> getStatsCollectionByDate(DateTime createdAt);
 }
 
 class LocalStorageDataSourceImpl implements LocalStorageDataSource {
@@ -70,6 +74,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
           classicStats: c.classicStats,
           brawlStats: c.brawlStats,
           createdAt: c.createdAt,
+          name: c.name, // NUEVO
         );
         return model.toJson();
       }).toList();
@@ -213,6 +218,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
           classicStats: c.classicStats,
           brawlStats: c.brawlStats,
           createdAt: c.createdAt,
+          name: c.name, // NUEVO
         );
         return model.toJson();
       }).toList();
@@ -252,6 +258,92 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
     } catch (e) {
       print('❌ Error en clearAllStats: $e');
       throw FileSystemFailure('Error clearing stats: ${e.toString()}');
+    }
+  }
+
+  // ==================== NUEVOS MÉTODOS ====================
+
+  @override
+  Future<void> updateStatsCollectionName(
+    DateTime createdAt,
+    String newName,
+  ) async {
+    try {
+      print('✏️ Actualizando nombre de colección: $createdAt');
+
+      final collections = await getAllStatsCollections();
+      final index = collections.indexWhere(
+        (c) =>
+            c.createdAt.millisecondsSinceEpoch ==
+            createdAt.millisecondsSinceEpoch,
+      );
+
+      if (index == -1) {
+        throw const FileSystemFailure('Stats collection not found');
+      }
+
+      // Actualizar el nombre usando copyWith
+      collections[index] = collections[index].copyWith(name: newName);
+
+      // Guardar todas las colecciones actualizadas
+      final jsonList = collections.map((c) {
+        final model = StatsCollectionModel(
+          totalStats: c.totalStats,
+          rankedStats: c.rankedStats,
+          classicStats: c.classicStats,
+          brawlStats: c.brawlStats,
+          createdAt: c.createdAt,
+          name: c.name,
+        );
+        return model.toJson();
+      }).toList();
+
+      final jsonString = json.encode(jsonList);
+      final success = await sharedPreferences.setString(
+        _collectionsKey,
+        jsonString,
+      );
+
+      if (!success) {
+        throw const FileSystemFailure('Failed to update stats collection name');
+      }
+
+      print('✅ Nombre actualizado a: $newName');
+    } catch (e) {
+      print('❌ Error en updateStatsCollectionName: $e');
+      if (e is FileSystemFailure) {
+        rethrow;
+      }
+      throw FileSystemFailure(
+        'Error updating collection name: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<StatsCollection?> getStatsCollectionByDate(DateTime createdAt) async {
+    try {
+      print('🔍 Buscando colección por fecha: $createdAt');
+
+      final collections = await getAllStatsCollections();
+
+      try {
+        final collection = collections.firstWhere(
+          (c) =>
+              c.createdAt.millisecondsSinceEpoch ==
+              createdAt.millisecondsSinceEpoch,
+        );
+        print('✅ Colección encontrada');
+        return collection;
+      } catch (e) {
+        print('❌ Colección no encontrada');
+        return null;
+      }
+    } catch (e) {
+      print('❌ Error en getStatsCollectionByDate: $e');
+      throw FileSystemFailure(
+        'Error loading collection by date: ${e.toString()}',
+      );
     }
   }
 }

@@ -10,4 +10,14 @@ abstract class StatsRepository {
   Future<Either<Failure, StatsCollection?>> getLatestStatsCollection();
   Future<Either<Failure, void>> deleteStatsCollection(DateTime createdAt);
   Future<Either<Failure, void>> clearAllStats();
+
+  // NUEVOS MÉTODOS
+  Future<Either<Failure, void>> updateStatsCollectionName(
+    DateTime createdAt,
+    String newName,
+  );
+
+  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(
+    DateTime createdAt,
+  );
 }
