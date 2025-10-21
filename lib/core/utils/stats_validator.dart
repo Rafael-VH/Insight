@@ -1,4 +1,4 @@
-import 'package:insight/stats/domain/entities/player_stats.dart';
+import 'package:insight/features/stats/domain/entities/player_stats.dart';
 
 /// Resultado de la validación de estadísticas
 class ValidationResult {

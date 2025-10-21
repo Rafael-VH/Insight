@@ -1,0 +1,21 @@
+import 'package:dartz/dartz.dart';
+//
+import 'package:insight/core/errors/failures.dart';
+//
+import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+//
+import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
+//
+import 'package:insight/features/stats/domain/usecases/usecase.dart';
+
+class GetAllStatsCollections
+    implements UseCase<List<StatsCollection>, NoParams> {
+  final StatsRepository repository;
+
+  GetAllStatsCollections(this.repository);
+
+  @override
+  Future<Either<Failure, List<StatsCollection>>> call(NoParams params) async {
+    return await repository.getAllStatsCollections();
+  }
+}
