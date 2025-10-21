@@ -1,7 +1,11 @@
+// lib/core/injection/injection_container.dart
+
 // Packages
 import 'package:get_it/get_it.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+// Blocs - Navigation
+import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 // Data Sources
 import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
 import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
@@ -21,10 +25,9 @@ import 'package:insight/features/stats/domain/usecases/get_all_stats_collections
 import 'package:insight/features/stats/domain/usecases/get_latest_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_text.dart';
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
-import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart'; // NUEVO
-// Blocs
+import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
+// Blocs - Stats
 import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/theme_bloc.dart';
@@ -74,7 +77,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SaveStatsCollection(sl()));
   sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
   sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
-  sl.registerLazySingleton(() => UpdateStatsCollectionName(sl())); // NUEVO
+  sl.registerLazySingleton(() => UpdateStatsCollectionName(sl()));
 
   // ==================== OCR SETUP ====================
   // Data sources
@@ -98,25 +101,26 @@ Future<void> init() async {
   );
 
   // ==================== BLOCS (FACTORY - SE CREAN NUEVOS CADA VEZ) ====================
-  // MEJORADO: Registrar SettingsBloc como Factory
+
+  // Settings Bloc
   sl.registerFactory(() => SettingsBloc(repository: sl()));
 
-  // ThemeBloc - CRÍTICO PARA SETTINGS
+  // Theme Bloc
   sl.registerFactory(
     () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
   );
 
-  // Navigation Bloc
-  sl.registerFactory(() => NavigationBloc());
+  // NAVIGATION BLOC (ACTUALIZADO - SOLO UNA VEZ)
+  sl.registerFactory(() => NavigationBloc(totalDestinations: 3));
 
-  // ML Stats Bloc - ACTUALIZADO CON NUEVAS DEPENDENCIAS
+  // ML Stats Bloc
   sl.registerFactory(
     () => MLStatsBloc(
       saveStatsCollection: sl(),
       getAllStatsCollections: sl(),
       getLatestStatsCollection: sl(),
       updateStatsCollectionName: sl(),
-      statsRepository: sl(), // NUEVO: Para operaciones directas
+      statsRepository: sl(),
     ),
   );
 
