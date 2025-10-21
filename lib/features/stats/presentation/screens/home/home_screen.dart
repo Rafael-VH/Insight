@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 //
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
 //
-import 'package:insight/features/stats/presentation/pages/stats_upload_page.dart';
+import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
 //
-import 'package:insight/features/stats/presentation/screens/history_screen.dart';
+import 'package:insight/features/stats/presentation/screens/upload/upload_screen.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 //
 import 'package:insight/features/stats/presentation/widgets/info_banner.dart';
@@ -115,7 +115,7 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StatsUploadPage(uploadType: uploadType),
+        builder: (context) => UploadScreen(uploadType: uploadType),
       ),
     );
   }

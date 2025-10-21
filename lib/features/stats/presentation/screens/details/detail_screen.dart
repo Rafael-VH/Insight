@@ -6,8 +6,8 @@ import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart'
 import 'package:insight/features/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:intl/intl.dart';
 
-class StatsDetailPage extends StatelessWidget {
-  const StatsDetailPage({super.key, required this.collection});
+class DetailScreen extends StatelessWidget {
+  const DetailScreen({super.key, required this.collection});
 
   final StatsCollection collection;
 

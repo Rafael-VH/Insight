@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
 import 'package:insight/core/injection/injection_container.dart' as di;
+import 'package:insight/features/navigation/presentation/screens/main_screen.dart';
 //
 import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/navigation_bloc.dart';
@@ -10,7 +11,6 @@ import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/theme_bloc.dart';
 //
 import 'package:insight/features/stats/presentation/config/theme_config.dart';
-import 'package:insight/features/stats/presentation/screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

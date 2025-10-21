@@ -22,16 +22,16 @@ import 'package:insight/features/stats/presentation/widgets/image_upload_card.da
 import 'package:insight/features/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/features/stats/presentation/widgets/validation_result_dialog.dart';
 
-class StatsUploadPage extends StatefulWidget {
-  const StatsUploadPage({super.key, required this.uploadType});
+class UploadScreen extends StatefulWidget {
+  const UploadScreen({super.key, required this.uploadType});
 
   final StatsUploadType uploadType;
 
   @override
-  State<StatsUploadPage> createState() => _StatsUploadPageState();
+  State<UploadScreen> createState() => _UploadScreenState();
 }
 
-class _StatsUploadPageState extends State<StatsUploadPage> {
+class _UploadScreenState extends State<UploadScreen> {
   late final StatsUploadController _controller;
   bool _isSaving = false;
 

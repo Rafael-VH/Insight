@@ -1,16 +1,16 @@
 // lib/core/navigation/presentation/pages/main_scaffold.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/features/settings/presentation/screens/settings_screen.dart';
 //
 import 'package:insight/features/stats/domain/entities/navigation_item.dart';
 //
 import 'package:insight/features/stats/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/navigation_event.dart';
 import 'package:insight/features/stats/presentation/bloc/navigation_state.dart';
-import 'package:insight/features/stats/presentation/screens/history_screen.dart';
+import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
 //
-import 'package:insight/features/stats/presentation/screens/home_screen.dart';
-import 'package:insight/features/stats/presentation/screens/settings_screen.dart';
+import 'package:insight/features/stats/presentation/screens/home/home_screen.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class MainScreen extends StatefulWidget {

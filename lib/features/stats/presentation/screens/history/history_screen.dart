@@ -10,7 +10,7 @@ import 'package:insight/features/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
 import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
 //
-import 'package:insight/features/stats/presentation/pages/stats_detail_page.dart';
+import 'package:insight/features/stats/presentation/screens/details/detail_screen.dart';
 //
 import 'package:insight/features/stats/presentation/services/dialog_service.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
@@ -336,7 +336,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StatsDetailPage(collection: collection),
+        builder: (context) => DetailScreen(collection: collection),
       ),
     );
   }
