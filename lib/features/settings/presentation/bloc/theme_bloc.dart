@@ -1,110 +1,14 @@
-import 'package:equatable/equatable.dart';
-//
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
-import 'package:insight/features/settings/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/domain/entities/app_theme.dart';
+//
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
-import 'package:insight/features/stats/domain/entities/app_theme.dart';
+//
+import 'package:insight/features/settings/presentation/bloc/theme_event.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_state.dart';
 //
 import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
 
-// ========== EVENTS ==========
-abstract class ThemeEvent extends Equatable {
-  const ThemeEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadTheme extends ThemeEvent {}
-
-class ChangeTheme extends ThemeEvent {
-  final String themeId;
-
-  const ChangeTheme(this.themeId);
-
-  @override
-  List<Object> get props => [themeId];
-}
-
-class ChangeThemeMode extends ThemeEvent {
-  final AppThemeMode mode;
-
-  const ChangeThemeMode(this.mode);
-
-  @override
-  List<Object> get props => [mode];
-}
-
-class LoadAllThemes extends ThemeEvent {}
-
-class SaveCustomTheme extends ThemeEvent {
-  final AppTheme theme;
-
-  const SaveCustomTheme(this.theme);
-
-  @override
-  List<Object> get props => [theme];
-}
-
-class DeleteCustomTheme extends ThemeEvent {
-  final String themeId;
-
-  const DeleteCustomTheme(this.themeId);
-
-  @override
-  List<Object> get props => [themeId];
-}
-
-// ========== STATES ==========
-abstract class ThemeState extends Equatable {
-  const ThemeState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class ThemeInitial extends ThemeState {}
-
-class ThemeLoading extends ThemeState {}
-
-class ThemeLoaded extends ThemeState {
-  final AppTheme currentTheme;
-  final AppThemeMode themeMode;
-  final List<AppTheme> availableThemes;
-
-  const ThemeLoaded({
-    required this.currentTheme,
-    required this.themeMode,
-    required this.availableThemes,
-  });
-
-  @override
-  List<Object> get props => [currentTheme, themeMode, availableThemes];
-
-  ThemeLoaded copyWith({
-    AppTheme? currentTheme,
-    AppThemeMode? themeMode,
-    List<AppTheme>? availableThemes,
-  }) {
-    return ThemeLoaded(
-      currentTheme: currentTheme ?? this.currentTheme,
-      themeMode: themeMode ?? this.themeMode,
-      availableThemes: availableThemes ?? this.availableThemes,
-    );
-  }
-}
-
-class ThemeError extends ThemeState {
-  final String message;
-
-  const ThemeError(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-// ========== BLOC ==========
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   final SettingsRepository settingsRepository;
   final ThemeRepository themeRepository;

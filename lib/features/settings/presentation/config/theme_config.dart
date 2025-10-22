@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 //
-import 'package:insight/features/stats/domain/entities/app_theme.dart';
+import 'package:insight/features/settings/domain/entities/app_theme.dart';
 
 /// Configuración de tema de la aplicación
 class ThemeConfig {

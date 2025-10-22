@@ -5,12 +5,15 @@ import 'package:insight/core/injection/injection_container.dart' as di;
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/navigation/presentation/screens/main_screen.dart';
 import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_event.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_state.dart';
+import 'package:insight/features/settings/presentation/config/theme_config.dart';
 //
 import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr_bloc.dart';
 //
-import 'package:insight/features/stats/presentation/config/theme_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

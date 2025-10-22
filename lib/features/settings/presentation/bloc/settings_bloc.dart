@@ -1,107 +1,11 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
+//
+import 'package:insight/features/settings/presentation/bloc/settings_event.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
 
-// ========== EVENTS ==========
-abstract class SettingsEvent extends Equatable {
-  const SettingsEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadSettings extends SettingsEvent {}
-
-class UpdateThemeMode extends SettingsEvent {
-  final AppThemeMode themeMode;
-
-  const UpdateThemeMode(this.themeMode);
-
-  @override
-  List<Object> get props => [themeMode];
-}
-
-class UpdateSelectedTheme extends SettingsEvent {
-  final String themeId;
-
-  const UpdateSelectedTheme(this.themeId);
-
-  @override
-  List<Object> get props => [themeId];
-}
-
-class UpdateNotifications extends SettingsEvent {
-  final bool enabled;
-
-  const UpdateNotifications(this.enabled);
-
-  @override
-  List<Object> get props => [enabled];
-}
-
-class UpdateHapticFeedback extends SettingsEvent {
-  final bool enabled;
-
-  const UpdateHapticFeedback(this.enabled);
-
-  @override
-  List<Object> get props => [enabled];
-}
-
-class UpdateAutoSave extends SettingsEvent {
-  final bool enabled;
-
-  const UpdateAutoSave(this.enabled);
-
-  @override
-  List<Object> get props => [enabled];
-}
-
-// NUEVO: Evento para cambiar estilo de diálogos
-class UpdateAwesomeSnackbar extends SettingsEvent {
-  final bool enabled;
-
-  const UpdateAwesomeSnackbar(this.enabled);
-
-  @override
-  List<Object> get props => [enabled];
-}
-
-class ResetSettings extends SettingsEvent {}
-
-// ========== STATES ==========
-abstract class SettingsState extends Equatable {
-  const SettingsState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class SettingsInitial extends SettingsState {}
-
-class SettingsLoading extends SettingsState {}
-
-class SettingsLoaded extends SettingsState {
-  final AppSettings settings;
-
-  const SettingsLoaded(this.settings);
-
-  @override
-  List<Object> get props => [settings];
-}
-
-class SettingsError extends SettingsState {
-  final String message;
-
-  const SettingsError(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-// ========== BLOC ==========
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsRepository repository;
   AppSettings _currentSettings = const AppSettings();

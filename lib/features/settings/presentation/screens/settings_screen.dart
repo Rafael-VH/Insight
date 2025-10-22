@@ -4,10 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 //
 import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_event.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
 import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_event.dart';
+import 'package:insight/features/settings/presentation/widgets/theme_selector_widget.dart';
 //
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
-import 'package:insight/features/stats/presentation/widgets/theme_selector_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

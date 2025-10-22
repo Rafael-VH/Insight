@@ -5,18 +5,29 @@ import 'package:image_picker/image_picker.dart';
 // Blocs - Navigation
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/settings/data/datasources/settings_datasource.dart';
+import 'package:insight/features/settings/data/datasources/theme_datasource.dart';
 import 'package:insight/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:insight/features/settings/data/repositories/theme_repository_impl.dart';
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
+// NUEVOS: Use Cases de Settings
+import 'package:insight/features/settings/domain/usecases/get_settings.dart';
+import 'package:insight/features/settings/domain/usecases/reset_settings.dart';
+import 'package:insight/features/settings/domain/usecases/save_settings.dart';
+import 'package:insight/features/settings/domain/usecases/update_auto_save.dart';
+import 'package:insight/features/settings/domain/usecases/update_awesome_snackbar.dart';
+import 'package:insight/features/settings/domain/usecases/update_haptic_feedback.dart';
+import 'package:insight/features/settings/domain/usecases/update_notifications.dart';
+import 'package:insight/features/settings/domain/usecases/update_selected_theme.dart';
+import 'package:insight/features/settings/domain/usecases/update_theme_mode.dart';
+// Blocs - Settings
 import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
 // Data Sources
 import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
 import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
-import 'package:insight/features/stats/data/datasources/theme_datasource.dart';
 // Repositories
 import 'package:insight/features/stats/data/repositories/ocr_repository_impl.dart';
 import 'package:insight/features/stats/data/repositories/stats_repository_impl.dart';
-import 'package:insight/features/stats/data/repositories/theme_repository_impl.dart';
 import 'package:insight/features/stats/domain/repositories/ocr_repository.dart';
 import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
 import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
@@ -60,6 +71,17 @@ Future<void> init() async {
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(dataSource: sl()),
   );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetSettings(sl()));
+  sl.registerLazySingleton(() => SaveSettings(sl()));
+  sl.registerLazySingleton(() => ResetSettings(sl()));
+  sl.registerLazySingleton(() => UpdateThemeMode(sl()));
+  sl.registerLazySingleton(() => UpdateSelectedTheme(sl()));
+  sl.registerLazySingleton(() => UpdateNotifications(sl()));
+  sl.registerLazySingleton(() => UpdateHapticFeedback(sl()));
+  sl.registerLazySingleton(() => UpdateAutoSave(sl()));
+  sl.registerLazySingleton(() => UpdateAwesomeSnackbar(sl()));
 
   // ==================== ML STATS SETUP ====================
   // Data sources
@@ -109,7 +131,7 @@ Future<void> init() async {
     () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
   );
 
-  // NAVIGATION BLOC (ACTUALIZADO - SOLO UNA VEZ)
+  // Navigation Bloc
   sl.registerFactory(() => NavigationBloc(totalDestinations: 3));
 
   // ML Stats Bloc

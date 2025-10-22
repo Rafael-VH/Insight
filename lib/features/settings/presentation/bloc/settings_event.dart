@@ -1,11 +1,7 @@
-// ========================================
-// EVENTS
-// ========================================
-
 import 'package:equatable/equatable.dart';
+//
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 
-/// Eventos base para el manejo de configuración
 abstract class SettingsEvent extends Equatable {
   const SettingsEvent();
 
@@ -13,96 +9,61 @@ abstract class SettingsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Evento: Cargar configuración inicial
-class LoadSettings extends SettingsEvent {
-  const LoadSettings();
+class LoadSettings extends SettingsEvent {}
 
-  @override
-  String toString() => 'LoadSettings()';
-}
-
-/// Evento: Actualizar modo de tema (claro/oscuro/sistema)
-class UpdateThemeModeEvent extends SettingsEvent {
+class UpdateThemeMode extends SettingsEvent {
   final AppThemeMode themeMode;
 
-  const UpdateThemeModeEvent(this.themeMode);
+  const UpdateThemeMode(this.themeMode);
 
   @override
   List<Object> get props => [themeMode];
-
-  @override
-  String toString() => 'UpdateThemeModeEvent(themeMode: ${themeMode.name})';
 }
 
-/// Evento: Actualizar tema seleccionado (ID)
-class UpdateSelectedThemeEvent extends SettingsEvent {
+class UpdateSelectedTheme extends SettingsEvent {
   final String themeId;
 
-  const UpdateSelectedThemeEvent(this.themeId);
+  const UpdateSelectedTheme(this.themeId);
 
   @override
   List<Object> get props => [themeId];
-
-  @override
-  String toString() => 'UpdateSelectedThemeEvent(themeId: $themeId)';
 }
 
-/// Evento: Habilitar/Deshabilitar notificaciones
-class UpdateNotificationsEvent extends SettingsEvent {
+class UpdateNotifications extends SettingsEvent {
   final bool enabled;
 
-  const UpdateNotificationsEvent(this.enabled);
+  const UpdateNotifications(this.enabled);
 
   @override
   List<Object> get props => [enabled];
-
-  @override
-  String toString() => 'UpdateNotificationsEvent(enabled: $enabled)';
 }
 
-/// Evento: Habilitar/Deshabilitar feedback háptico
-class UpdateHapticFeedbackEvent extends SettingsEvent {
+class UpdateHapticFeedback extends SettingsEvent {
   final bool enabled;
 
-  const UpdateHapticFeedbackEvent(this.enabled);
+  const UpdateHapticFeedback(this.enabled);
 
   @override
   List<Object> get props => [enabled];
-
-  @override
-  String toString() => 'UpdateHapticFeedbackEvent(enabled: $enabled)';
 }
 
-/// Evento: Habilitar/Deshabilitar auto-guardado
-class UpdateAutoSaveEvent extends SettingsEvent {
+class UpdateAutoSave extends SettingsEvent {
   final bool enabled;
 
-  const UpdateAutoSaveEvent(this.enabled);
+  const UpdateAutoSave(this.enabled);
 
   @override
   List<Object> get props => [enabled];
-
-  @override
-  String toString() => 'UpdateAutoSaveEvent(enabled: $enabled)';
 }
 
-/// Evento: Habilitar/Deshabilitar Awesome Snackbar
-class UpdateAwesomeSnackbarEvent extends SettingsEvent {
+// NUEVO: Evento para cambiar estilo de diálogos
+class UpdateAwesomeSnackbar extends SettingsEvent {
   final bool enabled;
 
-  const UpdateAwesomeSnackbarEvent(this.enabled);
+  const UpdateAwesomeSnackbar(this.enabled);
 
   @override
   List<Object> get props => [enabled];
-
-  @override
-  String toString() => 'UpdateAwesomeSnackbarEvent(enabled: $enabled)';
 }
 
-/// Evento: Restablecer configuración a valores por defecto
-class ResetSettingsEvent extends SettingsEvent {
-  const ResetSettingsEvent();
-
-  @override
-  String toString() => 'ResetSettingsEvent()';
-}
+class ResetSettings extends SettingsEvent {}

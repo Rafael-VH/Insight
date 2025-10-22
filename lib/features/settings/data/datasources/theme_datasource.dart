@@ -3,7 +3,7 @@ import 'dart:convert';
 //
 import 'package:insight/core/errors/failures.dart';
 //
-import 'package:insight/features/stats/domain/entities/app_theme.dart';
+import 'package:insight/features/settings/domain/entities/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ThemeDataSource {
