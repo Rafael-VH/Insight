@@ -1,16 +1,14 @@
 import 'package:dartz/dartz.dart';
 //
 import 'package:insight/core/errors/failures.dart';
-//
-import 'package:insight/features/stats/data/datasources/settings_datasource.dart';
-import 'package:insight/features/stats/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/data/datasources/settings_datasource.dart';
+import 'package:insight/features/settings/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
 
-abstract class SettingsRepository {
-  Future<Either<Failure, AppSettings>> getSettings();
-  Future<Either<Failure, void>> saveSettings(AppSettings settings);
-  Future<Either<Failure, void>> resetSettings();
-}
-
+/// Implementación concreta del repositorio de configuración
+///
+/// Orquesta las operaciones entre el DataSource y la capa de dominio,
+/// manejando errores y transformando excepciones en Failures
 class SettingsRepositoryImpl implements SettingsRepository {
   final SettingsDataSource dataSource;
 
@@ -24,7 +22,11 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
+      return Left(
+        FileSystemFailure(
+          'Error inesperado al cargar configuración: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -36,7 +38,11 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
+      return Left(
+        FileSystemFailure(
+          'Error inesperado al guardar configuración: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -48,7 +54,11 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(FileSystemFailure('Unexpected error: ${e.toString()}'));
+      return Left(
+        FileSystemFailure(
+          'Error inesperado al restablecer configuración: ${e.toString()}',
+        ),
+      );
     }
   }
 }

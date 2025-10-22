@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
 import 'package:insight/core/utils/stats_validator.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
 //
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
@@ -13,7 +14,6 @@ import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr_event.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr_state.dart';
-import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
 //
 import 'package:insight/features/stats/presentation/controllers/stats_upload_controller.dart';
 import 'package:insight/features/stats/presentation/services/dialog_service.dart';

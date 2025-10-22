@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
-import 'package:insight/features/stats/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/domain/entities/app_settings.dart';
 //
-import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/theme_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
 //
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/features/stats/presentation/widgets/theme_selector_widget.dart';

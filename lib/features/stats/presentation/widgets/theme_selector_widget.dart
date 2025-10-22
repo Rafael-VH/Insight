@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
-import 'package:insight/features/stats/domain/entities/app_theme.dart';
+import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
 //
-import 'package:insight/features/stats/presentation/bloc/theme_bloc.dart';
+import 'package:insight/features/stats/domain/entities/app_theme.dart';
 
 /// Widget para seleccionar temas en la configuración
 class ThemeSelectorWidget extends StatelessWidget {

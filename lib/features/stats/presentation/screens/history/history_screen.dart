@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
 //
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 //
 import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ml_stats_event.dart';
 import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
-import 'package:insight/features/stats/presentation/bloc/settings_bloc.dart';
 //
 import 'package:insight/features/stats/presentation/screens/details/detail_screen.dart';
 //

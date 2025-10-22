@@ -2,9 +2,8 @@ import 'package:equatable/equatable.dart';
 //
 import 'package:flutter_bloc/flutter_bloc.dart';
 //
-import 'package:insight/features/stats/data/repositories/settings_repository.dart';
-//
-import 'package:insight/features/stats/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/domain/entities/app_settings.dart';
+import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
 import 'package:insight/features/stats/domain/entities/app_theme.dart';
 //
 import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
