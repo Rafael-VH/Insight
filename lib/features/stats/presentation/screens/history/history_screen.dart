@@ -49,6 +49,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+
+    // Limpiar estado al salir
+    _searchQuery = '';
+    _allCollections.clear();
+    _displayedCollections.clear();
+
     super.dispose();
   }
 
@@ -58,6 +64,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _onScroll() {
+    // Prevenir llamadas múltiples
+    if (_isLoadingMore || !_hasMoreData) return;
+
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.9) {
       _loadMoreCollections();
@@ -105,14 +114,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
       _hasMoreData = _allCollections.isNotEmpty;
     });
 
+    // Cargar primera página inmediatamente
     if (_allCollections.isNotEmpty) {
       _loadMoreCollections();
     }
   }
 
   List<StatsCollection> _filterAndSortCollections(
-    List<StatsCollection> collections,
-  ) {
+      List<StatsCollection> collections,) {
     var filtered = collections;
 
     // Aplicar filtro de búsqueda
@@ -166,70 +175,72 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // ==================== NUEVAS FUNCIONES ====================
-
   Future<void> _showRenameDialog(StatsCollection collection) async {
     final currentName = collection.displayName;
     final controller = TextEditingController(text: currentName);
 
     final newName = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.edit, color: Theme.of(context).primaryColor),
-            const SizedBox(width: 12),
-            const Text('Cambiar Nombre'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ingresa un nuevo nombre para estas estadísticas:',
-              style: TextStyle(color: Colors.grey[600]),
+      builder: (dialogContext) =>
+          AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Icon(Icons.edit, color: Theme
+                    .of(context)
+                    .primaryColor),
+                const SizedBox(width: 12),
+                const Text('Cambiar Nombre'),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: 'Nuevo nombre',
-                hintText: 'Ej: Partidas del sábado',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ingresa un nuevo nombre para estas estadísticas:',
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
-                prefixIcon: const Icon(Icons.label),
-                counterText: '',
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    labelText: 'Nuevo nombre',
+                    hintText: 'Ej: Partidas del sábado',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.label),
+                    counterText: '',
+                  ),
+                  autofocus: true,
+                  maxLength: 50,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancelar'),
               ),
-              autofocus: true,
-              maxLength: 50,
-              textCapitalization: TextCapitalization.sentences,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final text = controller.text.trim();
+                  if (text.isNotEmpty) {
+                    Navigator.pop(dialogContext, text);
+                  }
+                },
+                icon: const Icon(Icons.check),
+                label: const Text('Guardar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
           ),
-          ElevatedButton.icon(
-            onPressed: () {
-              final text = controller.text.trim();
-              if (text.isNotEmpty) {
-                Navigator.pop(dialogContext, text);
-              }
-            },
-            icon: const Icon(Icons.check),
-            label: const Text('Guardar'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ],
-      ),
     );
 
     if (newName != null && newName.isNotEmpty && newName != currentName) {
@@ -243,83 +254,84 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _showDeleteConfirmation(StatsCollection collection) async {
-    final settingsState = context.read<SettingsBloc>().state;
-    final useAwesome = settingsState is SettingsLoaded
-        ? settingsState.settings.useAwesomeSnackbar
-        : true;
+    final settingsState = context
+        .read<SettingsBloc>()
+        .state;
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
-            const SizedBox(width: 12),
-            const Text('Confirmar Eliminación'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '¿Estás seguro de eliminar estas estadísticas?',
-              style: const TextStyle(fontSize: 16),
+      builder: (dialogContext) =>
+          AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
+                const SizedBox(width: 12),
+                const Text('Confirmar Eliminación'),
+              ],
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    collection.displayName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '¿Estás seguro de eliminar estas estadísticas?',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red[200]!),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatDate(collection.createdAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        collection.displayName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatDate(collection.createdAt),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Esta acción no se puede deshacer.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red[700],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Cancelar'),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Esta acción no se puede deshacer.',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.red[700],
-                fontStyle: FontStyle.italic,
+              ElevatedButton.icon(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                icon: const Icon(Icons.delete_forever),
+                label: const Text('Eliminar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancelar'),
+            ],
           ),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            icon: const Icon(Icons.delete_forever),
-            label: const Text('Eliminar'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ],
-      ),
     );
 
     if (confirm == true) {
@@ -344,95 +356,91 @@ class _HistoryScreenState extends State<HistoryScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (bottomSheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            // Título
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: Row(
-                children: [
-                  Icon(Icons.more_horiz, color: Colors.grey[700]),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Opciones',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
+      builder: (bottomSheetContext) =>
+          SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                ],
-              ),
-            ),
-            // Opciones
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.info_outline, color: Colors.blue[700]),
-              ),
-              title: const Text('Ver Detalles'),
-              onTap: () {
-                Navigator.pop(bottomSheetContext);
-                _showStatsDetail(collection);
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  borderRadius: BorderRadius.circular(8),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.more_horiz, color: Colors.grey[700]),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Opciones',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Icon(Icons.edit, color: Colors.green[700]),
-              ),
-              title: const Text('Cambiar Nombre'),
-              onTap: () {
-                Navigator.pop(bottomSheetContext);
-                _showRenameDialog(collection);
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(8),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.info_outline, color: Colors.blue[700]),
+                  ),
+                  title: const Text('Ver Detalles'),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _showStatsDetail(collection);
+                  },
                 ),
-                child: Icon(Icons.delete_outline, color: Colors.red[700]),
-              ),
-              title: const Text(
-                'Eliminar',
-                style: TextStyle(color: Colors.red),
-              ),
-              onTap: () {
-                Navigator.pop(bottomSheetContext);
-                _showDeleteConfirmation(collection);
-              },
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.edit, color: Colors.green[700]),
+                  ),
+                  title: const Text('Cambiar Nombre'),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _showRenameDialog(collection);
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.delete_outline, color: Colors.red[700]),
+                  ),
+                  title: const Text(
+                    'Eliminar',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _showDeleteConfirmation(collection);
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
             ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
+          ),
     );
   }
-
-  // ==================== UI HELPERS ====================
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
@@ -460,11 +468,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return BlocListener<MLStatsBloc, MLStatsState>(
       listener: (context, state) {
-        final settingsState = context.read<SettingsBloc>().state;
+        final settingsState = context
+            .read<SettingsBloc>()
+            .state;
         final useAwesome = settingsState is SettingsLoaded
             ? settingsState.settings.useAwesomeSnackbar
             : true;
 
+        // Actualizar colecciones PRIMERO
         if (state is MLStatsCollectionsLoaded) {
           _updateCollections(state.collections);
         } else if (state is MLStatsNameUpdated) {
@@ -489,26 +500,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
           );
         }
       },
-      child: Scaffold(
-        body: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            _buildAppBar(),
-            _buildSearchBar(),
-            _buildFilterBar(),
-            _buildContent(),
-          ],
+      child: GestureDetector(
+        // Cerrar teclado al tocar fuera
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          // Evitar que el contenido se redimensione con el teclado
+          resizeToAvoidBottomInset: true,
+          body: CustomScrollView(
+            controller: _scrollController,
+            // Comportamiento de scroll para teclado
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              _buildAppBar(),
+              _buildSearchBar(),
+              _buildFilterBar(),
+              _buildContent(),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAppBar() {
+    // Detectar si el teclado está visible
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return AppSliverBar(
       title: 'Historial de Estadísticas',
       colors: const [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+      // Reducir altura cuando aparece el teclado
+      expandedHeight: isKeyboardVisible ? 60.0 : 100.0,
       actions: [
-        // Botón de ordenamiento
         PopupMenuButton<String>(
           icon: Icon(
             _sortBy == 'date' ? Icons.calendar_today : Icons.sort_by_alpha,
@@ -521,7 +544,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               _toggleSort(value);
             }
           },
-          itemBuilder: (context) => [
+          itemBuilder: (context) =>
+          [
             PopupMenuItem(
               value: 'date',
               child: Row(
@@ -529,7 +553,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Icon(
                     Icons.calendar_today,
                     color: _sortBy == 'date'
-                        ? Theme.of(context).primaryColor
+                        ? Theme
+                        .of(context)
+                        .primaryColor
                         : null,
                   ),
                   const SizedBox(width: 12),
@@ -551,7 +577,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Icon(
                     Icons.sort_by_alpha,
                     color: _sortBy == 'name'
-                        ? Theme.of(context).primaryColor
+                        ? Theme
+                        .of(context)
+                        .primaryColor
                         : null,
                   ),
                   const SizedBox(width: 12),
@@ -581,7 +609,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ],
         ),
-        // Botón de refrescar
         IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: _loadCollections,
@@ -595,21 +622,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return SliverToBoxAdapter(
       child: Container(
         padding: const EdgeInsets.all(16),
-        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+        color: Theme
+            .of(context)
+            .primaryColor
+            .withValues(alpha: 0.05),
         child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
+          // Configuración de teclado
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
           decoration: InputDecoration(
             hintText: 'Buscar por nombre o fecha...',
             prefixIcon: const Icon(Icons.search),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      _onSearchChanged('');
-                    },
-                  )
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _searchController.clear();
+                _onSearchChanged('');
+                FocusScope.of(context).unfocus(); // Cerrar teclado
+              },
+            )
                 : null,
             filled: true,
             fillColor: Colors.white,
@@ -668,14 +702,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildContent() {
     return BlocBuilder<MLStatsBloc, MLStatsState>(
       builder: (context, state) {
-        // Estado de carga inicial
         if (state is MLStatsLoading && _displayedCollections.isEmpty) {
           return const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Estado de error
         if (state is MLStatsError && _displayedCollections.isEmpty) {
           return SliverFillRemaining(
             child: ErrorStateWidget(
@@ -686,7 +718,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           );
         }
 
-        // Estado vacío
         if (_allCollections.isEmpty && state is! MLStatsLoading) {
           return SliverFillRemaining(
             child: EmptyStateWidget(
@@ -699,20 +730,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   : 'Carga tus primeras estadísticas desde la pantalla principal',
               actionButton: _searchQuery.isEmpty
                   ? ElevatedButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Cargar Estadísticas'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
-                        foregroundColor: Colors.white,
-                      ),
-                    )
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Cargar Estadísticas'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
+                ),
+              )
                   : null,
             ),
           );
         }
 
-        // Mostrar colecciones
         return _buildCollectionsList();
       },
     );
@@ -734,13 +764,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return SliverList(
       delegate: SliverChildListDelegate([
-        // ========== ÚLTIMA ESTADÍSTICA ==========
         if (latestCollection != null && _searchQuery.isEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               'Última Estadística',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF059669),
               ),
@@ -756,7 +789,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ],
 
-        // ========== HISTORIAL COMPLETO ==========
         if (historyCollections.isNotEmpty || _searchQuery.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -767,7 +799,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   _searchQuery.isNotEmpty
                       ? 'Resultados de Búsqueda'
                       : 'Historial Completo',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF1E3A8A),
                   ),
@@ -795,22 +831,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           if (_searchQuery.isNotEmpty && _displayedCollections.isNotEmpty)
-            ..._displayedCollections.asMap().entries.map(
-              (entry) => _buildHistoryCard(entry.value, entry.key),
+            ..._displayedCollections
+                .asMap()
+                .entries
+                .map(
+                  (entry) => _buildHistoryCard(entry.value, entry.key),
             )
           else
-            ...historyCollections.asMap().entries.map(
-              (entry) => _buildHistoryCard(entry.value, entry.key + 1),
+            ...historyCollections
+                .asMap()
+                .entries
+                .map(
+                  (entry) => _buildHistoryCard(entry.value, entry.key + 1),
             ),
 
-          // Indicador de carga para paginación
           if (_isLoadingMore)
             const Padding(
               padding: EdgeInsets.all(16),
               child: Center(child: CircularProgressIndicator()),
             ),
 
-          // Mensaje de fin de datos
           if (!_hasMoreData && historyCollections.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16),
@@ -825,20 +865,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
             ),
-        ] else if (_searchQuery.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: Text(
-                'No hay más estadísticas guardadas',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
+        ] else
+          if (_searchQuery.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: Text(
+                  'No hay más estadísticas guardadas',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
             ),
-          ),
 
         const SizedBox(height: 16),
       ]),
@@ -873,7 +914,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Badge de "Más Reciente"
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -903,7 +943,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ],
                     ),
                   ),
-                  // Botón de opciones
                   IconButton(
                     onPressed: () => _showOptionsMenu(collection, 0),
                     icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -913,7 +952,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Nombre personalizado
               Text(
                 collection.displayName,
                 style: const TextStyle(
@@ -924,7 +962,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               const SizedBox(height: 8),
 
-              // Fecha y hora
               Row(
                 children: [
                   const Icon(
@@ -941,7 +978,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Modos disponibles
               if (collection.availableStats.isNotEmpty) ...[
                 Text(
                   'Modos capturados:',
@@ -961,7 +997,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ],
               const SizedBox(height: 16),
 
-              // Botón de ver detalles
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -995,6 +1030,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildHistoryCard(StatsCollection collection, int index) {
+    // Calcular badge correctamente
+    final badgeNumber = _allCollections.length - index;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         16,
@@ -1007,9 +1045,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: StatsCollectionCard(
           collection: collection,
           onTap: () => _showStatsDetail(collection),
-          badge: _searchQuery.isEmpty
-              ? '${_allCollections.length - index - (_displayedCollections.length > 1 ? 1 : 0)}'
-              : null,
+          badge: _searchQuery.isEmpty ? '$badgeNumber' : null,
         ),
       ),
     );
