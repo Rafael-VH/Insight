@@ -144,55 +144,65 @@ class _UploadScreenState extends State<UploadScreen> {
     OcrSuccess state,
     bool useAwesome,
   ) {
+    debugPrint('📥 OCR Success - Iniciando procesamiento');
+
     // Procesar con diagnóstico completo usando el controller
     final result = _controller.handleOcrSuccessWithDiagnostics(
       state.result.recognizedText,
       state.result.imagePath,
     );
 
-    final mode = _controller.currentProcessingMode;
+    // ✅ Usar el modo del resultado, no del controller
+    final mode = result.processedMode;
 
-    // Validar que el modo no sea null - Si mode era null, el app crasheaba al intentar usar mode! - Previene crashes y proporciona feedback claro al usuario
     if (mode == null) {
-      debugPrint('❌ Error: modo de procesamiento es null');
+      debugPrint('❌ Error: modo de procesamiento es null en el resultado');
       DialogService.showError(
         context,
         title: 'Error Interno',
         message: 'No se pudo determinar el modo de juego',
-        errorDetails: 'Por favor, intenta nuevamente',
+        errorDetails:
+            'Por favor, intenta nuevamente. Si el problema persiste, reinicia la aplicación.',
         useAwesome: useAwesome,
       );
-      return; // Salir temprano para evitar null reference
+      return;
     }
 
+    debugPrint('✅ Modo procesado: ${mode.fullDisplayName}');
+
     if (result.hasValidStats && result.validation != null) {
-      // Implementar debouncing para validaciones - Si el usuario cargaba imágenes rápidamente, se mostraban múltiples diálogos superpuestos - Cancelar el timer anterior y crear uno nuevo - Solo se muestra un diálogo después de que el usuario termine de cargar
+      debugPrint('📊 Estadísticas válidas encontradas');
+
+      // Implementar debouncing para validaciones
       _validationDebounceTimer?.cancel();
-      _validationDebounceTimer = Timer(
-        const Duration(milliseconds: 300), // 300ms de espera
-        () {
-          // Verificar que el widget sigue montado antes de mostrar diálogo - Prevenir errores si el usuario navega durante el timer
-          if (mounted) {
-            _currentValidatingMode = mode;
-            _showValidationDialog(result.validation!, mode);
-          }
-        },
-      );
+      _validationDebounceTimer = Timer(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          _currentValidatingMode = mode;
+          _showValidationDialog(result.validation!, mode);
+        }
+      });
     } else {
-      // Mensaje de error más específico con opción de reintentar - Usuario sabe exactamente qué hacer para solucionar el problema
+      debugPrint('⚠️ Estadísticas incompletas o inválidas');
+
+      // Mensaje de error más específico con opción de reintentar
       DialogService.showError(
         context,
         title: 'Error en Extracción',
-        message: 'No se pudieron extraer las estadísticas completas.',
+        message:
+            'No se pudieron extraer las estadísticas completas para ${mode.fullDisplayName}.',
         errorDetails:
-            'Verifica que la imagen muestre claramente todas las estadísticas',
+            'Verifica que la imagen muestre claramente todas las estadísticas. Intenta capturar la pantalla con buena iluminación.',
         useAwesome: useAwesome,
-        onRetry: () => _retryImageCapture(mode), // Callback para reintentar
+        onRetry: () => _retryImageCapture(mode),
       );
 
       // Mostrar log detallado solo si hay información de debugging
       if (result.extractionLog.isNotEmpty) {
-        _showExtractionLogDialog(result.extractionLog);
+        debugPrint(
+          '📋 Log de extracción disponible (${result.extractionLog.length} entradas)',
+        );
+        // Opcional: mostrar automáticamente en modo debug
+        // _showExtractionLogDialog(result.extractionLog);
       }
     }
   }

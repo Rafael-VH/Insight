@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
               Color(0xFF60A5FA),
             ],
             icon: Icons.analytics_rounded,
-            expandedHeight: 200.0,
+            expandedHeight: 160.0,
             actions: [
               IconButton(
                 icon: const Icon(Icons.history),
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 48),
                   _buildUploadButtons(context),
                   const Spacer(),
-                  _buildInfoBanner(),
+                  //_buildInfoBanner(),
                 ],
               ),
             ),

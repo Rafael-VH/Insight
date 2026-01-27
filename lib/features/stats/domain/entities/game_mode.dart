@@ -12,9 +12,9 @@ enum GameMode {
       case GameMode.total:
         return 'Total';
       case GameMode.ranked:
-        return 'Ranked';
+        return 'Clasificatoria';
       case GameMode.classic:
-        return 'Classic';
+        return 'Clásica';
       case GameMode.brawl:
         return 'Coliseo';
     }
