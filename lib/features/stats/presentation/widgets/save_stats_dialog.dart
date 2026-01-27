@@ -8,7 +8,7 @@ class SaveStatsDialog {
     required String message,
     VoidCallback? onClose,
   }) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -93,7 +93,7 @@ class SaveStatsDialog {
     String? errorDetails,
     VoidCallback? onRetry,
   }) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -267,7 +267,7 @@ class SaveStatsDialog {
               'Por favor espera',
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurface.withOpacity(0.6), // Adaptado
+                color: colorScheme.onSurface.withValues(alpha: 0.6), // Adaptado
               ),
               textAlign: TextAlign.center,
             ),
@@ -285,7 +285,7 @@ class SaveStatsDialog {
     String confirmButtonText = 'Guardar',
     String cancelButtonText = 'Cancelar',
   }) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
 
     return showDialog<bool>(
@@ -306,7 +306,7 @@ class SaveStatsDialog {
           message,
           style: TextStyle(
             fontSize: 14,
-            color: colorScheme.onSurface.withOpacity(0.8), // Adaptado
+            color: colorScheme.onSurface.withValues(alpha: 0.8), // Adaptado
             height: 1.5,
           ),
         ),
@@ -344,7 +344,7 @@ class SaveStatsDialog {
     required String message,
     String buttonText = 'Aceptar',
   }) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
@@ -364,7 +364,7 @@ class SaveStatsDialog {
           message,
           style: TextStyle(
             fontSize: 14,
-            color: colorScheme.onSurface.withOpacity(0.8), // Adaptado
+            color: colorScheme.onSurface.withValues(alpha: 0.8), // Adaptado
             height: 1.5,
           ),
         ),

@@ -1,11 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-//
 import 'package:insight/features/stats/domain/usecases/copy_text_to_clipboard.dart';
 import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_text.dart';
 import 'package:insight/features/stats/domain/usecases/usecase.dart';
-//
-import 'package:insight/features/stats/presentation/bloc/ocr_event.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr_state.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_event.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_state.dart';
 
 class OcrBloc extends Bloc<OcrEvent, OcrState> {
   final PickImageAndRecognizeText pickImageAndRecognizeText;

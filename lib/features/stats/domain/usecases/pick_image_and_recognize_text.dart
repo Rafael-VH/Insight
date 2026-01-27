@@ -1,11 +1,7 @@
 import 'package:dartz/dartz.dart';
-//
 import 'package:insight/core/errors/failures.dart';
-//
 import 'package:insight/features/stats/domain/entities/ocr_result.dart';
-//
 import 'package:insight/features/stats/domain/repositories/ocr_repository.dart';
-//
 import 'package:insight/features/stats/domain/usecases/usecase.dart';
 
 class PickImageAndRecognizeText

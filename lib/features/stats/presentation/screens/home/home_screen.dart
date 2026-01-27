@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-//
 import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
-//
 import 'package:insight/features/stats/presentation/screens/upload/upload_screen.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
-//
 import 'package:insight/features/stats/presentation/widgets/info_banner.dart';
 import 'package:insight/features/stats/presentation/widgets/stats_upload_button.dart';
 

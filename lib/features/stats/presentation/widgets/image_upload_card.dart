@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
 
@@ -21,7 +20,7 @@ class ImageUploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
@@ -34,7 +33,7 @@ class ImageUploadCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getGameModeColor().withOpacity(isDark ? 0.2 : 0.1),
+              color: _getGameModeColor().withValues(alpha: isDark ? 0.2 : 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -82,15 +81,15 @@ class ImageUploadCard extends StatelessWidget {
             height: 200,
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              // CORRECCIÓN: Fondo adaptado al tema
+              // Fondo adaptado al tema
               color: isDark
                   ? colorScheme.surfaceContainerHighest
                   : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                // CORRECCIÓN: Borde adaptado
+                // Borde adaptado
                 color: isDark
-                    ? colorScheme.outline.withOpacity(0.5)
+                    ? colorScheme.outline.withValues(alpha: 0.5)
                     : Colors.grey[300]!,
                 style: BorderStyle.solid,
                 width: 2,
@@ -106,7 +105,7 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   Widget _buildUploadArea(BuildContext context) {
-    // CORRECCIÓN: Colores de texto adaptados
+    // Colores de texto adaptados
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
@@ -135,7 +134,7 @@ class ImageUploadCard extends StatelessWidget {
                 Icons.cloud_upload_outlined,
                 size: 48,
                 color: isDark
-                    ? colorScheme.onSurface.withOpacity(0.5)
+                    ? colorScheme.onSurface.withValues(alpha: 0.5)
                     : Colors.grey[400],
               ),
               const SizedBox(height: 16),
@@ -145,7 +144,7 @@ class ImageUploadCard extends StatelessWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: isDark
-                      ? colorScheme.onSurface.withOpacity(0.8)
+                      ? colorScheme.onSurface.withValues(alpha: 0.8)
                       : Colors.grey[600],
                 ),
               ),
@@ -155,7 +154,7 @@ class ImageUploadCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: isDark
-                      ? colorScheme.onSurface.withOpacity(0.6)
+                      ? colorScheme.onSurface.withValues(alpha: 0.6)
                       : Colors.grey[500],
                 ),
               ),
@@ -183,7 +182,7 @@ class ImageUploadCard extends StatelessWidget {
           right: 8,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(
@@ -200,7 +199,7 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   void _showImageSourceDialog(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados al tema
+    // Colores adaptados al tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
@@ -244,7 +243,7 @@ class ImageUploadCard extends StatelessWidget {
                   subtitle: Text(
                     'Tomar una foto nueva',
                     style: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   onTap: () {
@@ -271,7 +270,7 @@ class ImageUploadCard extends StatelessWidget {
                   subtitle: Text(
                     'Elegir de la galería',
                     style: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   onTap: () {

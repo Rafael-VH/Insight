@@ -1,7 +1,5 @@
 import 'package:dartz/dartz.dart';
-//
 import 'package:insight/core/errors/failures.dart';
-//
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
 
 abstract class UseCase<Type, Params> {

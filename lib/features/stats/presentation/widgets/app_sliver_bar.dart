@@ -54,7 +54,7 @@ class AppSliverBar extends StatelessWidget {
                   child: Icon(
                     icon,
                     size: iconSize,
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                   ),
                 )
               : null,

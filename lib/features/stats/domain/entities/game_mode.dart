@@ -17,8 +17,6 @@ enum GameMode {
         return 'Classic';
       case GameMode.brawl:
         return 'Coliseo';
-      default:
-        return name;
     }
   }
 }

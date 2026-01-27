@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-//
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/features/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:intl/intl.dart';

@@ -8,7 +8,7 @@ class StatsCollectionModel extends StatsCollection {
     super.classicStats,
     super.brawlStats,
     required super.createdAt,
-    super.name, // NUEVO
+    super.name,
   });
 
   factory StatsCollectionModel.fromEntity(StatsCollection collection) {
@@ -18,17 +18,17 @@ class StatsCollectionModel extends StatsCollection {
       classicStats: collection.classicStats,
       brawlStats: collection.brawlStats,
       createdAt: collection.createdAt,
-      name: collection.name, // NUEVO
+      name: collection.name,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      // MEJORADO: Verificar null antes de convertir
-      'totalStats': totalStats != null ? totalStats!.toJson() : null,
-      'rankedStats': rankedStats != null ? rankedStats!.toJson() : null,
-      'classicStats': classicStats != null ? classicStats!.toJson() : null,
-      'brawlStats': brawlStats != null ? brawlStats!.toJson() : null,
+      // Verificar null antes de convertir
+      'totalStats': totalStats?.toJson(),
+      'rankedStats': rankedStats?.toJson(),
+      'classicStats': classicStats?.toJson(),
+      'brawlStats': brawlStats?.toJson(),
       'createdAt': createdAt.toIso8601String(),
       'name': name, // NUEVO
     };
@@ -36,7 +36,7 @@ class StatsCollectionModel extends StatsCollection {
 
   factory StatsCollectionModel.fromJson(Map<String, dynamic> json) {
     return StatsCollectionModel(
-      // MEJORADO: Verificar null correctamente
+      // Verificar null correctamente
       totalStats: json['totalStats'] != null
           ? PlayerStats.fromJson(json['totalStats'] as Map<String, dynamic>)
           : null,
@@ -52,7 +52,7 @@ class StatsCollectionModel extends StatsCollection {
       createdAt: DateTime.parse(json['createdAt'] as String),
       name:
           json['name'] as String? ??
-          '', // NUEVO: Compatibilidad con datos antiguos
+          '',
     );
   }
 }

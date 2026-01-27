@@ -28,7 +28,7 @@ class AppSettings {
   final bool enableHapticFeedback;
   final bool autoSaveStats;
   final String language;
-  final bool useAwesomeSnackbar; // NUEVO: Control de diálogos
+  final bool useAwesomeSnackbar; // Control de diálogos
 
   const AppSettings({
     this.themeMode = AppThemeMode.system,
@@ -37,7 +37,7 @@ class AppSettings {
     this.enableHapticFeedback = true,
     this.autoSaveStats = true,
     this.language = 'es',
-    this.useAwesomeSnackbar = true, // NUEVO: Habilitado por defecto
+    this.useAwesomeSnackbar = true, // Habilitado por defecto
   });
 
   AppSettings copyWith({
@@ -47,7 +47,7 @@ class AppSettings {
     bool? enableHapticFeedback,
     bool? autoSaveStats,
     String? language,
-    bool? useAwesomeSnackbar, // NUEVO
+    bool? useAwesomeSnackbar,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,

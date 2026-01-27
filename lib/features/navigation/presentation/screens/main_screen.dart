@@ -136,7 +136,7 @@ class _MainScreenState extends State<MainScreen>
         color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -149,7 +149,7 @@ class _MainScreenState extends State<MainScreen>
             currentIndex: currentIndex,
             onTap: _handleTabChange,
             selectedItemColor: _navigationItems[currentIndex].color,
-            unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
+            unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
             items: _buildBottomBarItems(),
           ),
         ),

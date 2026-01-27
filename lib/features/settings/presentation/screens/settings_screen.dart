@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
-//
-import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_event.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
-import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/theme_event.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_event.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
+import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/widgets/theme_selector_widget.dart';
-//
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -23,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // MEJORADO: Cargar configuración al iniciar
+    // Cargar configuración al iniciar
     _loadSettings();
   }
 
@@ -43,7 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             colors: const [Color(0xFF7C3AED), Color(0xFF9333EA)],
             icon: Icons.settings,
           ),
-          // MEJORADO: Solo un BlocBuilder para SettingsBloc
+          // Solo un BlocBuilder para SettingsBloc
           BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, settingsState) {
               if (settingsState is SettingsLoading) {
@@ -175,7 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         ),
 
-        // NUEVO: Switch para estilo de diálogos
+        // Switch para estilo de diálogos
         _buildSwitchTile(
           context: context,
           icon: Icons.chat_bubble_outline,
@@ -230,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // NUEVO: Método para mostrar preview del estilo seleccionado
+  // Método para mostrar preview del estilo seleccionado
   void _showStylePreview(BuildContext context, bool useAwesome) {
     if (useAwesome) {
       _showAwesomePreview(context);
@@ -239,7 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  // NUEVO: Preview del estilo Awesome
+  // Preview del estilo Awesome
   void _showAwesomePreview(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -277,7 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Text(
                           'Disfrutarás de notificaciones más modernas',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 13,
                           ),
                         ),
@@ -293,7 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // NUEVO: Preview del estilo clásico
+  // Preview del estilo clásico
   void _showClassicPreview(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -320,7 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // MEJORADO: Selector de modo de tema sin conflictos
+  // Selector de modo de tema sin conflictos
   Widget _buildThemeModeSelector(BuildContext context, AppSettings settings) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -354,7 +351,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mode: mode,
                       isSelected: isSelected,
                       onTap: () {
-                        // MEJORADO: Actualizar ambos blocs de forma sincronizada
+                        // Actualizar ambos blocs de forma sincronizada
                         _updateThemeMode(context, mode);
                       },
                     ),
@@ -368,7 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // NUEVO: Método para actualizar el modo de tema
+  // Método para actualizar el modo de tema
   void _updateThemeMode(BuildContext context, AppThemeMode mode) {
     if (mounted) {
       // Primero actualizar SettingsBloc
@@ -398,7 +395,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? colorScheme.primary.withOpacity(0.1)
+              ? colorScheme.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -440,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: Theme.of(context).primaryColor),
@@ -488,7 +485,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              // MEJORADO: Resetear ambos blocs correctamente
+              // Resetear ambos blocs correctamente
               context.read<SettingsBloc>().add(ResetSettings());
 
               // Pequeño delay para asegurar que SettingsBloc se actualiza primero

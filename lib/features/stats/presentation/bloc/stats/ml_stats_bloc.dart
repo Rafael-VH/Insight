@@ -1,14 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
-//
 import 'package:insight/features/stats/domain/usecases/get_all_stats_collections.dart';
 import 'package:insight/features/stats/domain/usecases/get_latest_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
 import 'package:insight/features/stats/domain/usecases/usecase.dart';
-//
-import 'package:insight/features/stats/presentation/bloc/ml_stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_event.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_state.dart';
 
 class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
   final SaveStatsCollection saveStatsCollection;

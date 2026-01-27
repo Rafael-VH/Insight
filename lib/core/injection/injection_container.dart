@@ -1,7 +1,8 @@
 // Packages
-import 'package:get_it/get_it.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:get_it/get_it.dart';
 // Blocs - Navigation
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/settings/data/datasources/settings_datasource.dart';
@@ -9,7 +10,7 @@ import 'package:insight/features/settings/data/datasources/theme_datasource.dart
 import 'package:insight/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:insight/features/settings/data/repositories/theme_repository_impl.dart';
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
-// NUEVOS: Use Cases de Settings
+// Use Cases de Settings
 import 'package:insight/features/settings/domain/usecases/get_settings.dart';
 import 'package:insight/features/settings/domain/usecases/reset_settings.dart';
 import 'package:insight/features/settings/domain/usecases/save_settings.dart';
@@ -20,8 +21,8 @@ import 'package:insight/features/settings/domain/usecases/update_notifications.d
 import 'package:insight/features/settings/domain/usecases/update_selected_theme.dart';
 import 'package:insight/features/settings/domain/usecases/update_theme_mode.dart';
 // Blocs - Settings
-import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/theme_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dart';
 // Data Sources
 import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
 import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
@@ -39,9 +40,8 @@ import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
 // Blocs - Stats
-import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 
 final sl = GetIt.instance;
 

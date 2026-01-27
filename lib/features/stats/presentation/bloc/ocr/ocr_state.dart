@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-//
 import 'package:insight/features/stats/domain/entities/ocr_result.dart';
 
 abstract class OcrState extends Equatable {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/stats/domain/entities/player_stats.dart';
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-//
 import 'package:insight/features/stats/presentation/utils/game_mode_extensions.dart';
 import 'package:intl/intl.dart';
 
@@ -16,7 +14,7 @@ class StatsCollectionCard extends StatelessWidget {
 
   final StatsCollection collection;
   final VoidCallback onTap;
-  final String? badge; // NUEVO: Badge opcional con número
+  final String? badge; // Badge opcional con número
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class StatsCollectionCard extends StatelessWidget {
                 ],
               ),
             ),
-            // NUEVO: Badge de número de orden
+            // Badge de número de orden
             if (badge != null)
               Positioned(
                 top: 12,
@@ -54,7 +52,7 @@ class StatsCollectionCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.3),
+                        color: Colors.blue.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -145,7 +143,7 @@ class StatsCollectionCard extends StatelessWidget {
         stats.mode.shortName,
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
-      backgroundColor: stats.mode.color.withOpacity(0.1),
+      backgroundColor: stats.mode.color.withValues(alpha: 0.1),
       side: BorderSide(color: stats.mode.color, width: 1.5),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       avatar: Icon(stats.mode.icon, size: 16, color: stats.mode.color),

@@ -1,7 +1,5 @@
 import 'package:dartz/dartz.dart';
-//
 import 'package:insight/core/errors/failures.dart';
-//
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 
 abstract class StatsRepository {

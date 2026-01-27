@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-//
+
 import 'package:insight/core/errors/failures.dart';
 import 'package:insight/features/settings/data/datasources/settings_datasource.dart';
 import 'package:insight/features/settings/domain/entities/app_settings.dart';

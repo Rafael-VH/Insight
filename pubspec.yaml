@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
 
   # UI & Icons
-  font_awesome_flutter: ^10.10.0
+  font_awesome_flutter: ^10.12.0
   cupertino_icons: ^1.0.8
   google_nav_bar: ^5.0.7
 
@@ -21,14 +21,14 @@ dependencies:
   equatable: ^2.0.7
 
   # Dependency Injection
-  get_it: ^8.2.0
+  get_it: ^9.1.1
 
   # Local Storage
   shared_preferences: ^2.5.3
 
   # OCR & Image Processing
   google_mlkit_text_recognition: ^0.15.0
-  image_picker: ^1.2.0
+  image_picker: ^1.2.1
 
   # Functional Programming
   dartz: ^0.10.1
@@ -41,7 +41,7 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
 
   # Awesome Snackbar Content
-  awesome_snackbar_content: ^0.1.2
+  awesome_snackbar_content: ^0.1.8
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +52,3 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
-
-  assets:
-    - assets/
-    - assets/images/

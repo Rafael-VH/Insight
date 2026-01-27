@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-//
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 
 abstract class SettingsEvent extends Equatable {

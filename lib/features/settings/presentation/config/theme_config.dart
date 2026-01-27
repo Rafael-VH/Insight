@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/settings/domain/entities/app_theme.dart';
 
 /// Configuración de tema de la aplicación
@@ -73,7 +72,7 @@ class ThemeConfig {
       // Chips
       chipTheme: ChipThemeData(
         backgroundColor: colorScheme.surface,
-        selectedColor: colorScheme.primary.withOpacity(0.2),
+        selectedColor: colorScheme.primary.withValues(alpha: 0.2),
         labelStyle: TextStyle(color: colorScheme.onSurface),
         side: BorderSide(color: colorScheme.outline),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -83,12 +82,12 @@ class ThemeConfig {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
       ),
 
       // Dividers
       dividerTheme: DividerThemeData(
-        color: colorScheme.outline.withOpacity(0.2),
+        color: colorScheme.outline.withValues(alpha: 0.2),
         thickness: 1,
       ),
 
@@ -116,7 +115,7 @@ class ThemeConfig {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return colorScheme.primary.withOpacity(0.5);
+            return colorScheme.primary.withValues(alpha: 0.5);
           }
           return colorScheme.surfaceContainerHighest;
         }),
@@ -197,7 +196,7 @@ class ThemeConfig {
       // Chips
       chipTheme: ChipThemeData(
         backgroundColor: colorScheme.surfaceContainerHighest,
-        selectedColor: colorScheme.primary.withOpacity(0.3),
+        selectedColor: colorScheme.primary.withValues(alpha: 0.3),
         labelStyle: TextStyle(color: colorScheme.onSurface),
         side: BorderSide(color: colorScheme.outline),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -207,12 +206,12 @@ class ThemeConfig {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
       ),
 
       // Dividers
       dividerTheme: DividerThemeData(
-        color: colorScheme.outline.withOpacity(0.2),
+        color: colorScheme.outline.withValues(alpha: 0.2),
         thickness: 1,
       ),
 
@@ -240,7 +239,7 @@ class ThemeConfig {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return colorScheme.primary.withOpacity(0.5);
+            return colorScheme.primary.withValues(alpha: 0.5);
           }
           return colorScheme.surfaceContainerHighest;
         }),

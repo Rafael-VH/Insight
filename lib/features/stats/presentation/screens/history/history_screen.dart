@@ -2,17 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
-//
+import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-//
-import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/ml_stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
-//
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_event.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_state.dart';
 import 'package:insight/features/stats/presentation/screens/details/detail_screen.dart';
-//
 import 'package:insight/features/stats/presentation/services/dialog_service.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/features/stats/presentation/widgets/empty_state_widget.dart';
@@ -33,7 +29,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   // Variables de estado local
   List<StatsCollection> _allCollections = [];
-  List<StatsCollection> _displayedCollections = [];
+  final List<StatsCollection> _displayedCollections = [];
   int _currentPage = 0;
   bool _isLoadingMore = false;
   bool _hasMoreData = true;
@@ -599,7 +595,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return SliverToBoxAdapter(
       child: Container(
         padding: const EdgeInsets.all(16),
-        color: Theme.of(context).primaryColor.withOpacity(0.05),
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
         child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
@@ -799,17 +795,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           if (_searchQuery.isNotEmpty && _displayedCollections.isNotEmpty)
-            ..._displayedCollections
-                .asMap()
-                .entries
-                .map((entry) => _buildHistoryCard(entry.value, entry.key))
-                .toList()
+            ..._displayedCollections.asMap().entries.map(
+              (entry) => _buildHistoryCard(entry.value, entry.key),
+            )
           else
-            ...historyCollections
-                .asMap()
-                .entries
-                .map((entry) => _buildHistoryCard(entry.value, entry.key + 1))
-                .toList(),
+            ...historyCollections.asMap().entries.map(
+              (entry) => _buildHistoryCard(entry.value, entry.key + 1),
+            ),
 
           // Indicador de carga para paginación
           if (_isLoadingMore)
@@ -864,13 +856,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF059669).withOpacity(0.9),
+              const Color(0xFF059669).withValues(alpha: 0.9),
               const Color(0xFF10B981),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF059669).withOpacity(0.3),
+              color: const Color(0xFF059669).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -891,7 +883,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -955,7 +947,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   'Modos capturados:',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1027,9 +1019,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
       ),
       child: Text(
         mode.shortName,

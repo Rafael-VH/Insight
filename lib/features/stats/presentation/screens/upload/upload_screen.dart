@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//
 import 'package:insight/core/utils/stats_validator.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
-//
+import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-//
-import 'package:insight/features/stats/presentation/bloc/ml_stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/ml_stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/ml_stats_state.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr_event.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr_state.dart';
-//
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_event.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_state.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_event.dart';
+import 'package:insight/features/stats/presentation/bloc/ocr/ocr_state.dart';
 import 'package:insight/features/stats/presentation/controllers/stats_upload_controller.dart';
 import 'package:insight/features/stats/presentation/services/dialog_service.dart';
-//
 import 'package:insight/features/stats/presentation/widgets/image_upload_card.dart';
 import 'package:insight/features/stats/presentation/widgets/stats_verification_widget.dart';
 import 'package:insight/features/stats/presentation/widgets/validation_result_dialog.dart';
@@ -36,7 +31,7 @@ class _UploadScreenState extends State<UploadScreen> {
   late final StatsUploadController _controller;
   bool _isSaving = false;
 
-  // NUEVO: Variable para rastrear el modo actual en validación
+  // Variable para rastrear el modo actual en validación
   GameMode? _currentValidatingMode;
 
   @override
@@ -183,7 +178,7 @@ class _UploadScreenState extends State<UploadScreen> {
             // Cerrar diálogo de éxito
             Navigator.of(context).pop();
 
-            // CRÍTICO: Recargar historial antes de volver
+            // Recargar historial antes de volver
             context.read<MLStatsBloc>().add(LoadAllStatsCollectionsEvent());
 
             // Esperar un momento y volver
@@ -326,7 +321,7 @@ class _UploadScreenState extends State<UploadScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-//
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
-//
-import 'package:insight/features/settings/presentation/bloc/settings_event.dart';
-import 'package:insight/features/settings/presentation/bloc/settings_state.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_event.dart';
+import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsRepository repository;

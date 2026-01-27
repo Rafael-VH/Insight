@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/core/utils/stats_parser.dart';
-//
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/player_stats.dart';
 
@@ -18,9 +16,10 @@ class StatsVerificationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fields = StatsParser.getFieldsForVerification(stats);
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -31,7 +30,7 @@ class StatsVerificationWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getGameModeColor().withOpacity(isDark ? 0.2 : 0.1),
+              color: _getGameModeColor().withValues(alpha: isDark ? 0.2 : 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -132,7 +131,7 @@ class StatsVerificationWidget extends StatelessWidget {
     String title,
     List<StatField> fields,
   ) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
@@ -150,14 +149,14 @@ class StatsVerificationWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            // CORRECCIÓN: Fondo adaptado
+            // Fondo adaptado
             color: isDark
                 ? colorScheme.surfaceContainerHighest
                 : Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isDark
-                  ? colorScheme.outline.withOpacity(0.3)
+                  ? colorScheme.outline.withValues(alpha: 0.3)
                   : Colors.grey[200]!,
             ),
           ),
@@ -172,7 +171,7 @@ class StatsVerificationWidget extends StatelessWidget {
   }
 
   Widget _buildStatRow(BuildContext context, StatField field) {
-    // CORRECCIÓN: Colores de texto adaptados
+    // Colores de texto adaptados
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),

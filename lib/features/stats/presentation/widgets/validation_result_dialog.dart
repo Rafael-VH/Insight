@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/core/utils/stats_validator.dart';
 
 /// Diálogo que muestra los resultados de validación de estadísticas
@@ -28,7 +27,7 @@ class ValidationResultDialog extends StatelessWidget {
 
   /// Construcción del diálogo clásico
   Widget _buildClassicDialog(BuildContext context) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
 
     return Dialog(
@@ -73,7 +72,7 @@ class ValidationResultDialog extends StatelessWidget {
 
   /// Construcción del diálogo con Awesome Snackbar
   Widget _buildAwesomeDialog(BuildContext context) {
-    // CORRECCIÓN: Obtener colores del tema
+    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -88,7 +87,7 @@ class ValidationResultDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.4 : 0.2),
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -103,8 +102,8 @@ class ValidationResultDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    _getHeaderColor().withOpacity(isDark ? 0.3 : 0.1),
-                    _getHeaderColor().withOpacity(isDark ? 0.15 : 0.05),
+                    _getHeaderColor().withValues(alpha: isDark ? 0.3 : 0.1),
+                    _getHeaderColor().withValues(alpha: isDark ? 0.15 : 0.05),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -229,7 +228,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildCompletionIndicator(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final percentage = result.completionPercentage;
@@ -283,7 +282,7 @@ class ValidationResultDialog extends StatelessWidget {
           '${result.validFields} de ${result.totalFields} campos detectados',
           style: TextStyle(
             fontSize: 12,
-            color: colorScheme.onSurface.withOpacity(0.6), // Adaptado
+            color: colorScheme.onSurface.withValues(alpha: 0.6), // Adaptado
           ),
         ),
       ],
@@ -291,7 +290,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildAwesomeMissingFields(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -367,7 +366,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildAwesomeWarnings(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -443,7 +442,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildMissingFieldsSection(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -505,7 +504,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildWarningsSection(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayWarnings = result.warningFields.take(6).toList();
     final hasMore = result.warningFields.length > 6;
@@ -589,7 +588,7 @@ class ValidationResultDialog extends StatelessWidget {
   }
 
   Widget _buildRecommendations(BuildContext context) {
-    // CORRECCIÓN: Colores adaptados
+    // Colores adaptados
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final recommendations = StatsValidator.getRecommendations(result);
 

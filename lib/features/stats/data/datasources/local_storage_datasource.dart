@@ -1,10 +1,7 @@
 import 'dart:convert';
 
-//
 import 'package:insight/core/errors/failures.dart';
-//
 import 'package:insight/features/stats/data/model/stats_collection_model.dart';
-//
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,7 +38,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
         collections = [];
       }
 
-      // CORRECCIÓN: Verificar duplicado SOLO si es exactamente el mismo timestamp
+      // Verificar duplicado SOLO si es exactamente el mismo timestamp
       // (mismo milisegundo = misma instancia)
       final exactDuplicateIndex = collections.indexWhere(
         (c) =>
@@ -74,7 +71,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
           classicStats: c.classicStats,
           brawlStats: c.brawlStats,
           createdAt: c.createdAt,
-          name: c.name, // NUEVO
+          name: c.name,
         );
         return model.toJson();
       }).toList();
@@ -218,7 +215,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
           classicStats: c.classicStats,
           brawlStats: c.brawlStats,
           createdAt: c.createdAt,
-          name: c.name, // NUEVO
+          name: c.name,
         );
         return model.toJson();
       }).toList();

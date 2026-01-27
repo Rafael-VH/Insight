@@ -58,14 +58,14 @@ class AppTheme {
 
   static Map<String, dynamic> _colorSchemeToJson(ColorScheme scheme) {
     return {
-      'primary': scheme.primary.value,
-      'onPrimary': scheme.onPrimary.value,
-      'secondary': scheme.secondary.value,
-      'onSecondary': scheme.onSecondary.value,
-      'error': scheme.error.value,
-      'onError': scheme.onError.value,
-      'surface': scheme.surface.value,
-      'onSurface': scheme.onSurface.value,
+      'primary': scheme.primary.toARGB32(),
+      'onPrimary': scheme.onPrimary.toARGB32(),
+      'secondary': scheme.secondary.toARGB32(),
+      'onSecondary': scheme.onSecondary.toARGB32(),
+      'error': scheme.error.toARGB32(),
+      'onError': scheme.onError.toARGB32(),
+      'surface': scheme.surface.toARGB32(),
+      'onSurface': scheme.onSurface.toARGB32(),
       'brightness': scheme.brightness.name,
     };
   }

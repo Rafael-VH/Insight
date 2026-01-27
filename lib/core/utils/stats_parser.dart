@@ -113,7 +113,7 @@ class StatsParser {
         'Partidas Totales',
       );
 
-      // MEJORADO: Patrones más flexibles para Tasa de Victorias
+      // Patrones más flexibles para Tasa de Victorias
       final double winRate = _extractWinRate(text);
 
       final int mvpCount = _extractNumberWithLog(text, r'(\d+)\s*MVP', 'MVP');
@@ -204,7 +204,7 @@ class StatsParser {
         'Primera Sangre',
       );
 
-      // MEJORADO: Extraer daños y oro máximos con patrones más flexibles
+      // Extraer daños y oro máximos con patrones más flexibles
       _log('\n--- Extrayendo valores máximos ---');
       final int maxDamageDealt = _extractMaxDamageDealt(text);
       final int maxDamageTaken = _extractMaxDamageTaken(text);
@@ -247,7 +247,7 @@ class StatsParser {
     }
   }
 
-  /// NUEVO: Método especializado para extraer Tasa de Victorias
+  /// Método especializado para extraer Tasa de Victorias
   static double _extractWinRate(String text) {
     for (int i = 0; i < _winRatePatterns.length; i++) {
       final matches = _winRatePatterns[i].allMatches(text);
@@ -271,7 +271,7 @@ class StatsParser {
     return 0.0;
   }
 
-  /// MEJORADO: Método especializado para extraer Daño Causado Máx - CORREGIDO PARA TOTAL
+  /// Método especializado para extraer Daño Causado Máx - CORREGIDO PARA TOTAL
   static int _extractMaxDamageDealt(String text) {
     _log('Intentando extraer Daño Causado Máx./min con múltiples patrones...');
 
@@ -295,7 +295,7 @@ class StatsParser {
       r'Max\s*Damage\s*Dealt[/\s]*min\s*(\d+)',
       r'DMG\s*Dealt\s*Max[/\s]*min\s*(\d+)',
 
-      // NUEVO: Búsqueda sin etiqueta, solo número entre 1000-99999
+      // Búsqueda sin etiqueta, solo número entre 1000-99999
       r'(?:Máx|Max)[.\s]*/?\s*min\s*[:\s]*(\d{4,5})',
     ];
 
@@ -327,7 +327,7 @@ class StatsParser {
     return 0;
   }
 
-  /// NUEVO: Método especializado para extraer Daño Tomado Máx
+  /// Método especializado para extraer Daño Tomado Máx
   static int _extractMaxDamageTaken(String text) {
     _log('Intentando extraer Daño Tomado Máx./min con múltiples patrones...');
 
@@ -362,7 +362,7 @@ class StatsParser {
     return 0;
   }
 
-  /// NUEVO: Método especializado para extraer Oro Máx
+  /// Método especializado para extraer Oro Máx
   static int _extractMaxGold(String text) {
     _log('Intentando extraer Oro Máx./min con múltiples patrones...');
 

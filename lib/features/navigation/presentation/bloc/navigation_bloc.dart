@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_state.dart';

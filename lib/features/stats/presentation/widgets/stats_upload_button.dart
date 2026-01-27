@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
 
 class StatsUploadButton extends StatelessWidget {
@@ -20,16 +19,16 @@ class StatsUploadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CORRECCIÓN: Adaptar colores según tema
+    // Adaptar colores según tema
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? color.withOpacity(0.2) : color;
+    final backgroundColor = isDark ? color.withValues(alpha: 0.2) : color;
     final gradientColor = isDark
-        ? color.withOpacity(0.3)
-        : color.withOpacity(0.8);
+        ? color.withValues(alpha: 0.3)
+        : color.withValues(alpha: 0.8);
     return Material(
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
-      shadowColor: color.withOpacity(0.3),
+      shadowColor: color.withValues(alpha: 0.3),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -57,7 +56,7 @@ class StatsUploadButton extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    // CORRECCIÓN: Texto adaptado al tema
+    // Texto adaptado al tema
     final textColor = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.white;
@@ -66,7 +65,7 @@ class StatsUploadButton extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: textColor, size: 28),
@@ -88,7 +87,7 @@ class StatsUploadButton extends StatelessWidget {
               Text(
                 '${uploadType.imageCount} imagen${uploadType.imageCount > 1 ? 'es' : ''}',
                 style: TextStyle(
-                  color: textColor.withOpacity(0.9),
+                  color: textColor.withValues(alpha: 0.9),
                   fontSize: 14,
                 ),
               ),
@@ -97,7 +96,7 @@ class StatsUploadButton extends StatelessWidget {
         ),
         Icon(
           Icons.arrow_forward_ios,
-          color: textColor.withOpacity(0.8),
+          color: textColor.withValues(alpha: 0.8),
           size: 16,
         ),
       ],

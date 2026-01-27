@@ -20,7 +20,7 @@ class InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // CORRECCIÓN: Adaptar colores al tema
+    // Adaptar colores al tema
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final defaultBlue = isDark ? Colors.blue[900]! : Colors.blue[50]!;

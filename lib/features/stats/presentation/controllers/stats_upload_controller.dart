@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-//
 import 'package:insight/core/utils/stats_parser.dart';
 import 'package:insight/core/utils/stats_validator.dart';
-//
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/player_stats.dart';
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-//
 import 'package:insight/features/stats/presentation/utils/game_mode_extensions.dart';
 
 /// Resultado del procesamiento de OCR con validación
@@ -32,7 +29,7 @@ class OcrProcessingResult {
 class StatsUploadController extends ChangeNotifier {
   final StatsUploadType uploadType;
 
-  // MEJORADO: Inicialización lazy para evitar problemas de memoria
+  // Inicialización lazy para evitar problemas de memoria
   late final Map<GameMode, String?> _uploadedImages;
   late final Map<GameMode, PlayerStats?> _parsedStats;
   late final Map<GameMode, ValidationResult?> _validationResults;
@@ -40,7 +37,7 @@ class StatsUploadController extends ChangeNotifier {
   late final Map<GameMode, List<String>> _extractionLogs;
   GameMode? _currentProcessingMode;
 
-  // NUEVO: Control de dispose
+  // Control de dispose
   bool _isDisposed = false;
 
   StatsUploadController({required this.uploadType}) {
@@ -77,7 +74,7 @@ class StatsUploadController extends ChangeNotifier {
     return List.unmodifiable(_extractionLogs[mode] ?? []);
   }
 
-  /// MEJORADO: Inicialización de estado
+  /// Inicialización de estado
   void _initializeState() {
     _uploadedImages = {};
     _parsedStats = {};
@@ -94,7 +91,7 @@ class StatsUploadController extends ChangeNotifier {
     }
   }
 
-  /// MEJORADO: Iniciar procesamiento con validación
+  /// Iniciar procesamiento con validación
   void startProcessing(GameMode mode) {
     _assertNotDisposed();
     if (!availableModes.contains(mode)) {
@@ -105,7 +102,7 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// MEJORADO: Procesa el resultado de OCR con diagnóstico completo
+  /// Procesa el resultado de OCR con diagnóstico completo
   OcrProcessingResult handleOcrSuccessWithDiagnostics(
     String text,
     String? imagePath,
@@ -135,7 +132,7 @@ class StatsUploadController extends ChangeNotifier {
         validation = StatsValidator.validate(parseResult.stats!);
       }
 
-      // MEJORADO: Guardar los resultados de forma segura
+      // Guardar los resultados de forma segura
       _uploadedImages[mode] = imagePath;
       _parsedStats[mode] = parseResult.stats;
       _validationResults[mode] = validation;
@@ -171,7 +168,7 @@ class StatsUploadController extends ChangeNotifier {
     handleOcrSuccessWithDiagnostics(text, imagePath);
   }
 
-  /// MEJORADO: Manejo de errores de OCR
+  /// Manejo de errores de OCR
   void handleOcrError() {
     _assertNotDisposed();
 
@@ -184,7 +181,7 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// MEJORADO: Remover estadísticas con limpieza completa
+  /// Remover estadísticas con limpieza completa
   void removeStats(GameMode mode) {
     _assertNotDisposed();
 
@@ -201,7 +198,7 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// MEJORADO: Crear colección con validación
+  /// Crear colección con validación
   StatsCollection createCollection() {
     _assertNotDisposed();
 
@@ -262,14 +259,14 @@ class StatsUploadController extends ChangeNotifier {
     return buffer.toString();
   }
 
-  /// NUEVO: Método para verificar si el controlador ha sido liberado
+  /// Método para verificar si el controlador ha sido liberado
   void _assertNotDisposed() {
     if (_isDisposed) {
       throw StateError('StatsUploadController has been disposed');
     }
   }
 
-  /// MEJORADO: Dispose con limpieza completa de memoria
+  /// Dispose con limpieza completa de memoria
   @override
   void dispose() {
     if (_isDisposed) return;

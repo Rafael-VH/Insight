@@ -7,7 +7,7 @@ class ValidationResult {
   final List<String> warningFields;
   final int totalFields;
   final int validFields;
-  final Map<String, dynamic> extractedValues; // NUEVO: Valores extraídos
+  final Map<String, dynamic> extractedValues;
 
   const ValidationResult({
     required this.isValid,
@@ -15,7 +15,7 @@ class ValidationResult {
     required this.warningFields,
     required this.totalFields,
     required this.validFields,
-    this.extractedValues = const {}, // NUEVO
+    this.extractedValues = const {},
   });
 
   double get completionPercentage => (validFields / totalFields) * 100;
@@ -52,7 +52,7 @@ class StatsValidator {
 
     if (stats.winRate == 0.0) {
       missingFields.add('Tasa de Victorias');
-      // NUEVO: Agregar sugerencia específica
+      // Agregar sugerencia específica
       extractedValues['Tasa de Victorias (sugerencia)'] =
           'Verifica que el porcentaje sea visible en la imagen';
     } else {
@@ -138,7 +138,7 @@ class StatsValidator {
         // Los logros pueden ser 0, pero vale la pena notarlo
         warningFields.add(achievement.$1);
 
-        // NUEVO: Agregar sugerencia específica para Daño Causado
+        // Agregar sugerencia específica para Daño Causado
         if (achievement.$1 == 'Daño Causado Máx./min') {
           extractedValues['Daño Causado Máx./min (sugerencia)'] =
               'Este campo es importante. Verifica que el número sea visible en la imagen.';
@@ -171,7 +171,7 @@ class StatsValidator {
       for (var field in result.missingFields) {
         buffer.writeln('  • $field');
 
-        // NUEVO: Agregar sugerencias específicas
+        // Agregar sugerencias específicas
         if (field == 'Tasa de Victorias') {
           buffer.writeln(
             '    💡 Asegúrate de que el porcentaje (ej: 59.29%) sea visible',
@@ -187,7 +187,7 @@ class StatsValidator {
       for (var field in result.warningFields.take(5)) {
         buffer.writeln('  • $field');
 
-        // NUEVO: Sugerencias específicas para campos importantes
+        // Sugerencias específicas para campos importantes
         if (field == 'Daño Causado Máx./min') {
           buffer.writeln(
             '    💡 Verifica que el número de 4-5 dígitos sea visible',
@@ -222,7 +222,7 @@ class StatsValidator {
         '🔍 Verifica que el texto sea legible y no esté borroso',
       );
 
-      // NUEVO: Recomendaciones específicas
+      // Recomendaciones específicas
       if (result.missingFields.contains('Tasa de Victorias')) {
         recommendations.add(
           '🎯 Tasa de Victorias: Asegúrate de que el porcentaje esté completo (ej: 59.29%)',
@@ -245,7 +245,7 @@ class StatsValidator {
     return recommendations;
   }
 
-  /// NUEVO: Método para obtener un informe completo de depuración
+  /// Método para obtener un informe completo de depuración
   static String getDebugReport(ValidationResult result) {
     final buffer = StringBuffer();
 

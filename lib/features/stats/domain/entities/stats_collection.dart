@@ -6,7 +6,7 @@ class StatsCollection {
   final PlayerStats? classicStats;
   final PlayerStats? brawlStats;
   final DateTime createdAt;
-  final String name; // NUEVO: Nombre personalizado
+  final String name;
 
   const StatsCollection({
     this.totalStats,
@@ -14,8 +14,8 @@ class StatsCollection {
     this.classicStats,
     this.brawlStats,
     required this.createdAt,
-    String? name, // NUEVO: Parámetro opcional
-  }) : name = name ?? ''; // NUEVO: Valor por defecto
+    String? name,
+  }) : name = name ?? '';
 
   bool get hasAnyStats =>
       totalStats != null ||
@@ -32,7 +32,7 @@ class StatsCollection {
     return stats;
   }
 
-  // NUEVO: Método copyWith para facilitar actualizaciones
+  // Método copyWith para facilitar actualizaciones
   StatsCollection copyWith({
     PlayerStats? totalStats,
     PlayerStats? rankedStats,
@@ -51,7 +51,7 @@ class StatsCollection {
     );
   }
 
-  // NUEVO: Método para obtener nombre auto-generado si está vacío
+  // Método para obtener nombre auto-generado si está vacío
   String get displayName {
     if (name.isNotEmpty) return name;
 
