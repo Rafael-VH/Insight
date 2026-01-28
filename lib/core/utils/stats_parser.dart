@@ -16,78 +16,19 @@ class ParseResult {
 
 /// Clase que contiene conjuntos de patrones compilados para mejor rendimiento
 class _CompiledPatterns {
-  // ==================== WIN RATE PATTERNS ====================
+  // ==================== WIN RATE PATTERNS (ESTRATEGIA SIMPLE) ====================
   static final List<RegExp> winRate = [
-    // ===== PATRONES CRÍTICOS PARA SALTOS DE LÍNEA (PRIORIDAD MÁXIMA) =====
+    // Capturar TODOS los porcentajes y validar por rango (40-80%)
+    // Los Win Rates típicos están en este rango
 
-    // Patrón 1: MULTILINE - Maneja "\n" entre porcentaje y "Tasa de Victorias"
-    // Ejemplo: "63.62%\n\nTasa de\nVictorias"
-    // \s* captura cualquier whitespace incluyendo \n \r
-    RegExp(
-      r'(\d+\.\d{1,2})\s*%\s*Tasa\s+de\s+Victorias?',
-      caseSensitive: false,
-      multiLine: true,
-    ),
+    // Patrón 1: Porcentaje con 2 decimales (formato más común)
+    RegExp(r'(\d{1,2}\.\d{2})\s*%'),
 
-    // Patrón 2: Versión ultra flexible con dotAll (el punto captura \n)
-    // .{0,30} permite hasta 30 caracteres (incluyendo \n) entre % y Tasa
-    RegExp(
-      r'(\d+\.\d{1,2})\s*%.{0,30}?Tasa\s*de\s*Victorias?',
-      caseSensitive: false,
-      multiLine: true,
-      dotAll: true,
-    ),
+    // Patrón 2: Porcentaje con 1-2 decimales
+    RegExp(r'(\d{1,2}\.\d{1,2})\s*%'),
 
-    // Patrón 3: Específico para [\r\n] explícitos
-    RegExp(
-      r'(\d+\.\d{1,2})\s*%[\s\r\n]+Tasa[\s\r\n]+de[\s\r\n]+Victorias?',
-      caseSensitive: false,
-    ),
-
-    // Patrón 4: Solo porcentaje cerca de "Victorias" (muy flexible)
-    RegExp(
-      r'(\d+\.\d{1,2})\s*%.{0,50}?Victorias?',
-      caseSensitive: false,
-      multiLine: true,
-      dotAll: true,
-    ),
-
-    // ===== PATRONES ESTÁNDAR SIN SALTOS DE LÍNEA =====
-
-    // Español - Formato clásico (una línea)
-    RegExp(r'(\d+\.?\d*)\s*%\s*Tasa\s*de\s*Victorias?', caseSensitive: false),
-    RegExp(
-      r'Tasa\s*de\s*Victorias?\s*[:\s]*(\d+\.?\d*)\s*%',
-      caseSensitive: false,
-    ),
-
-    // Español - Con separadores
-    RegExp(r'(\d+\.\d+)\s*%\s*[-–—]?\s*Tasa', caseSensitive: false),
-    RegExp(r'(\d+\.\d+)\s*%\s*[-–—]?\s*Victoria', caseSensitive: false),
-
-    // Inglés - Formatos estándar
-    RegExp(r'Win\s*Rate\s*[:\s]*(\d+\.?\d*)\s*%?', caseSensitive: false),
-    RegExp(r'(\d+\.?\d*)\s*%?\s*Win\s*Rate', caseSensitive: false),
-    RegExp(r'WR\s*[:\s]*(\d+\.?\d*)\s*%?', caseSensitive: false),
-
-    // ===== PATRONES GENÉRICOS (ÚLTIMO RECURSO) =====
-
-    // Cualquier decimal de 2 dígitos con % (con validación 0-100 en código)
-    RegExp(r'([0-5]?\d\.\d{1,2})\s*%(?!\s*\d)', caseSensitive: false),
-
-    // Búsqueda en contexto amplio
-    RegExp(
-      r'(?:Tasa|Victoria|Win).{0,100}?(\d+\.?\d*)\s*%',
-      caseSensitive: false,
-      multiLine: true,
-      dotAll: true,
-    ),
-    RegExp(
-      r'(\d+\.?\d*)\s*%.{0,100}?(?:Tasa|Victoria|Win)',
-      caseSensitive: false,
-      multiLine: true,
-      dotAll: true,
-    ),
+    // Patrón 3: Porcentaje entero
+    RegExp(r'(\d{1,2})\s*%'),
   ];
 
   // ==================== TOTAL GAMES PATTERNS ====================
@@ -102,7 +43,7 @@ class _CompiledPatterns {
     RegExp(r'(\d+)\s*(?:Total\s*)?(?:Games?|Matches?)', caseSensitive: false),
     RegExp(r'(?:Games?|Matches?)\s*Played\s*[:\s]*(\d+)', caseSensitive: false),
 
-    // Patrones contextuales (cerca de "Win Rate")
+    // Patrones contextuales
     RegExp(r'(\d+)\s*(?=.*(?:Tasa|Win\s*Rate))', caseSensitive: false),
   ];
 
@@ -457,12 +398,8 @@ class StatsParser {
         isInteger: true,
       ).toInt();
 
-      final double winRate = _extractWithPatterns(
-        text,
-        _CompiledPatterns.winRate,
-        'Tasa de Victorias',
-        validator: (value) => value >= 0 && value <= 100,
-      );
+      // Extraer Win Rate con validación por rango
+      final double winRate = _extractWinRateWithValidation(text);
 
       final int mvpCount = _extractWithPatterns(
         text,
@@ -649,6 +586,61 @@ class StatsParser {
       print('Error parsing stats: $e');
       return null;
     }
+  }
+
+  /// Extraer Win Rate con validación por rango
+  static double _extractWinRateWithValidation(String text) {
+    _log('\n🔍 [WIN RATE] Estrategia: Buscar TODOS los % y validar por rango');
+
+    // Buscar TODOS los porcentajes en el texto
+    final allPercentages = <double>[];
+
+    for (final pattern in _CompiledPatterns.winRate) {
+      final matches = pattern.allMatches(text);
+      for (final match in matches) {
+        if (match.groupCount > 0) {
+          final valueStr = match.group(1)!.trim().replaceAll(',', '');
+          final value = double.tryParse(valueStr);
+          if (value != null && !allPercentages.contains(value)) {
+            allPercentages.add(value);
+            _log('   → Porcentaje encontrado: $value%');
+          }
+        }
+      }
+    }
+
+    if (allPercentages.isEmpty) {
+      _log('   ✗ No se encontró ningún porcentaje');
+      _rawMatches['Tasa de Victorias'] = 0.0;
+      return 0.0;
+    }
+
+    _log('   📊 Total de porcentajes encontrados: ${allPercentages.length}');
+    _log('   📋 Lista: ${allPercentages.join(', ')}');
+
+    // Filtrar por rango típico de Win Rate (40% - 80%)
+    final validWinRates = allPercentages
+        .where((p) => p >= 40.0 && p <= 80.0)
+        .toList();
+
+    if (validWinRates.isEmpty) {
+      _log('   ⚠️ Ningún porcentaje en rango válido (40-80%)');
+      _log('   💡 Usando el primer porcentaje encontrado como fallback');
+      final fallback = allPercentages.first;
+      _rawMatches['Tasa de Victorias'] = fallback;
+      return fallback;
+    }
+
+    _log(
+      '   ✓ Porcentajes en rango válido (40-80%): ${validWinRates.join(', ')}',
+    );
+
+    // Si hay múltiples, usar el primero
+    final winRate = validWinRates.first;
+    _log('   ✅ Tasa de Victorias: $winRate%');
+    _rawMatches['Tasa de Victorias'] = winRate;
+
+    return winRate;
   }
 
   /// Método unificado para extraer valores usando múltiples patrones
