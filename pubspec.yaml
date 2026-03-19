@@ -1,58 +1,59 @@
 name: insight
-description: "A new Flutter project."
+description: >
+  Aplicación Flutter que usa OCR (Google ML Kit) para extraer estadísticas
+  de Mobile Legends desde capturas de pantalla y construir un historial
+  de rendimiento con gráficos por modo de juego.
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ">=3.10.3 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # UI & Icons
-  font_awesome_flutter: ^10.12.0
-  cupertino_icons: ^1.0.8
-  google_nav_bar: ^5.0.7
-
-  # State Management
-  flutter_bloc: ^9.1.1
-  equatable: ^2.0.7
-
-  # Dependency Injection
-  get_it: ^9.1.1
-
-  # Local Storage
-  shared_preferences: ^2.5.3
-
-  # OCR & Image Processing
-  google_mlkit_text_recognition: ^0.15.0
-  image_picker: ^1.2.1
-
-  # Functional Programming
-  dartz: ^0.10.1
-
-  # Date Formatting
-  intl: ^0.20.2
-
-  # Permissions (if needed for camera)
-  permission_handler: ^12.0.1
+  # UI & Navegación
+  font_awesome_flutter: ^11.0.0
   salomon_bottom_bar: ^3.3.2
 
-  # Awesome Snackbar Content
+  # Gráficos
+  fl_chart: ^1.2.0
+
+  # Gestión de estado
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
+
+  # Inyección de dependencias
+  get_it: ^9.2.1
+
+  # Almacenamiento local
+  shared_preferences: ^2.5.4
+
+  # OCR & Selección de imágenes
+  google_mlkit_text_recognition: ^0.15.1
+  image_picker: ^1.2.1
+
+  # Programación funcional
+  dartz: ^0.10.1
+
+  # Internacionalización
+  intl: ^0.20.2
+
+  # Permisos
+  permission_handler: ^12.0.1
+
+  # Exportar / Importar / Compartir
   awesome_snackbar_content: ^0.1.8
   share_plus: ^12.0.1
   file_picker: ^10.3.10
   path_provider: ^2.1.5
-  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^6.0.0
 
 flutter:
-
   uses-material-design: true
