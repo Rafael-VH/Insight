@@ -1,276 +1,257 @@
-# ML Stats OCR - Mobile Legends Statistics Tracker
+# 📊 Insight
 
-## 📱 Descripción
-ML Stats OCR es una aplicación Flutter que utiliza OCR (Reconocimiento Óptico de Caracteres) para extraer automáticamente las estadísticas de Mobile Legends desde capturas de pantalla, permitiendo a los jugadores hacer un seguimiento de su historial de rendimiento.
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Google ML Kit](https://img.shields.io/badge/Google%20ML%20Kit-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/ml-kit)
+[![Architecture](https://img.shields.io/badge/Clean%20Architecture-BLoC-blueviolet?style=for-the-badge)](https://bloclibrary.dev)
 
-## 🏗️ Arquitectura
-El proyecto utiliza **Clean Architecture** con el patrón **BLoC** para la gestión de estados:
+**Convierte tus capturas de pantalla de Mobile Legends en datos reales al instante.**
 
-- **Capa de Presentación**: UI con Flutter y BLoC para la gestión de estados
-- **Capa de Dominio**: Entidades, casos de uso y contratos de repositorios
-- **Capa de Datos**: Implementaciones de repositorios y fuentes de datos
+Insight es una aplicación móvil que usa OCR (Reconocimiento Óptico de Caracteres) para escanear las pantallas de estadísticas de Mobile Legends, extraer automáticamente todos los datos numéricos y construir un historial de rendimiento detallado sin necesidad de escribir nada a mano.
 
-## 📋 Requisitos Previos
-
-### Software Necesario
-- Flutter SDK: 3.0.0 o superior
-- Dart SDK: 3.0.0 o superior
-- Android Studio / VS Code con extensiones de Flutter
-- Xcode (solo para desarrollo iOS en macOS)
-
-### Configuración del Entorno
-
-#### 1. Instalar Flutter
-```bash
-# Verificar si Flutter está instalado
-flutter --version
-
-# Si no está instalado, seguir las instrucciones en:
-# https://flutter.dev/docs/get-started/install
-```
-
-#### 2. Verificar la instalación
-```bash
-flutter doctor
-```
-Asegúrate de que todos los checkmarks estén en verde ✓
-
-## 🚀 Configuración del Proyecto
-
-### 1. Clonar o crear el proyecto
-```bash
-# Crear un nuevo proyecto Flutter (si no existe)
-flutter create insight
-cd insight
-
-# O clonar desde tu repositorio
-git clone <tu-repositorio>
-cd insight
-```
-
-### 2. Reemplazar los archivos
-Copia todos los archivos proporcionados en sus respectivas ubicaciones según la estructura del proyecto.
-
-### 3. Estructura de Carpetas
-```
-insight/
-├── lib/
-│   ├── main.dart
-│   ├── core/
-│   │   ├── errors/
-│   │   │   └── failures.dart
-│   │   ├── injection/
-│   │   │   └── injection_container.dart
-│   │   └── utils/
-│   │       └── stats_parser.dart
-│   └── stats/
-│       ├── data/
-│       │   ├── datasources/
-│       │   │   ├── local_storage_datasource.dart
-│       │   │   └── ocr_datasource.dart
-│       │   ├── models/
-│       │   │   ├── ocr_result_model.dart
-│       │   │   └── stats_collection_model.dart
-│       │   └── repositories/
-│       │       ├── ocr_repository_impl.dart
-│       │       └── stats_repository_impl.dart
-│       ├── domain/
-│       │   ├── entities/
-│       │   │   ├── game_mode.dart
-│       │   │   ├── image_source_type.dart
-│       │   │   ├── ocr_result.dart
-│       │   │   ├── player_stats.dart
-│       │   │   ├── stats_collection.dart
-│       │   │   ├── stats_upload_type.dart
-│       │   │   ├── text_block.dart
-│       │   │   └── text_line.dart
-│       │   ├── repositories/
-│       │   │   ├── ocr_repository.dart
-│       │   │   └── stats_repository.dart
-│       │   └── usecases/
-│       │       ├── copy_text_to_clipboard.dart
-│       │       ├── get_all_stats_collections.dart
-│       │       ├── get_latest_stats_collection.dart
-│       │       ├── pick_image_and_recognize_text.dart
-│       │       ├── save_stats_collection.dart
-│       │       └── usecase.dart
-│       └── presentation/
-│           ├── bloc/
-│           │   ├── ml_stats_bloc.dart
-│           │   ├── ml_stats_event.dart
-│           │   ├── ml_stats_state.dart
-│           │   ├── ocr_bloc.dart
-│           │   ├── ocr_event.dart
-│           │   └── ocr_state.dart
-│           └── pages/
-│               ├── home_screen.dart
-│               ├── stats_detail_screen.dart
-│               ├── stats_history_screen.dart
-│               ├── stats_upload_screen.dart
-│               └── widgets/
-│                   ├── image_upload_card.dart
-│                   ├── quick_stats_overview.dart
-│                   ├── stats_summary_card.dart
-│                   └── stats_verification_widget.dart
-├── android/
-│   └── app/
-│       └── src/
-│           └── main/
-│               └── AndroidManifest.xml
-├── ios/
-│   └── Runner/
-│       └── Info.plist
-└── pubspec.yaml
-```
-
-### 4. Instalar Dependencias
-```bash
-# Limpiar cualquier caché previo
-flutter clean
-
-# Obtener las dependencias
-flutter pub get
-```
-
-### 5. Configuración Específica de Plataforma
-
-#### Android
-1. Abrir `android/app/build.gradle`
-2. Asegurarse de que `minSdkVersion` sea al menos 21:
-```gradle
-android {
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 33
-    }
-}
-```
-
-#### iOS (solo en macOS)
-```bash
-cd ios
-pod install
-cd ..
-```
-
-## 📱 Ejecutar la Aplicación
-
-### En un Emulador/Simulador
-```bash
-# Listar dispositivos disponibles
-flutter devices
-
-# Ejecutar en modo debug
-flutter run
-
-# O especificar un dispositivo
-flutter run -d <device_id>
-```
-
-### En un Dispositivo Físico
-
-#### Android
-1. Habilitar "Opciones de desarrollador" en tu dispositivo
-2. Activar "Depuración USB"
-3. Conectar el dispositivo por USB
-4. Ejecutar: `flutter run`
-
-#### iOS
-1. Conectar el iPhone a tu Mac
-2. Confiar en el ordenador desde el dispositivo
-3. Ejecutar: `flutter run`
-
-### Compilar APK (Android)
-```bash
-# APK de debug
-flutter build apk --debug
-
-# APK de release
-flutter build apk --release
-
-# El APK se encontrará en: build/app/outputs/flutter-apk/
-```
-
-### Compilar para iOS
-```bash
-# Solo en macOS
-flutter build ios --release
-```
-
-## 🧪 Modo de Desarrollo
-
-### Hot Reload
-Mientras la app está ejecutándose, puedes usar:
-- `r` - Hot reload (cambios rápidos)
-- `R` - Hot restart (reinicio completo)
-- `q` - Salir
-
-### Logs y Debugging
-```bash
-# Ver logs en tiempo real
-flutter logs
-
-# Ejecutar con más información de debug
-flutter run --verbose
-```
-
-## 🎮 Uso de la Aplicación
-
-1. **Pantalla Principal**:
-    - Selecciona cómo cargar las estadísticas (Total o Por Modos)
-    - Accede al historial de estadísticas guardadas
-
-2. **Cargar Estadísticas**:
-    - Toma una foto o selecciona desde galería
-    - La app extraerá automáticamente los datos
-    - Verifica y guarda las estadísticas
-
-3. **Historial**:
-    - Visualiza todas las estadísticas guardadas
-    - Accede a los detalles de cada colección
-
-## 🔧 Solución de Problemas Comunes
-
-### Error: "No devices available"
-```bash
-# Verificar que ADB detecta el dispositivo (Android)
-adb devices
-
-# Reiniciar el servidor ADB si es necesario
-adb kill-server
-adb start-server
-```
-
-### Error de Dependencias
-```bash
-# Limpiar y reinstalar
-flutter clean
-flutter pub cache clean
-flutter pub get
-```
-
-### Error de ML Kit
-Asegúrate de que tu dispositivo tenga Google Play Services actualizado (Android) o iOS 10.0+ (iPhone).
-
-### Error de Permisos
-- Android: Ve a Configuración > Apps > ML Stats OCR > Permisos
-- iOS: Ve a Configuración > ML Stats OCR > Permitir acceso a Cámara/Fotos
-
-## 📝 Notas Adicionales
-
-- La aplicación guarda los datos localmente usando SharedPreferences
-- El OCR funciona mejor con capturas de pantalla de alta calidad
-- Asegúrate de que las estadísticas sean visibles y legibles en la imagen
-
-## 🤝 Soporte
-
-Si encuentras algún problema durante la configuración, verifica:
-1. Que todos los archivos estén en su ubicación correcta
-2. Que las dependencias estén instaladas correctamente
-3. Que los permisos estén configurados en el dispositivo
+[¿Cómo funciona?](#-cómo-funciona) · [Estadísticas que rastrea](#-estadísticas-que-rastrea) · [Características](#-características) · [Tecnología](#-tecnología) · [Arquitectura](#-arquitectura) · [Instalación](#-instalación)
 
 ---
 
-**¡Listo para ejecutar!** 🚀
+## 🤔 ¿Cómo funciona?
 
-Ejecuta `flutter run` y disfruta de tu aplicación ML Stats OCR.
+El flujo completo desde la captura hasta el historial tiene cuatro pasos:
+
+```text
+  1. CAPTURA              2. EXTRACCIÓN             3. VALIDACIÓN             4. HISTORIAL
+──────────────────    ──────────────────────    ──────────────────────    ──────────────────────
+Tomas una foto o  →   Google ML Kit reconoce →  StatsValidator clasifica →  La sesión queda
+subes una captura     el texto y StatsParser     cada campo como crítico     guardada con sus
+de tu pantalla de     lo convierte en un         u opcional y calcula un     gráficos listos
+Mobile Legends        objeto PlayerStats          % de completitud           para consultar
+```
+
+### Dos modos de carga
+
+Insight ofrece dos formas distintas de escanear tus estadísticas según cómo aparezcan en tu pantalla:
+
+| Modo | Imágenes | Cuándo usarlo |
+| --- | --- | --- |
+| **Total** | 1 imagen | Cuando tienes una pantalla con el resumen general de todas tus partidas |
+| **Por modos de juego** | 3 imágenes | Cuando quieres cargar por separado Clasificatoria, Clásica y Coliseo para comparar tu rendimiento en cada modalidad |
+
+---
+
+## 📋 Estadísticas que rastrea
+
+Insight extrae y almacena **28 campos** por cada modo de juego escaneado, organizados en tres grupos:
+
+### Estadísticas principales
+
+| Campo | Descripción |
+| --- | --- |
+| Partidas Totales | Número total de partidas jugadas |
+| Tasa de Victorias | Porcentaje de victorias (ej. `59.29%`) |
+| MVP | Cantidad de veces nombrado jugador más valioso |
+
+### Rendimiento por partida
+
+| Campo | Descripción |
+| --- | --- |
+| KDA | Ratio Kills / Deaths / Assists |
+| Participación en Equipo | Porcentaje de participación en peleas de equipo |
+| Oro / Min | Promedio de oro generado por minuto |
+| Daño a Héroe / Min | Daño promedio infligido a héroes por minuto |
+| Muertes / Partida | Promedio de muertes por partida |
+| Daño a Torre / Partida | Daño promedio a estructuras por partida |
+
+### Logros y récords históricos
+
+| Campo | Campo | Campo |
+| --- | --- | --- |
+| Legendario | Savage | Maniac |
+| Asesinato Triple | Asesinato Doble | MVP Perdedor |
+| Asesinatos Máx. | Asistencias Máx. | Racha de Victorias Máx. |
+| Primera Sangre | Daño Causado Máx./min | Daño Tomado Máx./min |
+| Oro Máx./min | — | — |
+
+> Los logros como Legendario o Savage pueden ser legítimamente 0. El validador los trata como **opcionales** y no los marca como errores, a diferencia de campos críticos como el KDA o la Tasa de Victorias.
+
+---
+
+## ✨ Características
+
+### 🔍 Motor de OCR con validación inteligente
+
+El texto extraído por Google ML Kit pasa por `StatsParser`, un motor de expresiones regulares con múltiples patrones alternativos por campo para tolerar las variaciones que el OCR puede introducir (espacios extra, caracteres similares, orden alterado). A continuación, `StatsValidator` distingue entre campos **críticos** —cuya ausencia invalida el registro— y campos **opcionales** —que pueden ser cero sin problema. El resultado es un informe de completitud con porcentaje y recomendaciones específicas si algo falló ("Asegúrate de que el porcentaje de victorias esté completo en la imagen").
+
+### 🎮 Cuatro modos de juego independientes
+
+Cada sesión guardada puede contener estadísticas de hasta cuatro modos distintos: **Total**, **Clasificatoria**, **Clásica** y **Coliseo**. El parser detecta automáticamente el modo a partir de palabras clave en el texto reconocido (`clasificatoria`, `clásica`, `coliseo`, `todos los juegos`).
+
+### 📊 Análisis visual por modo de juego
+
+Cada registro del historial tiene una pantalla de gráficos con cuatro visualizaciones independientes, una por modo escaneado:
+
+- **Gauge de Win Rate** — Medidor semicircular con código de color: verde ≥60 %, amarillo ≥50 %, rojo <50 %.
+- **Barras de Rendimiento** — Comparativa normalizada de KDA, participación en equipo, tasa de muertes/partida y porcentaje de MVPs.
+- **Radar de Logros** — Gráfico radial de seis ejes (Legendario, Savage, Maniac, Triple Kill, Doble Kill, Primera Sangre) con valores normalizados respecto a referencias realistas.
+- **Torta de Economía** — Distribución porcentual entre Oro/min, Daño a Héroe/min y Daño a Torre/partida, con interacción al tocar cada sector.
+
+### 📚 Historial con búsqueda, ordenamiento y paginación
+
+El historial soporta búsqueda en tiempo real por nombre o fecha, ordenamiento ascendente/descendente por fecha o nombre alfabético, y carga paginada de 10 elementos para mantener la fluidez con grandes colecciones. La sesión más reciente tiene una tarjeta destacada al inicio de la lista.
+
+### 🔄 Exportar e importar historial
+
+Todo el historial se exporta a un archivo `.json` con metadatos de versión y fecha (`ml_stats_YYYYMMDD_HHMMSS.json`). El archivo puede compartirse directamente desde la app y luego importarse en otro dispositivo. La importación soporta dos modos:
+
+- **Fusionar** — Añade las colecciones del archivo sin tocar las existentes, omitiendo duplicados por timestamp.
+- **Reemplazar** — Limpia el historial actual antes de importar.
+
+### 🏷️ Gestión del historial
+
+Cada registro se puede renombrar con un nombre personalizado (hasta 50 caracteres) para encontrarlo fácilmente, o eliminarse individualmente con un diálogo de confirmación. Las opciones se acceden con un toque largo sobre la tarjeta.
+
+### 🎨 Apariencia totalmente personalizable
+
+Seis temas de color predefinidos con sus variantes clara y oscura:
+
+| Tema | Color semilla |
+| --- | --- |
+| Esmeralda *(por defecto)* | `#059669` |
+| Violeta | `#7C3AED` |
+| Azul Océano | `#2563EB` |
+| Carmesí | `#DC2626` |
+| Ámbar | `#F59E0B` |
+| Rosa | `#EC4899` |
+
+El modo de tema (Claro / Oscuro / Sistema) y el tema de color se persisten entre sesiones.
+
+---
+
+## 🛠 Tecnología
+
+| Librería | Versión | Rol en la app |
+| --- | --- | --- |
+| **Flutter / Dart** | SDK `>=3.9.2` | Framework principal de UI multiplataforma |
+| **google_mlkit_text_recognition** | `^0.15.0` | Motor OCR — procesa imágenes con el script Latin |
+| **flutter_bloc** | `^9.1.1` | Gestión de estado reactiva con el patrón BLoC |
+| **get_it** | `^9.1.1` | Inyección de dependencias y service locator |
+| **dartz** | `^0.10.1` | Tipo `Either<Failure, T>` para manejo funcional de errores |
+| **shared_preferences** | `^2.5.3` | Almacenamiento local del historial serializado en JSON |
+| **fl_chart** | `^1.2.0` | PieChart, BarChart, RadarChart y gráfico de gauge |
+| **image_picker** | `^1.2.1` | Acceso a cámara y galería de fotos |
+| **file_picker** | `^10.3.10` | Selección de archivos `.json` para importar |
+| **share_plus** | `^12.0.1` | Compartir el archivo exportado con otras apps |
+| **path_provider** | `^2.1.5` | Ruta de directorio para guardar archivos exportados |
+| **equatable** | `^2.0.7` | Comparación estructural de objetos en BLoC |
+| **intl** | `^0.20.2` | Formateo de fechas y números |
+| **salomon_bottom_bar** | `^3.3.2` | Barra de navegación inferior animada |
+| **awesome_snackbar_content** | `^0.1.8` | Notificaciones flotantes con estilo moderno |
+| **permission_handler** | `^12.0.1` | Gestión de permisos de cámara en tiempo de ejecución |
+
+---
+
+## 🏗 Arquitectura
+
+El proyecto implementa **Clean Architecture** en tres capas desacopladas, con el patrón **BLoC** como eje de gestión de estado en la presentación.
+
+### Estructura de carpetas
+
+```text
+lib/
+├── core/
+│   ├── errors/
+│   │   └── failures.dart               # ImagePickerFailure · TextRecognitionFailure
+│   │                                   # FileSystemFailure · ParseFailure
+│   ├── injection/
+│   │   └── injection_container.dart    # Registro global de dependencias con GetIt
+│   └── utils/
+│       ├── stats_parser.dart           # Motor de extracción: regex compiladas por campo
+│       └── stats_validator.dart        # Validación, clasificación y % de completitud
+│
+└── features/
+    ├── navigation/                     # NavigationBloc — bottom nav y back stack
+    ├── settings/                       # ThemeBloc · SettingsBloc · pantalla de ajustes
+    └── stats/
+        ├── data/
+        │   ├── datasources/            # OcrDataSourceImpl · LocalStorageDataSourceImpl
+        │   │                           # JsonExportDataSourceImpl
+        │   ├── model/                  # OcrResultModel · StatsCollectionModel (toJson/fromJson)
+        │   └── repositories/           # OcrRepositoryImpl · StatsRepositoryImpl
+        ├── domain/
+        │   ├── entities/               # PlayerStats · StatsCollection · GameMode
+        │   │                           # OcrResult · TextBlock · TextLine · …
+        │   ├── repositories/           # Contratos abstractos (interfaces)
+        │   └── usecases/               # Un caso de uso por operación (SRP estricto)
+        └── presentation/
+            ├── bloc/                   # OcrBloc · StatsBloc
+            ├── controllers/            # StatsUploadController (ChangeNotifier)
+            ├── screens/                # home/ · history/ · upload/ · details/ · charts/
+            ├── services/               # DialogService — notificaciones centralizadas
+            ├── utils/                  # GameModeExtensions (color, icono, nombre)
+            └── widgets/                # Widgets reutilizables entre pantallas
+```
+
+### Los cinco BLoCs del proyecto
+
+| BLoC | Eventos principales | Responsabilidad |
+| --- | --- | --- |
+| `NavigationBloc` | `NavigationItemSelected` · `NavigateBack` · `UpdateNavigationBadge` | Índice activo del bottom nav, historial de navegación, badges |
+| `SettingsBloc` | `LoadSettings` · `UpdateThemeMode` · `UpdateAutoSave` · `ResetSettings` | Persistencia de todas las preferencias del usuario |
+| `ThemeBloc` | `LoadTheme` · `ChangeTheme` · `ChangeThemeMode` | Carga y cambio de tema en tiempo real, temas personalizados |
+| `OcrBloc` | `ProcessImageEvent` · `CopyTextEvent` · `ResetStateEvent` | Ciclo de vida del escaneo: imagen → OCR → resultado |
+| `StatsBloc` | `SaveStatsCollectionEvent` · `LoadAllStatsCollectionsEvent` · `DeleteStatsCollectionEvent` · `ExportStatsToJsonEvent` · `ImportStatsFromJsonEvent` | CRUD completo del historial más exportación/importación |
+
+### Flujo de datos
+
+```text
+[ Widget ]  →  Event  →  [ BLoC ]  →  UseCase  →  [ Repository ]  →  DataSource
+                                                          ↑
+                                               Either<Failure, T>
+                                           (manejo funcional sin excepciones)
+[ Widget ]  ←  State  ←  [ BLoC ]  ←──────────────────────┘
+```
+
+El manejo de errores usa el tipo `Either<Failure, T>` de **dartz**. Cualquier fallo en cualquier capa sube como `Left(Failure)` sin lanzar excepciones no controladas. El BLoC convierte ese `Left` en un estado de error concreto que la UI renderiza con información útil para el usuario.
+
+---
+
+## 🚀 Instalación
+
+### Requisitos
+
+- Flutter SDK `>=3.9.2` / Dart `>=3.0.0`
+- Android `minSdk 21` (Android 5.0+) con Google Play Services actualizado
+- iOS `10.0+`
+
+### Pasos
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/tu-usuario/insight.git
+cd insight
+
+# 2. Instalar dependencias
+flutter pub get
+
+# 3. Solo iOS — instalar pods
+cd ios && pod install && cd ..
+
+# 4. Ejecutar
+flutter run
+```
+
+> **Permisos requeridos:** La app necesita acceso a la **cámara** y a la **galería de fotos** para funcionar. En Android se solicitan en tiempo de ejecución. En iOS deben estar declarados en `Info.plist` (`NSCameraUsageDescription` y `NSPhotoLibraryUsageDescription`).
+
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Si encuentras un bug o tienes una idea de mejora, abre un issue describiendo el problema o envía un pull request con tus cambios.
+
+---
+
+## 📄 Licencia
+
+Distribuido bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
+---
+
+Hecho con ❤️ para la comunidad de Mobile Legends
