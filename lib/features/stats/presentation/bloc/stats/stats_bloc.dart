@@ -1,41 +1,52 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
+import 'package:insight/features/stats/domain/usecases/export_stats_to_json.dart';
 import 'package:insight/features/stats/domain/usecases/get_all_stats_collections.dart';
 import 'package:insight/features/stats/domain/usecases/get_latest_stats_collection.dart';
+import 'package:insight/features/stats/domain/usecases/import_stats_from_json.dart';
+import 'package:insight/features/stats/domain/usecases/save_collections_batch.dart';
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
-import 'package:insight/features/stats/domain/usecases/usecase.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_state.dart';
 
-class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
+import 'package:insight/features/stats/domain/usecases/usecase.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
+
+class StatsBloc extends Bloc<StatsEvent, StatsState> {
   final SaveStatsCollection saveStatsCollection;
   final GetAllStatsCollections getAllStatsCollections;
   final GetLatestStatsCollection getLatestStatsCollection;
   final UpdateStatsCollectionName updateStatsCollectionName;
-  final StatsRepository statsRepository; // Para operaciones directas
+  final StatsRepository statsRepository;
+  final ExportStatsToJson exportStatsToJson;
+  final ImportStatsFromJson importStatsFromJson;
+  final SaveCollectionsBatch saveCollectionsBatch;
 
-  MLStatsBloc({
+  StatsBloc({
     required this.saveStatsCollection,
     required this.getAllStatsCollections,
     required this.getLatestStatsCollection,
     required this.updateStatsCollectionName,
     required this.statsRepository,
-  }) : super(MLStatsInitial()) {
+    required this.exportStatsToJson,
+    required this.importStatsFromJson,
+    required this.saveCollectionsBatch,
+  }) : super(StatsInitial()) {
     on<SaveStatsCollectionEvent>(_onSaveStatsCollection);
     on<LoadAllStatsCollectionsEvent>(_onLoadAllStatsCollections);
     on<LoadLatestStatsCollectionEvent>(_onLoadLatestStatsCollection);
     on<DeleteStatsCollectionEvent>(_onDeleteStatsCollection);
     on<ClearAllStatsEvent>(_onClearAllStats);
-
-    // NUEVOS HANDLERS
     on<UpdateStatsCollectionNameEvent>(_onUpdateStatsCollectionName);
     on<GetStatsCollectionByDateEvent>(_onGetStatsCollectionByDate);
+    on<ExportStatsToJsonEvent>(_onExportStatsToJson);
+    on<ImportStatsFromJsonEvent>(_onImportStatsFromJson);
   }
 
   Future<void> _onSaveStatsCollection(
     SaveStatsCollectionEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     try {
       print('\n🚀 INICIANDO GUARDADO DE ESTADÍSTICAS');
@@ -46,7 +57,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       if (!event.collection.hasAnyStats) {
         print('❌ No hay estadísticas para guardar');
         emit(
-          const MLStatsError(
+          const StatsError(
             'No hay estadísticas para guardar',
             errorDetails:
                 'Debes cargar al menos una estadística antes de guardar.',
@@ -55,7 +66,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
         return;
       }
 
-      emit(const MLStatsSaving('Guardando estadísticas...'));
+      emit(const StatsSaving('Guardando estadísticas...'));
 
       final result = await saveStatsCollection(event.collection);
 
@@ -63,7 +74,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
         (failure) async {
           print('❌ ERROR al guardar: ${failure.message}');
           emit(
-            MLStatsError(
+            StatsError(
               'Error al guardar estadísticas',
               errorDetails: failure.message,
             ),
@@ -71,7 +82,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
         },
         (_) async {
           print('✅ Estadísticas guardadas exitosamente');
-          emit(const MLStatsSaved('Estadísticas guardadas correctamente'));
+          emit(const StatsSaved('Estadísticas guardadas correctamente'));
 
           // CRÍTICO: Esperar un momento antes de recargar
           await Future.delayed(const Duration(milliseconds: 300));
@@ -83,19 +94,19 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       );
     } catch (e) {
       print('❌ ERROR INESPERADO: $e');
-      emit(MLStatsError('Error inesperado', errorDetails: e.toString()));
+      emit(StatsError('Error inesperado', errorDetails: e.toString()));
     }
   }
 
   Future<void> _onLoadAllStatsCollections(
     LoadAllStatsCollectionsEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n📚 CARGANDO TODAS LAS COLECCIONES');
 
     // Solo mostrar loading si no hay estado previo
-    if (state is! MLStatsCollectionsLoaded) {
-      emit(MLStatsLoading());
+    if (state is! StatsCollectionsLoaded) {
+      emit(StatsLoading());
     }
 
     final result = await getAllStatsCollections(NoParams());
@@ -104,7 +115,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) {
         print('❌ Error al cargar: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al cargar estadísticas',
             errorDetails: failure.message,
           ),
@@ -120,18 +131,18 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
           );
         }
 
-        emit(MLStatsCollectionsLoaded(collections));
+        emit(StatsCollectionsLoaded(collections));
       },
     );
   }
 
   Future<void> _onLoadLatestStatsCollection(
     LoadLatestStatsCollectionEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n🔍 CARGANDO ÚLTIMA COLECCIÓN');
 
-    emit(MLStatsLoading());
+    emit(StatsLoading());
 
     final result = await getLatestStatsCollection(NoParams());
 
@@ -139,7 +150,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) {
         print('❌ Error al cargar última: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al cargar últimas estadísticas',
             errorDetails: failure.message,
           ),
@@ -151,18 +162,18 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
         } else {
           print('ℹ No hay colecciones');
         }
-        emit(MLLatestStatsLoaded(collection));
+        emit(LatestStatsLoaded(collection));
       },
     );
   }
 
   Future<void> _onDeleteStatsCollection(
     DeleteStatsCollectionEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n🗑️ ELIMINANDO COLECCIÓN: ${event.createdAt}');
 
-    emit(MLStatsLoading());
+    emit(StatsLoading());
 
     final result = await statsRepository.deleteStatsCollection(event.createdAt);
 
@@ -170,7 +181,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) async {
         print('❌ Error al eliminar: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al eliminar estadísticas',
             errorDetails: failure.message,
           ),
@@ -178,7 +189,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       },
       (_) async {
         print('✅ Colección eliminada exitosamente');
-        emit(const MLStatsDeleted('Estadística eliminada correctamente'));
+        emit(const StatsDeleted('Estadística eliminada correctamente'));
 
         await Future.delayed(const Duration(milliseconds: 300));
 
@@ -190,11 +201,11 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
 
   Future<void> _onClearAllStats(
     ClearAllStatsEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n🧹 LIMPIANDO TODAS LAS ESTADÍSTICAS');
 
-    emit(MLStatsLoading());
+    emit(StatsLoading());
 
     final result = await statsRepository.clearAllStats();
 
@@ -202,7 +213,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) {
         print('❌ Error al limpiar: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al limpiar estadísticas',
             errorDetails: failure.message,
           ),
@@ -210,19 +221,15 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       },
       (_) {
         print('✅ Todas las estadísticas eliminadas');
-        emit(
-          const MLStatsCleared('Todas las estadísticas han sido eliminadas'),
-        );
+        emit(const StatsCleared('Todas las estadísticas han sido eliminadas'));
         add(LoadAllStatsCollectionsEvent());
       },
     );
   }
 
-  // ==================== NUEVOS HANDLERS ====================
-
   Future<void> _onUpdateStatsCollectionName(
     UpdateStatsCollectionNameEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n✏️ ACTUALIZANDO NOMBRE DE COLECCIÓN');
     print('📅 Fecha: ${event.createdAt}');
@@ -240,7 +247,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) async {
         print('❌ Error al actualizar nombre: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al actualizar nombre',
             errorDetails: failure.message,
           ),
@@ -249,7 +256,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (_) async {
         print('✅ Nombre actualizado exitosamente');
         emit(
-          MLStatsNameUpdated(
+          StatsNameUpdated(
             message: 'Nombre actualizado a "${event.newName}"',
             newName: event.newName,
           ),
@@ -265,11 +272,11 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
 
   Future<void> _onGetStatsCollectionByDate(
     GetStatsCollectionByDateEvent event,
-    Emitter<MLStatsState> emit,
+    Emitter<StatsState> emit,
   ) async {
     print('\n🔍 BUSCANDO COLECCIÓN POR FECHA: ${event.createdAt}');
 
-    emit(MLStatsLoading());
+    emit(StatsLoading());
 
     final result = await statsRepository.getStatsCollectionByDate(
       event.createdAt,
@@ -279,7 +286,7 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
       (failure) {
         print('❌ Error al buscar colección: ${failure.message}');
         emit(
-          MLStatsError(
+          StatsError(
             'Error al buscar estadística',
             errorDetails: failure.message,
           ),
@@ -291,7 +298,81 @@ class MLStatsBloc extends Bloc<MLStatsEvent, MLStatsState> {
         } else {
           print('❌ Colección no encontrada');
         }
-        emit(MLStatsCollectionByDateLoaded(collection));
+        emit(StatsCollectionByDateLoaded(collection));
+      },
+    );
+  }
+
+  Future<void> _onExportStatsToJson(
+    ExportStatsToJsonEvent event,
+    Emitter<StatsState> emit,
+  ) async {
+    emit(const StatsExporting());
+
+    List<StatsCollection> toExport = event.collections ?? [];
+
+    if (toExport.isEmpty) {
+      final loadResult = await getAllStatsCollections(NoParams());
+      toExport = loadResult.fold((_) => [], (list) => list);
+    }
+
+    if (toExport.isEmpty) {
+      emit(
+        const StatsError(
+          'No hay estadísticas para exportar',
+          errorDetails: 'Guarda al menos una sesión antes de exportar.',
+        ),
+      );
+      return;
+    }
+
+    final result = await exportStatsToJson(toExport);
+    result.fold(
+      (failure) =>
+          emit(StatsError('Error al exportar', errorDetails: failure.message)),
+      (filePath) => emit(
+        StatsExported(filePath: filePath, totalCollections: toExport.length),
+      ),
+    );
+  }
+
+  Future<void> _onImportStatsFromJson(
+    ImportStatsFromJsonEvent event,
+    Emitter<StatsState> emit,
+  ) async {
+    emit(const StatsImporting());
+
+    final parseResult = await importStatsFromJson(event.filePath);
+
+    await parseResult.fold(
+      (failure) async => emit(
+        StatsError('Error al leer el archivo', errorDetails: failure.message),
+      ),
+      (importedCollections) async {
+        final saveResult = await saveCollectionsBatch(
+          importedCollections,
+          replaceExisting: !event.mergeWithExisting,
+        );
+
+        saveResult.fold(
+          (failure) => emit(
+            StatsError('Error al guardar', errorDetails: failure.message),
+          ),
+          (savedCount) {
+            final skipped = importedCollections.length - savedCount;
+            emit(
+              StatsImported(
+                importedCount: savedCount,
+                skippedCount: skipped,
+                merged: event.mergeWithExisting,
+              ),
+            );
+            Future.delayed(
+              const Duration(milliseconds: 300),
+              () => add(LoadAllStatsCollectionsEvent()),
+            );
+          },
+        );
       },
     );
   }

@@ -153,34 +153,51 @@ class PlayerStats {
     };
   }
 
+  static double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is double) return v;
+    if (v is int) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+
+  static int _toInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is double) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
   factory PlayerStats.fromJson(Map<String, dynamic> json) {
     return PlayerStats(
-      mode: GameMode.values.firstWhere((e) => e.name == json['mode']),
-      totalGames: json['totalGames'],
-      winRate: json['winRate'],
-      mvpCount: json['mvpCount'],
-      legendary: json['legendary'],
-      savage: json['savage'],
-      maniac: json['maniac'],
-      tripleKill: json['tripleKill'],
-      doubleKill: json['doubleKill'],
-      mvpLoss: json['mvpLoss'],
-      maxKills: json['maxKills'],
-      maxAssists: json['maxAssists'],
-      maxWinningStreak: json['maxWinningStreak'],
-      firstBlood: json['firstBlood'],
-      maxDamageDealt: json['maxDamageDealt'],
-      maxDamageTaken: json['maxDamageTaken'],
-      maxGold: json['maxGold'],
-      kda: json['kda'],
-      teamFightParticipation: json['teamFightParticipation'],
-      goldPerMin: json['goldPerMin'],
-      heroDamagePerMin: json['heroDamagePerMin'],
-      deathsPerGame: json['deathsPerGame'],
-      towerDamagePerGame: json['towerDamagePerGame'],
-      oroMaxMin: json['oroMaxMin'],
-      danoTomadoMaxMin: json['danoTomadoMaxMin'],
-      danoCausadoMaxMin: json['danoCausadoMaxMin'],
+      mode: GameMode.values.firstWhere(
+        (e) => e.name == json['mode'],
+        orElse: () => GameMode.total,
+      ),
+      totalGames: _toInt(json['totalGames']),
+      winRate: _toDouble(json['winRate']),
+      mvpCount: _toInt(json['mvpCount']),
+      legendary: _toInt(json['legendary']),
+      savage: _toInt(json['savage']),
+      maniac: _toInt(json['maniac']),
+      tripleKill: _toInt(json['tripleKill']),
+      doubleKill: _toInt(json['doubleKill']),
+      mvpLoss: _toInt(json['mvpLoss']),
+      maxKills: _toInt(json['maxKills']),
+      maxAssists: _toInt(json['maxAssists']),
+      maxWinningStreak: _toInt(json['maxWinningStreak']),
+      firstBlood: _toInt(json['firstBlood']),
+      maxDamageDealt: _toInt(json['maxDamageDealt']),
+      maxDamageTaken: _toInt(json['maxDamageTaken']),
+      maxGold: _toInt(json['maxGold']),
+      kda: _toDouble(json['kda']),
+      teamFightParticipation: _toDouble(json['teamFightParticipation']),
+      goldPerMin: _toInt(json['goldPerMin']),
+      heroDamagePerMin: _toInt(json['heroDamagePerMin']),
+      deathsPerGame: _toDouble(json['deathsPerGame']),
+      towerDamagePerGame: _toInt(json['towerDamagePerGame']),
+      oroMaxMin: _toInt(json['oroMaxMin']),
+      danoTomadoMaxMin: _toInt(json['danoTomadoMaxMin']),
+      danoCausadoMaxMin: _toInt(json['danoCausadoMaxMin']),
     );
   }
 }

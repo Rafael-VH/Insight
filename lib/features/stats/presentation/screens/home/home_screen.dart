@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
 import 'package:insight/features/stats/presentation/screens/upload/upload_screen.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 import 'package:insight/features/stats/presentation/widgets/info_banner.dart';
@@ -21,15 +20,7 @@ class HomeScreen extends StatelessWidget {
               Color(0xFF3B82F6),
               Color(0xFF60A5FA),
             ],
-            icon: Icons.analytics_rounded,
-            expandedHeight: 160.0,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.history),
-                onPressed: () => _navigateToHistory(context),
-                tooltip: 'Ver historial',
-              ),
-            ],
+            expandedHeight: 80.0,
           ),
           SliverFillRemaining(
             hasScrollBody: false,
@@ -44,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 48),
                   _buildUploadButtons(context),
                   const Spacer(),
-                  //_buildInfoBanner(),
+                  _buildInfoBanner(),
                 ],
               ),
             ),
@@ -59,10 +50,9 @@ class HomeScreen extends StatelessWidget {
       children: [
         Text(
           'Cargar Estadísticas',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[800],
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
@@ -113,13 +103,6 @@ class HomeScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => UploadScreen(uploadType: uploadType),
       ),
-    );
-  }
-
-  void _navigateToHistory(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HistoryScreen()),
     );
   }
 }

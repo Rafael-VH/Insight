@@ -26,6 +26,7 @@ import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dar
 // Data Sources
 import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
 import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
+import 'package:insight/features/stats/data/datasources/json_export_datasource.dart';
 // Repositories
 import 'package:insight/features/stats/data/repositories/ocr_repository_impl.dart';
 import 'package:insight/features/stats/data/repositories/stats_repository_impl.dart';
@@ -39,8 +40,11 @@ import 'package:insight/features/stats/domain/usecases/get_latest_stats_collecti
 import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_text.dart';
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
 import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
+import 'package:insight/features/stats/domain/usecases/export_stats_to_json.dart';
+import 'package:insight/features/stats/domain/usecases/import_stats_from_json.dart';
+import 'package:insight/features/stats/domain/usecases/save_collections_batch.dart';
 // Blocs - Stats
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 
 final sl = GetIt.instance;
@@ -88,10 +92,14 @@ Future<void> init() async {
   sl.registerLazySingleton<LocalStorageDataSource>(
     () => LocalStorageDataSourceImpl(sharedPreferences: sl()),
   );
+  sl.registerLazySingleton<JsonExportDataSource>(
+    () => JsonExportDataSourceImpl(),
+  );
 
   // Repository
   sl.registerLazySingleton<StatsRepository>(
-    () => StatsRepositoryImpl(localDataSource: sl()),
+    () =>
+        StatsRepositoryImpl(localDataSource: sl(), jsonExportDataSource: sl()),
   );
 
   // Use cases
@@ -99,6 +107,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
   sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
   sl.registerLazySingleton(() => UpdateStatsCollectionName(sl()));
+  sl.registerLazySingleton(() => ExportStatsToJson(sl()));
+  sl.registerLazySingleton(() => ImportStatsFromJson(sl()));
+  sl.registerLazySingleton(() => SaveCollectionsBatch(sl()));
 
   // ==================== OCR SETUP ====================
   // Data sources
@@ -136,12 +147,15 @@ Future<void> init() async {
 
   // ML Stats Bloc
   sl.registerFactory(
-    () => MLStatsBloc(
+    () => StatsBloc(
       saveStatsCollection: sl(),
       getAllStatsCollections: sl(),
       getLatestStatsCollection: sl(),
       updateStatsCollectionName: sl(),
       statsRepository: sl(),
+      exportStatsToJson: sl(),
+      importStatsFromJson: sl(),
+      saveCollectionsBatch: sl(),
     ),
   );
 

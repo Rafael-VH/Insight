@@ -8,9 +8,9 @@ import 'package:insight/features/settings/presentation/bloc/setting/settings_sta
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_state.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_event.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_state.dart';
@@ -67,7 +67,7 @@ class _UploadScreenState extends State<UploadScreen> {
     // Usa BlocListener para escuchar estados sin reconstruir - Separar la lógica de side effects (diálogos, navegación) de la UI
     return BlocListener<OcrBloc, OcrState>(
       listener: _handleOcrState,
-      child: BlocListener<MLStatsBloc, MLStatsState>(
+      child: BlocListener<StatsBloc, StatsState>(
         listener: _handleMlStatsState,
         child: Scaffold(
           //AppBar fuera del ListenableBuilder - El AppBar no depende del controller, no debe reconstruirse - Reduce reconstrucciones innecesarias, mejora rendimiento
@@ -247,13 +247,13 @@ class _UploadScreenState extends State<UploadScreen> {
   // ==================== ML STATS STATE HANDLER ====================
 
   // Escucha cambios en MLStatsBloc durante el guardado - Coordinar la UI con el proceso de guardado de estadísticas
-  void _handleMlStatsState(BuildContext context, MLStatsState state) {
+  void _handleMlStatsState(BuildContext context, StatsState state) {
     final settingsState = context.read<SettingsBloc>().state;
     final useAwesome = settingsState is SettingsLoaded
         ? settingsState.settings.useAwesomeSnackbar
         : true;
 
-    if (state is MLStatsSaving) {
+    if (state is StatsSaving) {
       _handleSavingState(context, useAwesome);
     } else {
       // SIEMPRE resetear _isSaving en estados finales - Si ocurría un error, _isSaving podía quedar en true - El botón de guardar quedaba deshabilitado permanentemente - Resetear el flag antes de manejar estados específicos
@@ -263,9 +263,9 @@ class _UploadScreenState extends State<UploadScreen> {
       }
 
       // Manejo separado de estados finales - Código más claro y fácil de mantener
-      if (state is MLStatsSaved) {
+      if (state is StatsSaved) {
         _handleSuccessfulSave(context, state, useAwesome);
-      } else if (state is MLStatsError) {
+      } else if (state is StatsError) {
         _handleSaveError(context, state, useAwesome);
       }
     }
@@ -311,7 +311,7 @@ class _UploadScreenState extends State<UploadScreen> {
   // Manejo de guardado exitoso - Centralizar y clarificar el flujo después de guardar
   void _handleSuccessfulSave(
     BuildContext context,
-    MLStatsSaved state,
+    StatsSaved state,
     bool useAwesome,
   ) async {
     // async para poder usar await
@@ -335,7 +335,7 @@ class _UploadScreenState extends State<UploadScreen> {
   // Manejo de error al guardar - Proporcionar feedback claro y opción de reintentar
   void _handleSaveError(
     BuildContext context,
-    MLStatsError state,
+    StatsError state,
     bool useAwesome,
   ) async {
     // async para await
@@ -396,7 +396,7 @@ class _UploadScreenState extends State<UploadScreen> {
     Navigator.of(context).pop();
 
     // Paso 2: Recargar historial ANTES de navegar - Asegurar que el historial muestre los datos actualizados
-    context.read<MLStatsBloc>().add(LoadAllStatsCollectionsEvent());
+    context.read<StatsBloc>().add(LoadAllStatsCollectionsEvent());
 
     // Paso 3: Navegar después de un pequeño delay - Dar tiempo a que el Bloc procese el evento de recarga
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -441,7 +441,7 @@ class _UploadScreenState extends State<UploadScreen> {
 
     // Verificar mounted después de await
     if (mounted) {
-      context.read<MLStatsBloc>().add(SaveStatsCollectionEvent(collection));
+      context.read<StatsBloc>().add(SaveStatsCollectionEvent(collection));
     }
   }
 

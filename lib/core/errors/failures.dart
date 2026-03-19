@@ -14,3 +14,7 @@ class TextRecognitionFailure extends Failure {
 class FileSystemFailure extends Failure {
   const FileSystemFailure(super.message);
 }
+
+class ParseFailure extends Failure {
+  const ParseFailure(super.message);
+}

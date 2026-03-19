@@ -9,7 +9,7 @@ import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dar
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
 import 'package:insight/features/settings/presentation/config/theme_config.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/ml_stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 
 void main() async {
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         ),
 
         // ========== ML STATS BLOC ==========
-        BlocProvider<MLStatsBloc>(create: (context) => di.sl<MLStatsBloc>()),
+        BlocProvider<StatsBloc>(create: (context) => di.sl<StatsBloc>()),
 
         // ========== OCR BLOC ==========
         BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           if (themeState is ThemeError) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              title: 'ML Stats OCR',
+              title: 'Insight',
               theme: ThemeData.light(useMaterial3: true),
               darkTheme: ThemeData.dark(useMaterial3: true),
               themeMode: ThemeMode.system,
@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
 
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              title: 'ML Stats OCR',
+              title: 'Insight',
 
               // Temas personalizados
               theme: ThemeConfig.buildLightTheme(appTheme),
@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
           // Fallback
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'ML Stats OCR',
+            title: 'Insight',
             theme: ThemeData.light(useMaterial3: true),
             home: const MainScreen(),
           );
