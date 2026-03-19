@@ -7,7 +7,10 @@ import 'package:insight/features/navigation/presentation/bloc/navigation_state.d
 import 'package:insight/features/settings/presentation/screens/settings_screen.dart';
 import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
 import 'package:insight/features/stats/presentation/screens/home/home_screen.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+
+// Widgets locales de esta pantalla
+import 'widgets/main_back_handler.dart';
+import 'widgets/main_bottom_bar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -22,6 +25,8 @@ class _MainScreenState extends State<MainScreen>
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
 
+  // ==================== LIFECYCLE ====================
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +40,8 @@ class _MainScreenState extends State<MainScreen>
     super.dispose();
   }
 
-  /// Inicializa los items de navegación
+  // ==================== INICIALIZACIÓN ====================
+
   void _initializeNavigationItems() {
     _navigationItems = [
       NavigationItem(
@@ -62,143 +68,26 @@ class _MainScreenState extends State<MainScreen>
     ];
   }
 
-  /// Inicializa las animaciones
   void _initializeAnimations() {
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-
     _animationController.forward();
   }
 
-  /// Maneja el cambio de pestaña con animación
-  void _handleTabChange(int index) {
-    // Iniciar animación de salida
-    _animationController.reverse().then((_) {
-      // Cambiar de pestaña
-      context.read<NavigationBloc>().add(NavigationItemSelected(index));
+  // ==================== ACCIONES ====================
 
-      // Animar entrada
+  void _handleTabChange(int index) {
+    _animationController.reverse().then((_) {
+      context.read<NavigationBloc>().add(NavigationItemSelected(index));
       _animationController.forward();
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<NavigationBloc, NavigationState>(
-      listener: _handleNavigationStateChanges,
-      child: BlocBuilder<NavigationBloc, NavigationState>(
-        builder: (context, state) {
-          return WillPopScope(
-            onWillPop: _handleBackPress,
-            child: Scaffold(
-              body: _buildBody(state),
-              bottomNavigationBar: _buildBottomNavigationBar(state),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Construye el cuerpo de la pantalla
-  Widget _buildBody(NavigationState state) {
-    final currentIndex = state.currentIndex;
-
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: IndexedStack(
-        index: currentIndex,
-        children: _navigationItems.map((item) => item.page).toList(),
-      ),
-    );
-  }
-
-  /// Construye el bottom navigation bar
-  Widget _buildBottomNavigationBar(NavigationState state) {
-    final currentIndex = state.currentIndex;
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SalomonBottomBar(
-            currentIndex: currentIndex,
-            onTap: _handleTabChange,
-            selectedItemColor: _navigationItems[currentIndex].color,
-            unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
-            items: _buildBottomBarItems(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Construye los items del bottom bar
-  List<SalomonBottomBarItem> _buildBottomBarItems() {
-    final navigationBloc = context.read<NavigationBloc>();
-
-    return _navigationItems.asMap().entries.map((entry) {
-      final index = entry.key;
-      final item = entry.value;
-      final badge = navigationBloc.getBadge(index);
-
-      return SalomonBottomBarItem(
-        icon: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Icon(item.icon),
-            if (badge != null)
-              Positioned(
-                right: -8,
-                top: -4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    badge,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        title: Text(item.title),
-        selectedColor: item.color,
-      );
-    }).toList();
-  }
-
-  /// Maneja los cambios de estado de navegación
   void _handleNavigationStateChanges(
     BuildContext context,
     NavigationState state,
@@ -214,51 +103,31 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 
-  /// Maneja el botón de retroceso del sistema
-  Future<bool> _handleBackPress() async {
-    final navigationBloc = context.read<NavigationBloc>();
+  // ==================== BUILD ====================
 
-    if (navigationBloc.canGoBack) {
-      navigationBloc.add(const NavigateBack());
-      return false;
-    } else if (navigationBloc.currentIndex != 0) {
-      navigationBloc.add(const NavigationItemSelected(0));
-      return false;
-    }
-
-    return await _showExitConfirmation() ?? false;
-  }
-
-  /// Muestra diálogo de confirmación para salir
-  Future<bool?> _showExitConfirmation() {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: colorScheme.surface,
-        title: Text(
-          'Salir de la aplicación',
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
-        content: Text(
-          '¿Estás seguro de que quieres salir?',
-          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<NavigationBloc, NavigationState>(
+      listener: _handleNavigationStateChanges,
+      child: BlocBuilder<NavigationBloc, NavigationState>(
+        builder: (context, state) {
+          return MainBackHandler(
+            child: Scaffold(
+              body: FadeTransition(
+                opacity: _fadeAnimation,
+                child: IndexedStack(
+                  index: state.currentIndex,
+                  children: _navigationItems.map((item) => item.page).toList(),
+                ),
+              ),
+              bottomNavigationBar: MainBottomBar(
+                items: _navigationItems,
+                currentIndex: state.currentIndex,
+                onTap: _handleTabChange,
+              ),
             ),
-            child: const Text('Salir'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
