@@ -20,9 +20,9 @@ class ImageUploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener colores del tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -81,16 +81,14 @@ class ImageUploadCard extends StatelessWidget {
             height: 200,
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              // Fondo adaptado al tema
               color: isDark
                   ? colorScheme.surfaceContainerHighest
-                  : Colors.grey[100],
+                  : colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                // Borde adaptado
-                color: isDark
-                    ? colorScheme.outline.withValues(alpha: 0.5)
-                    : Colors.grey[300]!,
+                color: colorScheme.outline.withValues(
+                  alpha: isDark ? 0.4 : 0.5,
+                ),
                 style: BorderStyle.solid,
                 width: 2,
               ),
@@ -105,9 +103,8 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   Widget _buildUploadArea(BuildContext context) {
-    // Colores de texto adaptados
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: isProcessing ? null : () => _showImageSourceDialog(context),
       borderRadius: BorderRadius.circular(12),
@@ -126,16 +123,14 @@ class ImageUploadCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurface, // Adaptado
+                  color: colorScheme.onSurface,
                 ),
               ),
             ] else ...[
               Icon(
                 Icons.cloud_upload_outlined,
                 size: 48,
-                color: isDark
-                    ? colorScheme.onSurface.withValues(alpha: 0.5)
-                    : Colors.grey[400],
+                color: colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               const SizedBox(height: 16),
               Text(
@@ -143,9 +138,7 @@ class ImageUploadCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? colorScheme.onSurface.withValues(alpha: 0.8)
-                      : Colors.grey[600],
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 8),
@@ -153,9 +146,7 @@ class ImageUploadCard extends StatelessWidget {
                 'Captura de ${_getDisplayName()}',
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark
-                      ? colorScheme.onSurface.withValues(alpha: 0.6)
-                      : Colors.grey[500],
+                  color: colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ],
@@ -199,12 +190,12 @@ class ImageUploadCard extends StatelessWidget {
   }
 
   void _showImageSourceDialog(BuildContext context) {
-    // Colores adaptados al tema
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: colorScheme.surface, // Adaptado
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -220,7 +211,7 @@ class ImageUploadCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface, // Adaptado
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 20),

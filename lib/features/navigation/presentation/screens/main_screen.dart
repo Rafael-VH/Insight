@@ -9,12 +9,6 @@ import 'package:insight/features/stats/presentation/screens/history/history_scre
 import 'package:insight/features/stats/presentation/screens/home/home_screen.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-/// Pantalla principal que gestiona la navegación entre secciones
-///
-/// Utiliza:
-/// - NavigationBloc para gestionar el estado
-/// - IndexedStack para mantener el estado de las páginas
-/// - SalomonBottomBar para una navegación visual atractiva
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -177,7 +171,7 @@ class _MainScreenState extends State<MainScreen>
                 top: -4,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
                   ),
@@ -226,23 +220,31 @@ class _MainScreenState extends State<MainScreen>
 
     if (navigationBloc.canGoBack) {
       navigationBloc.add(const NavigateBack());
-      return false; // No cerrar la app
+      return false;
     } else if (navigationBloc.currentIndex != 0) {
       navigationBloc.add(const NavigationItemSelected(0));
-      return false; // No cerrar la app
+      return false;
     }
 
-    // Mostrar diálogo de confirmación para salir
     return await _showExitConfirmation() ?? false;
   }
 
   /// Muestra diálogo de confirmación para salir
   Future<bool?> _showExitConfirmation() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Salir de la aplicación'),
-        content: const Text('¿Estás seguro de que quieres salir?'),
+        backgroundColor: colorScheme.surface,
+        title: Text(
+          'Salir de la aplicación',
+          style: TextStyle(color: colorScheme.onSurface),
+        ),
+        content: Text(
+          '¿Estás seguro de que quieres salir?',
+          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

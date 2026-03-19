@@ -192,11 +192,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // Sección: Acerca de
         _buildSectionHeader('Acerca de'),
         _buildInfoTile(
+          context: context,
           icon: Icons.info_outline,
           title: 'Versión',
           subtitle: '1.0.0+1',
         ),
         _buildInfoTile(
+          context: context,
           icon: Icons.bug_report_outlined,
           title: 'Reportar un problema',
           subtitle: 'Ayúdanos a mejorar la app',
@@ -293,11 +295,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Preview del estilo clásico
   void _showClassicPreview(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Usando diálogos clásicos'),
+      const SnackBar(
+        content: Text('Usando diálogos clásicos'),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -350,10 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context: context,
                       mode: mode,
                       isSelected: isSelected,
-                      onTap: () {
-                        // Actualizar ambos blocs de forma sincronizada
-                        _updateThemeMode(context, mode);
-                      },
+                      onTap: () => _updateThemeMode(context, mode),
                     ),
                   ),
                 );
@@ -399,7 +398,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? colorScheme.primary : Colors.grey[300]!,
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.outline.withValues(alpha: 0.5),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -407,7 +408,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Icon(
               mode.icon,
-              color: isSelected ? colorScheme.primary : Colors.grey[600],
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: 0.6),
               size: 28,
             ),
             const SizedBox(height: 8),
@@ -416,7 +419,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? colorScheme.primary : Colors.grey[700],
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -449,19 +454,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildInfoTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
     VoidCallback? onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: Colors.grey[700]),
+        child: Icon(icon, color: colorScheme.onSurface.withValues(alpha: 0.7)),
       ),
       title: Text(title),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),

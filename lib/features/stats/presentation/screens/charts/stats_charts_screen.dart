@@ -88,10 +88,6 @@ class _StatsChartsScreenState extends State<StatsChartsScreen>
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// PÁGINA POR MODO
-// ══════════════════════════════════════════════════════════
-
 class _ModeChartsPage extends StatelessWidget {
   const _ModeChartsPage({required this.stats});
 
@@ -127,10 +123,6 @@ class _ModeChartsPage extends StatelessWidget {
     );
   }
 }
-
-// ══════════════════════════════════════════════════════════
-// WIDGETS AUXILIARES COMUNES
-// ══════════════════════════════════════════════════════════
 
 class _SectionTitle extends StatelessWidget {
   const _SectionTitle({required this.title, required this.icon});
@@ -173,10 +165,6 @@ class _ChartCard extends StatelessWidget {
     );
   }
 }
-
-// ══════════════════════════════════════════════════════════
-// TARJETA RESUMEN
-// ══════════════════════════════════════════════════════════
 
 class _SummaryHeaderCard extends StatelessWidget {
   const _SummaryHeaderCard({required this.stats});
@@ -248,6 +236,8 @@ class _StatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Text(
@@ -261,16 +251,15 @@ class _StatPill extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          style: TextStyle(
+            fontSize: 11,
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
       ],
     );
   }
 }
-
-// ══════════════════════════════════════════════════════════
-// WIN RATE GAUGE
-// ══════════════════════════════════════════════════════════
 
 class _WinRateGauge extends StatelessWidget {
   const _WinRateGauge({required this.winRate});
@@ -287,6 +276,7 @@ class _WinRateGauge extends StatelessWidget {
   Widget build(BuildContext context) {
     final pct = winRate.clamp(0.0, 100.0);
     final color = _gaugeColor(pct);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return _ChartCard(
       child: SizedBox(
@@ -308,7 +298,7 @@ class _WinRateGauge extends StatelessWidget {
                   ),
                   PieChartSectionData(
                     value: 100.0 - pct,
-                    color: Colors.grey.shade200,
+                    color: colorScheme.onSurface.withValues(alpha: 0.1),
                     title: '',
                     radius: 28,
                   ),
@@ -328,7 +318,10 @@ class _WinRateGauge extends StatelessWidget {
                 ),
                 Text(
                   'Win Rate',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
               ],
             ),
@@ -339,10 +332,6 @@ class _WinRateGauge extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// PERFORMANCE BAR CHART
-// ══════════════════════════════════════════════════════════
-
 class _PerformanceBarChart extends StatelessWidget {
   const _PerformanceBarChart({required this.stats});
 
@@ -351,9 +340,9 @@ class _PerformanceBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = stats.mode.color;
+    final colorScheme = Theme.of(context).colorScheme;
     final totalGames = stats.totalGames > 0 ? stats.totalGames.toDouble() : 1.0;
 
-    // Cada entrada: (etiqueta, valor real, valor máximo de referencia)
     final entries = <_BarEntry>[
       _BarEntry('KDA', stats.kda, 10.0, color),
       _BarEntry('Part.%', stats.teamFightParticipation, 100.0, color),
@@ -377,7 +366,6 @@ class _PerformanceBarChart extends StatelessWidget {
                 maxY: 100,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    //tooltipRoundedRadius: 8,
                     getTooltipColor: (_) =>
                         Colors.black.withValues(alpha: 0.75),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
@@ -407,7 +395,10 @@ class _PerformanceBarChart extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             entries[idx].label,
-                            style: const TextStyle(fontSize: 10),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
                           ),
                         );
                       },
@@ -426,8 +417,10 @@ class _PerformanceBarChart extends StatelessWidget {
                 gridData: FlGridData(
                   drawVerticalLine: false,
                   horizontalInterval: 25,
-                  getDrawingHorizontalLine: (_) =>
-                      FlLine(color: Colors.grey.shade200, strokeWidth: 1),
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: colorScheme.outline.withValues(alpha: 0.2),
+                    strokeWidth: 1,
+                  ),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: entries.asMap().entries.map((e) {
@@ -477,7 +470,10 @@ class _PerformanceBarChart extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${e.label}: ${e.rawValue.toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 11),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
                       ),
                     ],
                   ),
@@ -499,16 +495,11 @@ class _BarEntry {
   final Color color;
 }
 
-// ══════════════════════════════════════════════════════════
-// ACHIEVEMENTS RADAR CHART
-// ══════════════════════════════════════════════════════════
-
 class _AchievementsRadarChart extends StatelessWidget {
   const _AchievementsRadarChart({required this.stats});
 
   final PlayerStats stats;
 
-  // Normalización segura: evita división por cero
   static double _norm(num value, num maxRef) {
     if (maxRef <= 0) return 0.0;
     return (value / maxRef * 10.0).clamp(0.0, 10.0);
@@ -517,6 +508,7 @@ class _AchievementsRadarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = stats.mode.color;
+    final colorScheme = Theme.of(context).colorScheme;
     final totalGames = stats.totalGames > 0 ? stats.totalGames : 1;
 
     final labels = [
@@ -546,18 +538,19 @@ class _AchievementsRadarChart extends StatelessWidget {
       _norm(stats.firstBlood, totalGames),
     ];
 
-    // fl_chart requiere mínimo 3 puntos y que no sean todos 0
     final allZero = normalizedValues.every((v) => v == 0.0);
 
     return _ChartCard(
       child: Column(
         children: [
           if (allZero)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 48),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
               child: Text(
                 'Sin logros registrados',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                  color: colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
               ),
             )
           else
@@ -580,11 +573,11 @@ class _AchievementsRadarChart extends StatelessWidget {
                   radarBackgroundColor: Colors.transparent,
                   borderData: FlBorderData(show: false),
                   radarBorderData: BorderSide(
-                    color: Colors.grey.shade300,
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                     width: 1,
                   ),
                   gridBorderData: BorderSide(
-                    color: Colors.grey.shade200,
+                    color: colorScheme.outline.withValues(alpha: 0.2),
                     width: 1,
                   ),
                   tickCount: 4,
@@ -594,13 +587,12 @@ class _AchievementsRadarChart extends StatelessWidget {
                   ),
                   getTitle: (index, angle) => RadarChartTitle(
                     text: labels[index],
-                    angle: 0, // ← siempre horizontal para legibilidad
+                    angle: 0,
                   ),
                   titleTextStyle: TextStyle(
                     fontSize: 10,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: colorScheme.onSurface,
                   ),
-                  //titlePadding: 16,
                 ),
               ),
             ),
@@ -656,10 +648,6 @@ class _LegendChip extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// ECONOMY PIE CHART
-// ══════════════════════════════════════════════════════════
-
 class _EconomyPieChart extends StatefulWidget {
   const _EconomyPieChart({required this.stats});
 
@@ -675,6 +663,8 @@ class _EconomyPieChartState extends State<_EconomyPieChart> {
   @override
   Widget build(BuildContext context) {
     final s = widget.stats;
+    final colorScheme = Theme.of(context).colorScheme;
+
     final entries = [
       _PieEntry('Oro/Min', s.goldPerMin.toDouble(), const Color(0xFFF59E0B)),
       _PieEntry(
@@ -693,12 +683,14 @@ class _EconomyPieChartState extends State<_EconomyPieChart> {
 
     if (total == 0) {
       return _ChartCard(
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 32),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 32),
           child: Center(
             child: Text(
               'Sin datos de economía',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
             ),
           ),
         ),
@@ -767,9 +759,10 @@ class _EconomyPieChartState extends State<_EconomyPieChart> {
                           children: [
                             Text(
                               e.label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                             Text(

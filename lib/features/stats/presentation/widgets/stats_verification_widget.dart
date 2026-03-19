@@ -16,8 +16,6 @@ class StatsVerificationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fields = StatsParser.getFieldsForVerification(stats);
-    // Obtener colores del tema
-    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(

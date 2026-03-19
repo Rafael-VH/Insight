@@ -30,16 +30,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
   static const int _pageSize = 10;
 
-  // Variables de estado local
   List<StatsCollection> _allCollections = [];
   final List<StatsCollection> _displayedCollections = [];
   int _currentPage = 0;
   bool _isLoadingMore = false;
   bool _hasMoreData = true;
 
-  // Filtro y ordenamiento
   String _searchQuery = '';
-  String _sortBy = 'date'; // 'date' o 'name'
+  String _sortBy = 'date';
   bool _isAscending = false;
 
   @override
@@ -52,12 +50,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
-
-    // Limpiar estado al salir
     _searchQuery = '';
     _allCollections.clear();
     _displayedCollections.clear();
-
     super.dispose();
   }
 
@@ -67,9 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _onScroll() {
-    // Prevenir llamadas múltiples
     if (_isLoadingMore || !_hasMoreData) return;
-
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.9) {
       _loadMoreCollections();
@@ -84,10 +77,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _loadMoreCollections() {
     if (_isLoadingMore || !_hasMoreData) return;
-
-    setState(() {
-      _isLoadingMore = true;
-    });
+    setState(() => _isLoadingMore = true);
 
     final startIndex = _currentPage * _pageSize;
     final endIndex = min(startIndex + _pageSize, _allCollections.length);
@@ -116,8 +106,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       _currentPage = 0;
       _hasMoreData = _allCollections.isNotEmpty;
     });
-
-    // Cargar primera página inmediatamente
     if (_allCollections.isNotEmpty) {
       _loadMoreCollections();
     }
@@ -128,7 +116,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   ) {
     var filtered = collections;
 
-    // Aplicar filtro de búsqueda
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((collection) {
         final name = collection.displayName.toLowerCase();
@@ -138,7 +125,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }).toList();
     }
 
-    // Aplicar ordenamiento
     filtered.sort((a, b) {
       int comparison;
       if (_sortBy == 'date') {
@@ -153,9 +139,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-    });
+    setState(() => _searchQuery = query);
     _reloadWithFilters();
   }
 
@@ -182,16 +166,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _showRenameDialog(StatsCollection collection) async {
     final currentName = collection.displayName;
     final controller = TextEditingController(text: currentName);
+    final colorScheme = Theme.of(context).colorScheme;
 
     final newName = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: colorScheme.surface,
         title: Row(
           children: [
             Icon(Icons.edit, color: Theme.of(context).primaryColor),
             const SizedBox(width: 12),
-            const Text('Cambiar Nombre'),
+            Text(
+              'Cambiar Nombre',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ],
         ),
         content: Column(
@@ -200,7 +189,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             Text(
               'Ingresa un nuevo nombre para estas estadísticas:',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -254,49 +245,59 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _showDeleteConfirmation(StatsCollection collection) async {
-    final settingsState = context.read<SettingsBloc>().state;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: colorScheme.surface,
         title: Row(
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
             const SizedBox(width: 12),
-            const Text('Confirmar'),
+            Text('Confirmar', style: TextStyle(color: colorScheme.onSurface)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '¿Estás seguro de eliminar estas estadísticas?',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red[50],
+                color: isDark
+                    ? Colors.red[900]!.withValues(alpha: 0.3)
+                    : Colors.red[50],
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red[200]!),
+                border: Border.all(
+                  color: isDark ? Colors.red[700]! : Colors.red[200]!,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     collection.displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _formatDate(collection.createdAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
@@ -306,7 +307,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               'Esta acción no se puede deshacer.',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.red[700],
+                color: isDark ? Colors.red[300] : Colors.red[700],
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -347,8 +348,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _showOptionsMenu(StatsCollection collection, int index) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     showModalBottomSheet(
       context: context,
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -361,7 +365,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               height: 4,
               margin: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: colorScheme.onSurface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -369,14 +373,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               child: Row(
                 children: [
-                  Icon(Icons.more_horiz, color: Colors.grey[700]),
+                  Icon(
+                    Icons.more_horiz,
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Opciones',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -386,15 +393,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.bar_chart_rounded,
-                  color: Colors.blue.shade700,
+                  color: colorScheme.primary,
                 ),
               ),
-              title: const Text('Ver Gráficos'),
+              title: Text(
+                'Ver Gráficos',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
               onTap: () {
                 Navigator.pop(bottomSheetContext);
                 Navigator.push(
@@ -409,15 +419,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.teal.shade50,
+                  color: Colors.teal.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.import_export_rounded,
-                  color: Colors.teal.shade700,
+                  color: Colors.teal,
                 ),
               ),
-              title: const Text('Exportar / Importar'),
+              title: Text(
+                'Exportar / Importar',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
               onTap: () {
                 Navigator.pop(bottomSheetContext);
                 ExportImportBottomSheet.show(context);
@@ -427,12 +440,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green[50],
+                  color: const Color(0xFF059669).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.edit, color: Colors.green[700]),
+                child: const Icon(Icons.edit, color: Color(0xFF059669)),
               ),
-              title: const Text('Cambiar Nombre'),
+              title: Text(
+                'Cambiar Nombre',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
               onTap: () {
                 Navigator.pop(bottomSheetContext);
                 _showRenameDialog(collection);
@@ -442,10 +458,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
+                  color: Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.delete_outline, color: Colors.red[700]),
+                child: Icon(Icons.delete_outline, color: Colors.red[400]),
               ),
               title: const Text(
                 'Eliminar',
@@ -488,7 +504,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<StatsBloc, StatsState>(
-      // Listener para export/import
       listener: _handleExportImportState,
       child: BlocListener<StatsBloc, StatsState>(
         listener: (context, state) {
@@ -496,7 +511,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           final useAwesome = settingsState is SettingsLoaded
               ? settingsState.settings.useAwesomeSnackbar
               : true;
-          // Actualizar colecciones PRIMERO
           if (state is StatsCollectionsLoaded) {
             _updateCollections(state.collections);
           } else if (state is StatsNameUpdated) {
@@ -522,14 +536,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
           }
         },
         child: GestureDetector(
-          // Cerrar teclado al tocar fuera
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            // Evitar que el contenido se redimensione con el teclado
             resizeToAvoidBottomInset: true,
             body: CustomScrollView(
               controller: _scrollController,
-              // Comportamiento de scroll para teclado
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               slivers: [
                 _buildAppBar(),
@@ -572,13 +583,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildAppBar() {
-    // Detectar si el teclado está visible
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return AppSliverBar(
       title: 'Historial de Estadísticas',
       colors: const [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-      // Reducir altura cuando aparece el teclado
       expandedHeight: isKeyboardVisible ? 60.0 : 100.0,
       actions: [
         PopupMenuButton<String>(
@@ -668,14 +677,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildSearchBar() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SliverToBoxAdapter(
       child: Container(
         padding: const EdgeInsets.all(16),
-        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+        color: colorScheme.primary.withValues(alpha: 0.05),
         child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
-          // Configuración de teclado
           textInputAction: TextInputAction.search,
           onSubmitted: (_) => FocusScope.of(context).unfocus(),
           decoration: InputDecoration(
@@ -687,12 +697,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     onPressed: () {
                       _searchController.clear();
                       _onSearchChanged('');
-                      FocusScope.of(context).unfocus(); // Cerrar teclado
+                      FocusScope.of(context).unfocus();
                     },
                   )
                 : null,
             filled: true,
-            fillColor: Colors.white,
+            fillColor: colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
@@ -705,6 +715,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildFilterBar() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -713,12 +725,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.filter_list, size: 16, color: Colors.grey[600]),
+                Icon(
+                  Icons.filter_list,
+                  size: 16,
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
                 const SizedBox(width: 8),
                 Text(
                   '${_allCollections.length} resultado(s)',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -735,7 +751,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   _searchController.clear();
                   _onSearchChanged('');
                 },
-                backgroundColor: Colors.blue[50],
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -801,6 +817,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       );
     }
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     final latestCollection = _displayedCollections.isNotEmpty
         ? _displayedCollections.first
         : null;
@@ -853,7 +871,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.blue[100],
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -861,7 +879,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue[900],
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -891,7 +909,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   'No hay más estadísticas',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -905,7 +923,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 'No hay más estadísticas guardadas',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -957,9 +975,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(Icons.star, size: 16, color: Colors.white),
                         SizedBox(width: 4),
                         Text(
@@ -982,7 +1000,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-
               Text(
                 collection.displayName,
                 style: const TextStyle(
@@ -992,7 +1009,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-
               Row(
                 children: [
                   const Icon(
@@ -1008,7 +1024,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-
               if (collection.availableStats.isNotEmpty) ...[
                 Text(
                   'Modos capturados:',
@@ -1027,7 +1042,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ],
               const SizedBox(height: 16),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -1040,9 +1054,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
                         'Ver Detalles',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -1061,7 +1075,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildHistoryCard(StatsCollection collection, int index) {
-    // Calcular badge correctamente
     final badgeNumber = _allCollections.length - index;
 
     return Padding(

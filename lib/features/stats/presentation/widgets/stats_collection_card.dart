@@ -14,11 +14,12 @@ class StatsCollectionCard extends StatelessWidget {
 
   final StatsCollection collection;
   final VoidCallback onTap;
-  final String? badge; // Badge opcional con número
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       elevation: 2,
@@ -33,9 +34,9 @@ class StatsCollectionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(dateFormat),
+                  _buildHeader(context, dateFormat, colorScheme),
                   const SizedBox(height: 12),
-                  _buildStatsPreview(),
+                  _buildStatsPreview(context, colorScheme),
                 ],
               ),
             ),
@@ -76,7 +77,11 @@ class StatsCollectionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(DateFormat dateFormat) {
+  Widget _buildHeader(
+    BuildContext context,
+    DateFormat dateFormat,
+    ColorScheme colorScheme,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -86,31 +91,39 @@ class StatsCollectionCard extends StatelessWidget {
             children: [
               Text(
                 dateFormat.format(collection.createdAt),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 _getRelativeTime(collection.createdAt),
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
               ),
             ],
           ),
         ),
-        Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+        Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: colorScheme.onSurface.withValues(alpha: 0.4),
+        ),
       ],
     );
   }
 
-  Widget _buildStatsPreview() {
+  Widget _buildStatsPreview(BuildContext context, ColorScheme colorScheme) {
     final availableStats = collection.availableStats;
 
     if (availableStats.isEmpty) {
       return Text(
         'Sin estadísticas disponibles',
-        style: TextStyle(color: Colors.grey[600]),
+        style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
       );
     }
 
@@ -121,7 +134,7 @@ class StatsCollectionCard extends StatelessWidget {
           'Modos capturados:',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[700],
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),

@@ -5,7 +5,6 @@ import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dar
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
 
-/// Widget para seleccionar temas en la configuración
 class ThemeSelectorWidget extends StatelessWidget {
   const ThemeSelectorWidget({super.key});
 
@@ -20,7 +19,6 @@ class ThemeSelectorWidget extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sección de temas predefinidos
             _buildSectionHeader('Temas Predefinidos'),
             const SizedBox(height: 12),
             _buildThemeGrid(
@@ -28,8 +26,6 @@ class ThemeSelectorWidget extends StatelessWidget {
               state.availableThemes.where((t) => !t.isCustom).toList(),
               state.currentTheme,
             ),
-
-            // Sección de temas personalizados
             if (state.availableThemes.any((t) => t.isCustom)) ...[
               const SizedBox(height: 24),
               _buildSectionHeader('Temas Personalizados'),
@@ -41,8 +37,6 @@ class ThemeSelectorWidget extends StatelessWidget {
                 showDelete: true,
               ),
             ],
-
-            // Botón para crear tema personalizado
             const SizedBox(height: 24),
             _buildCreateCustomThemeButton(context),
           ],
@@ -86,9 +80,7 @@ class ThemeSelectorWidget extends StatelessWidget {
           theme: theme,
           isSelected: isSelected,
           showDelete: showDelete,
-          onTap: () {
-            context.read<ThemeBloc>().add(ChangeTheme(theme.id));
-          },
+          onTap: () => context.read<ThemeBloc>().add(ChangeTheme(theme.id)),
           onDelete: showDelete
               ? () => _showDeleteConfirmation(context, theme)
               : null,
@@ -100,7 +92,6 @@ class ThemeSelectorWidget extends StatelessWidget {
   Widget _buildCreateCustomThemeButton(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: () {
-        // Navegar a pantalla de creación de tema personalizado
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Función de crear tema personalizado próximamente'),
@@ -163,6 +154,8 @@ class _ThemeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Stack(
       children: [
         InkWell(
@@ -174,24 +167,28 @@ class _ThemeCard extends StatelessWidget {
               border: Border.all(
                 color: isSelected
                     ? theme.lightColorScheme.primary
-                    : Colors.grey[300]!,
+                    : colorScheme.outline.withValues(alpha: 0.5),
                 width: isSelected ? 3 : 2,
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Muestra de colores
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _ColorCircle(color: theme.lightColorScheme.primary),
+                    _ColorCircle(
+                      color: theme.lightColorScheme.primary,
+                      borderColor: colorScheme.outline.withValues(alpha: 0.3),
+                    ),
                     const SizedBox(width: 4),
-                    _ColorCircle(color: theme.lightColorScheme.secondary),
+                    _ColorCircle(
+                      color: theme.lightColorScheme.secondary,
+                      borderColor: colorScheme.outline.withValues(alpha: 0.3),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                // Nombre del tema
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
@@ -206,7 +203,7 @@ class _ThemeCard extends StatelessWidget {
                           : FontWeight.normal,
                       color: isSelected
                           ? theme.lightColorScheme.primary
-                          : Colors.grey[700],
+                          : colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -214,7 +211,6 @@ class _ThemeCard extends StatelessWidget {
             ),
           ),
         ),
-        // Icono de seleccionado
         if (isSelected)
           Positioned(
             top: 4,
@@ -232,7 +228,6 @@ class _ThemeCard extends StatelessWidget {
               ),
             ),
           ),
-        // Botón de eliminar
         if (showDelete && onDelete != null)
           Positioned(
             top: 4,
@@ -256,9 +251,10 @@ class _ThemeCard extends StatelessWidget {
 
 /// Círculo de color para vista previa
 class _ColorCircle extends StatelessWidget {
-  const _ColorCircle({required this.color});
+  const _ColorCircle({required this.color, required this.borderColor});
 
   final Color color;
+  final Color borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +264,7 @@ class _ColorCircle extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
     );
   }

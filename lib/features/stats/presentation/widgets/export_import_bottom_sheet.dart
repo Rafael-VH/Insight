@@ -5,9 +5,6 @@ import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
 import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 
-/// Bottom sheet de exportar/importar.
-/// Solo dispara eventos al Bloc y muestra estado de carga.
-/// Los side-effects (share, snackbar) los maneja HistoryScreen.
 class ExportImportBottomSheet extends StatefulWidget {
   const ExportImportBottomSheet({super.key});
 
@@ -61,16 +58,21 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
   }
 
   Widget _buildLoading() {
-    return const SizedBox(
-      key: ValueKey('loading'),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      key: const ValueKey('loading'),
       height: 140,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Procesando archivo...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Procesando archivo...',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ],
         ),
       ),
@@ -78,6 +80,8 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
   }
 
   Widget _buildContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       key: const ValueKey('content'),
       mainAxisSize: MainAxisSize.min,
@@ -87,7 +91,7 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: colorScheme.onSurface.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -101,9 +105,9 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
         const SizedBox(height: 4),
         Text(
           'Respalda o restaura tus estadísticas en formato JSON',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -174,6 +178,8 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Material(
       color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(16),
@@ -199,20 +205,26 @@ class _ActionTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: Colors.grey.shade400),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
             ],
           ),
         ),

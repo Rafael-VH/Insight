@@ -6,7 +6,6 @@ import 'package:insight/features/stats/presentation/widgets/save_stats_dialog.da
 class DialogService {
   static const Duration _defaultDuration = Duration(seconds: 3);
 
-  /// Muestra un diálogo de éxito
   static Future<void> showSuccess(
     BuildContext context, {
     required String message,
@@ -44,7 +43,6 @@ class DialogService {
     }
   }
 
-  /// Muestra un diálogo de cargando
   static Future<void> showLoading(
     BuildContext context, {
     String message = 'Guardando estadísticas...',
@@ -84,8 +82,6 @@ class DialogService {
       );
     }
   }
-
-  /// ========== IMPLEMENTACIONES AWESOME SNACKBAR ==========
 
   static void _showAwesomeSuccess(
     BuildContext context,
@@ -174,41 +170,54 @@ class DialogService {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(
-              cancelButtonText,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+      builder: (dialogContext) {
+        final colorScheme = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: colorScheme.surface,
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
             ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          content: Text(
+            message,
+            style: TextStyle(
+              fontSize: 14,
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(
+                cancelButtonText,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
-            child: Text(
-              confirmButtonText,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF059669),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                confirmButtonText,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 

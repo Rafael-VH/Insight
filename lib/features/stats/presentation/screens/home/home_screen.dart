@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           AppSliverBar(
-            title: 'Mobile Legends Stats',
+            title: 'Insight',
             colors: const [
               Color(0xFF1E3A8A),
               Color(0xFF3B82F6),
@@ -26,7 +26,6 @@ class HomeScreen extends StatelessWidget {
             hasScrollBody: false,
             child: Container(
               padding: const EdgeInsets.all(24.0),
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -46,6 +45,8 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildSectionTitle(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Text(
@@ -58,9 +59,9 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Selecciona cómo deseas cargar tus estadísticas',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
           textAlign: TextAlign.center,
         ),
       ],
