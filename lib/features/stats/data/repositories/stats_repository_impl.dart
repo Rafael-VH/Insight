@@ -114,8 +114,6 @@ class StatsRepositoryImpl implements StatsRepository {
     }
   }
 
-  // Exportar
-
   @override
   Future<Either<Failure, String>> exportStatsToJson(
     List<StatsCollection> collections,
@@ -156,8 +154,6 @@ class StatsRepositoryImpl implements StatsRepository {
       return Left(FileSystemFailure('Error al exportar: ${e.toString()}'));
     }
   }
-
-  // Importar
 
   @override
   Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(
@@ -201,7 +197,7 @@ class StatsRepositoryImpl implements StatsRepository {
           if (item is! Map<String, dynamic>) continue;
           collections.add(StatsCollectionModel.fromJson(item));
         } catch (_) {
-          continue; // Saltar ítems corruptos sin fallar todo
+          continue;
         }
       }
 
@@ -220,8 +216,6 @@ class StatsRepositoryImpl implements StatsRepository {
       return Left(FileSystemFailure('Error al importar: ${e.toString()}'));
     }
   }
-
-  // Batch save
 
   @override
   Future<Either<Failure, int>> saveCollectionsBatch(
@@ -258,6 +252,5 @@ class StatsRepositoryImpl implements StatsRepository {
     }
   }
 
-  // Helper privado
   String _pad(int n) => n.toString().padLeft(2, '0');
 }

@@ -18,32 +18,19 @@ class ParseResult {
 class _CompiledPatterns {
   // ==================== WIN RATE PATTERNS (ESTRATEGIA SIMPLE) ====================
   static final List<RegExp> winRate = [
-    // Capturar TODOS los porcentajes y validar por rango (40-80%)
-    // Los Win Rates típicos están en este rango
-
-    // Patrón 1: Porcentaje con 2 decimales (formato más común)
     RegExp(r'(\d{1,2}\.\d{2})\s*%'),
-
-    // Patrón 2: Porcentaje con 1-2 decimales
     RegExp(r'(\d{1,2}\.\d{1,2})\s*%'),
-
-    // Patrón 3: Porcentaje entero
     RegExp(r'(\d{1,2})\s*%'),
   ];
 
   // ==================== TOTAL GAMES PATTERNS ====================
   static final List<RegExp> totalGames = [
-    // Español
     RegExp(r'(\d+)\s*Partidas?\s*(?:Totales?|Jugadas?)?', caseSensitive: false),
     RegExp(r'(?:Total\s*)?Partidas?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Juegos?\s*Jugados?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(?:Nº|N°|Num)\s*Partidas?\s*[:\s]*(\d+)', caseSensitive: false),
-
-    // Inglés
     RegExp(r'(\d+)\s*(?:Total\s*)?(?:Games?|Matches?)', caseSensitive: false),
     RegExp(r'(?:Games?|Matches?)\s*Played\s*[:\s]*(\d+)', caseSensitive: false),
-
-    // Patrones contextuales
     RegExp(r'(\d+)\s*(?=.*(?:Tasa|Win\s*Rate))', caseSensitive: false),
   ];
 
@@ -87,7 +74,6 @@ class _CompiledPatterns {
 
   // ==================== GOLD PER MIN PATTERNS ====================
   static final List<RegExp> goldPerMin = [
-    // Español
     RegExp(
       r'Oro\s*(?:por\s*)?(?:/|por)?\s*Min(?:uto)?\s*[:\s]*(\d+)',
       caseSensitive: false,
@@ -99,22 +85,17 @@ class _CompiledPatterns {
     ),
     RegExp(r'GPM\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*GPM', caseSensitive: false),
-
-    // Variaciones con espacios
     RegExp(r'Oro\s*Min\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Gold\s*Min\s*[:\s]*(\d+)', caseSensitive: false),
   ];
 
   // ==================== HERO DAMAGE PER MIN PATTERNS ====================
   static final List<RegExp> heroDamagePerMin = [
-    // Español
     RegExp(
       r'(?:DAÑO|Daño)\s*a\s*(?:Héroe|Heroe|Hero)s?\s*(?:/|por)\s*Min(?:uto)?\s*[:\s]*(\d+)',
       caseSensitive: false,
     ),
     RegExp(r'(\d+)\s*(?:DAÑO|Daño)\s*(?:Héroe|Hero)', caseSensitive: false),
-
-    // Inglés
     RegExp(
       r'Hero\s*Damage\s*(?:per\s*)?(?:/|per)?\s*Min(?:ute)?\s*[:\s]*(\d+)',
       caseSensitive: false,
@@ -124,8 +105,6 @@ class _CompiledPatterns {
       caseSensitive: false,
     ),
     RegExp(r'HDPM\s*[:\s]*(\d+)', caseSensitive: false),
-
-    // Variaciones
     RegExp(r'Daño\s*Héroe\s*Min\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Hero\s*DMG\s*Min\s*[:\s]*(\d+)', caseSensitive: false),
   ];
@@ -164,32 +143,42 @@ class _CompiledPatterns {
 
   // ==================== ACHIEVEMENTS PATTERNS ====================
   static final List<RegExp> legendary = [
+    // "Legendario  290" — texto luego número con espacios
+    RegExp(r'Legendario\s+(\d+)', caseSensitive: false),
     RegExp(r'Legendario\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*Legendarios?', caseSensitive: false),
-    RegExp(r'Legendary\s*[:\s]*(\d+)', caseSensitive: false),
+    RegExp(r'Legendary\s+(\d+)', caseSensitive: false),
   ];
 
   static final List<RegExp> savage = [
+    // "Savage  9" — texto luego número con espacios
+    RegExp(r'Savage\s+(\d+)', caseSensitive: false),
     RegExp(r'Savage\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*Savages?', caseSensitive: false),
-    RegExp(r'Salvaje\s*[:\s]*(\d+)', caseSensitive: false),
+    RegExp(r'Salvaje\s+(\d+)', caseSensitive: false),
   ];
 
   static final List<RegExp> maniac = [
+    // "Maniac  42" — texto luego número con espacios
+    RegExp(r'Maniac(?:o|a)?\s+(\d+)', caseSensitive: false),
     RegExp(r'Maniac(?:o|a)?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*Maniac', caseSensitive: false),
   ];
 
   static final List<RegExp> tripleKill = [
+    // "Asesinato Triple  281"
+    RegExp(r'Asesinato\s+Triple\s+(\d+)', caseSensitive: false),
     RegExp(
       r'(?:Asesinato\s*)?Triple\s*(?:Kill)?\s*[:\s]*(\d+)',
       caseSensitive: false,
     ),
-    RegExp(r'Triple\s*[:\s]*(\d+)', caseSensitive: false),
+    RegExp(r'Triple\s+(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*Triple(?:s)?', caseSensitive: false),
   ];
 
   static final List<RegExp> doubleKill = [
+    // "Asesinato Doble  1929"
+    RegExp(r'Asesinato\s+Doble\s+(\d+)', caseSensitive: false),
     RegExp(
       r'(?:Asesinato\s*)?Doble\s*(?:Kill)?\s*[:\s]*(\d+)',
       caseSensitive: false,
@@ -199,6 +188,8 @@ class _CompiledPatterns {
   ];
 
   static final List<RegExp> mvpLoss = [
+    // "MVP Perdedor  165"
+    RegExp(r'MVP\s+Perdedor\s+(\d+)', caseSensitive: false),
     RegExp(r'MVP\s*Perdedor\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'MVP\s*Loss\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Losing\s*MVP\s*[:\s]*(\d+)', caseSensitive: false),
@@ -207,32 +198,62 @@ class _CompiledPatterns {
 
   // ==================== MAX STATS PATTERNS ====================
   static final List<RegExp> maxKills = [
-    RegExp(r'Asesinatos?\s*Máx\.?\s*[:\s]*(\d+)', caseSensitive: false),
+    // "Asesinatos Máx.  34"
+    RegExp(r'Asesinatos?\s+M[aá]x\.?\s+(\d+)', caseSensitive: false),
+    RegExp(r'Asesinatos?\s*M[aá]x\.?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Max\.?\s*Kills?\s*[:\s]*(\d+)', caseSensitive: false),
-    RegExp(r'Kills?\s*Máx\.?\s*[:\s]*(\d+)', caseSensitive: false),
-    RegExp(r'(\d+)\s*(?:Asesinatos?|Kills?)\s*Máx', caseSensitive: false),
+    RegExp(r'Kills?\s*M[aá]x\.?\s*[:\s]*(\d+)', caseSensitive: false),
+    RegExp(r'(\d+)\s*(?:Asesinatos?|Kills?)\s*M[aá]x', caseSensitive: false),
   ];
 
   static final List<RegExp> maxAssists = [
-    RegExp(r'Asistencias?\s*Máx\.?\s*[:\s]*(\d+)', caseSensitive: false),
+    // "Asistencias Máx.  42"
+    RegExp(r'Asistencias?\s+M[aá]x\.?\s+(\d+)', caseSensitive: false),
+    RegExp(r'Asistencias?\s*M[aá]x\.?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Max\.?\s*Assists?\s*[:\s]*(\d+)', caseSensitive: false),
-    RegExp(r'(\d+)\s*Asistencias?\s*Máx', caseSensitive: false),
+    RegExp(r'(\d+)\s*Asistencias?\s*M[aá]x', caseSensitive: false),
   ];
 
   static final List<RegExp> maxWinStreak = [
+    // "Racha de Victorias Máx.  20" — formato real de la imagen
     RegExp(
-      r'Racha\s*de\s*Victorias?\s*Máx\.?\s*[:\s]*(\d+)',
+      r'Racha\s+de\s+Victorias?\s+M[aá]x\.?\s+(\d+)',
       caseSensitive: false,
     ),
+    // Con separador : o espacio variable
+    RegExp(
+      r'Racha\s*de\s*Victorias?\s*M[aá]x\.?\s*[:\s]*(\d+)',
+      caseSensitive: false,
+    ),
+    // Formato OCR con pipe: "34 | Racha de Victorias Máx."
+    RegExp(
+      r'(\d+)\s*\|\s*Racha\s*de\s*Victorias?\s*M[aá]x',
+      caseSensitive: false,
+    ),
+    // Formato OCR inverso con pipe: "Racha de Victorias Máx. | 34"
+    RegExp(
+      r'Racha\s*de\s*Victorias?\s*M[aá]x\.?\s*\|\s*(\d+)',
+      caseSensitive: false,
+    ),
+    // Número ANTES del texto sin pipe
+    RegExp(r'(\d+)\s*Racha\s*de\s*Victorias?\s*M[aá]x', caseSensitive: false),
+    // Número en línea siguiente (OCR parte el texto)
+    RegExp(r'Racha\s*de\s*Victorias?\s*[\r\n]+\s*(\d+)', caseSensitive: false),
+    // Sin "Máx": "Racha de Victorias  5"
+    RegExp(r'Racha\s+de\s+Victorias?\s+(\d+)', caseSensitive: false),
+    // Abreviado con pipe: "34 | Racha Vic. Máx."
+    RegExp(r'(\d+)\s*\|\s*Racha\s*Vic\.?\s*M[aá]x', caseSensitive: false),
+    // Inglés
     RegExp(
       r'Max\.?\s*(?:Win(?:ning)?\s*)?Streak\s*[:\s]*(\d+)',
       caseSensitive: false,
     ),
-    RegExp(r'(?:Win\s*)?Streak\s*Máx\.?\s*[:\s]*(\d+)', caseSensitive: false),
-    RegExp(r'(\d+)\s*Racha\s*Máx', caseSensitive: false),
+    RegExp(r'(\d+)\s*\|\s*(?:Win(?:ning)?\s*)?Streak', caseSensitive: false),
   ];
 
   static final List<RegExp> firstBlood = [
+    // "Primera Sangre  418"
+    RegExp(r'Primera\s+Sangre\s+(\d+)', caseSensitive: false),
     RegExp(r'Primera\s*Sangre\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'First\s*Blood\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(\d+)\s*Primera\s*Sangre', caseSensitive: false),
@@ -241,70 +262,72 @@ class _CompiledPatterns {
 
   // ==================== MAX DAMAGE DEALT PATTERNS ====================
   static final List<RegExp> maxDamageDealt = [
-    // Español - Formatos completos
+    // "Daño Causado Máx./min  10134" — formato real de la imagen
     RegExp(
-      r'Daño\s*Causado\s*Máx\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{4,6})',
+      r'Da[ñn]o\s+Causado\s+M[aá]x\.?/min\s+(\d{4,6})',
       caseSensitive: false,
     ),
-    RegExp(r'Daño\s*Causado\s*Máx\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
-    RegExp(r'DAÑO\s*Causado\s*Máx\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
-
-    // Inglés
+    RegExp(
+      r'Da[ñn]o\s*Causado\s*M[aá]x\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{4,6})',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'Da[ñn]o\s*Causado\s*M[aá]x\.?\s*[:\s]*(\d{4,6})',
+      caseSensitive: false,
+    ),
     RegExp(
       r'Max\.?\s*Damage\s*Dealt\s*(?:/|per)?\s*min\.?\s*[:\s]*(\d{4,6})',
       caseSensitive: false,
     ),
     RegExp(r'Damage\s*Dealt\s*Max\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
     RegExp(r'Max\.?\s*DMG\s*Dealt\s*[:\s]*(\d{4,6})', caseSensitive: false),
-
-    // Variaciones sin "Máx"
-    RegExp(r'Daño\s*Causado\s*[:\s]*(\d{4,6})', caseSensitive: false),
+    RegExp(r'Da[ñn]o\s*Causado\s*[:\s]*(\d{4,6})', caseSensitive: false),
     RegExp(r'Causado[^0-9]{0,10}(\d{4,6})', caseSensitive: false),
-
-    // Patrones más generales (4-6 dígitos después de "Daño")
-    RegExp(r'Daño[^0-9]{0,20}(\d{4,6})', caseSensitive: false),
-
-    // Búsqueda de números grandes aislados (como último recurso)
+    RegExp(r'Da[ñn]o[^0-9]{0,20}(\d{4,6})', caseSensitive: false),
     RegExp(
-      r'(?:Máx|Max)\.?[^0-9]{0,15}(\d{4,6})(?:\s*(?:/|por)\s*min)?',
+      r'(?:M[aá]x|Max)\.?[^0-9]{0,15}(\d{4,6})(?:\s*(?:/|por)\s*min)?',
       caseSensitive: false,
     ),
   ];
 
   // ==================== MAX DAMAGE TAKEN PATTERNS ====================
   static final List<RegExp> maxDamageTaken = [
-    // Español
+    // "Daño tomado Máx./min  15555" — formato real de la imagen (minúscula "tomado")
     RegExp(
-      r'Daño\s*Tomado\s*Máx\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{4,6})',
+      r'Da[ñn]o\s+[Tt]omado\s+M[aá]x\.?/min\s+(\d{4,6})',
       caseSensitive: false,
     ),
-    RegExp(r'Daño\s*Tomado\s*Máx\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
-    RegExp(r'DAÑO\s*Tomado\s*Máx\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
-    RegExp(r'Daño\s*Recibido\s*Máx\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
-
-    // Inglés
+    RegExp(
+      r'Da[ñn]o\s*[Tt]omado\s*M[aá]x\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{4,6})',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'Da[ñn]o\s*[Tt]omado\s*M[aá]x\.?\s*[:\s]*(\d{4,6})',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'Da[ñn]o\s*Recibido\s*M[aá]x\.?\s*[:\s]*(\d{4,6})',
+      caseSensitive: false,
+    ),
     RegExp(
       r'Max\.?\s*Damage\s*Taken\s*(?:/|per)?\s*min\.?\s*[:\s]*(\d{4,6})',
       caseSensitive: false,
     ),
     RegExp(r'Damage\s*Taken\s*Max\.?\s*[:\s]*(\d{4,6})', caseSensitive: false),
     RegExp(r'Max\.?\s*DMG\s*Taken\s*[:\s]*(\d{4,6})', caseSensitive: false),
-
-    // Variaciones
-    RegExp(r'Tomado[^0-9]{0,10}(\d{4,6})', caseSensitive: false),
+    RegExp(r'[Tt]omado[^0-9]{0,10}(\d{4,6})', caseSensitive: false),
     RegExp(r'Recibido[^0-9]{0,10}(\d{4,6})', caseSensitive: false),
   ];
 
   // ==================== MAX GOLD PATTERNS ====================
   static final List<RegExp> maxGold = [
-    // Español
+    // "Oro Máx./min  1246" — formato real de la imagen
+    RegExp(r'Oro\s+M[aá]x\.?/min\s+(\d{3,5})', caseSensitive: false),
     RegExp(
-      r'Oro\s*Máx\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{3,5})',
+      r'Oro\s*M[aá]x\.?\s*(?:/|por)?\s*min\.?\s*[:\s]*(\d{3,5})',
       caseSensitive: false,
     ),
-    RegExp(r'Oro\s*Máx\.?\s*[:\s]*(\d{3,5})', caseSensitive: false),
-
-    // Inglés
+    RegExp(r'Oro\s*M[aá]x\.?\s*[:\s]*(\d{3,5})', caseSensitive: false),
     RegExp(
       r'Max\.?\s*Gold\s*(?:/|per)?\s*min\.?\s*[:\s]*(\d{3,5})',
       caseSensitive: false,
@@ -315,13 +338,9 @@ class _CompiledPatterns {
 }
 
 class StatsParser {
-  /// Lista para almacenar logs de extracción
   static final List<String> _extractionLog = [];
-
-  /// Mapa para almacenar las coincidencias encontradas
   static final Map<String, dynamic> _rawMatches = {};
 
-  /// Método principal para parsear stats con un modo específico
   static PlayerStats? parseStats(String text, GameMode mode) {
     if (text.isEmpty) return null;
 
@@ -331,7 +350,6 @@ class StatsParser {
     return stats.copyWith(mode: mode);
   }
 
-  /// Método principal con resultado detallado
   static ParseResult parseStatsWithDiagnostics(String text, GameMode mode) {
     _extractionLog.clear();
     _rawMatches.clear();
@@ -379,16 +397,9 @@ class StatsParser {
     try {
       _log('--- Comenzando análisis de texto ---');
 
-      final sample = text.length > 200 ? text.substring(0, 200) : text;
-      _log('Muestra del texto: ${sample.replaceAll('\n', ' | ')}...');
-
-      final lines = text.split('\n').map((line) => line.trim()).toList();
-      _log('Total de líneas: ${lines.length}');
-
       final GameMode mode = _detectGameMode(text);
       _log('Modo detectado: ${mode.displayName}');
 
-      // ==================== EXTRACCIÓN DE ESTADÍSTICAS PRINCIPALES ====================
       _log('\n--- Extrayendo estadísticas principales ---');
 
       final int totalGames = _extractWithPatterns(
@@ -398,7 +409,6 @@ class StatsParser {
         isInteger: true,
       ).toInt();
 
-      // Extraer Win Rate con validación por rango
       final double winRate = _extractWinRateWithValidation(text);
 
       final int mvpCount = _extractWithPatterns(
@@ -408,7 +418,6 @@ class StatsParser {
         isInteger: true,
       ).toInt();
 
-      // ==================== EXTRACCIÓN DE RENDIMIENTO ====================
       _log('\n--- Extrayendo estadísticas de rendimiento ---');
 
       final double kda = _extractWithPatterns(
@@ -451,7 +460,6 @@ class StatsParser {
         isInteger: true,
       ).toInt();
 
-      // ==================== EXTRACCIÓN DE LOGROS ====================
       _log('\n--- Extrayendo logros y récords ---');
 
       final int legendary = _extractWithPatterns(
@@ -524,7 +532,6 @@ class StatsParser {
         isInteger: true,
       ).toInt();
 
-      // ==================== EXTRACCIÓN DE VALORES MÁXIMOS ====================
       _log('\n--- Extrayendo valores máximos ---');
 
       final int maxDamageDealt = _extractWithPatterns(
@@ -583,16 +590,13 @@ class StatsParser {
       );
     } catch (e) {
       _log('ERROR FATAL: $e');
-      print('Error parsing stats: $e');
       return null;
     }
   }
 
-  /// Extraer Win Rate con validación por rango
   static double _extractWinRateWithValidation(String text) {
     _log('\n🔍 [WIN RATE] Estrategia: Buscar TODOS los % y validar por rango');
 
-    // Buscar TODOS los porcentajes en el texto
     final allPercentages = <double>[];
 
     for (final pattern in _CompiledPatterns.winRate) {
@@ -618,7 +622,6 @@ class StatsParser {
     _log('   📊 Total de porcentajes encontrados: ${allPercentages.length}');
     _log('   📋 Lista: ${allPercentages.join(', ')}');
 
-    // Filtrar por rango típico de Win Rate (40% - 80%)
     final validWinRates = allPercentages
         .where((p) => p >= 40.0 && p <= 80.0)
         .toList();
@@ -635,7 +638,6 @@ class StatsParser {
       '   ✓ Porcentajes en rango válido (40-80%): ${validWinRates.join(', ')}',
     );
 
-    // Si hay múltiples, usar el primero
     final winRate = validWinRates.first;
     _log('   ✅ Tasa de Victorias: $winRate%');
     _rawMatches['Tasa de Victorias'] = winRate;
@@ -643,7 +645,6 @@ class StatsParser {
     return winRate;
   }
 
-  /// Método unificado para extraer valores usando múltiples patrones
   static double _extractWithPatterns(
     String text,
     List<RegExp> patterns,
@@ -661,7 +662,6 @@ class StatsParser {
             final value = double.tryParse(valueStr);
 
             if (value != null) {
-              // Validar si se proporciona validador
               if (validator != null && !validator(value)) {
                 _log(
                   '⚠ $fieldName: Valor $value descartado por validación (patrón ${i + 1})',
@@ -709,6 +709,8 @@ class StatsParser {
     return GameMode.total;
   }
 
+  // Logs internos: se almacenan en memoria y se imprimen en consola
+  // para facilitar el diagnóstico de campos que no se extraen correctamente.
   static void _log(String message) {
     _extractionLog.add(message);
     print('[StatsParser] $message');

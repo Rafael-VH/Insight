@@ -49,13 +49,7 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     Emitter<StatsState> emit,
   ) async {
     try {
-      print('\n🚀 INICIANDO GUARDADO DE ESTADÍSTICAS');
-      print('📅 Fecha de creación: ${event.collection.createdAt}');
-      print('📊 Modos disponibles: ${event.collection.availableStats.length}');
-
-      // Validar que haya al menos una estadística
       if (!event.collection.hasAnyStats) {
-        print('❌ No hay estadísticas para guardar');
         emit(
           const StatsError(
             'No hay estadísticas para guardar',
@@ -72,7 +66,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
       await result.fold(
         (failure) async {
-          print('❌ ERROR al guardar: ${failure.message}');
           emit(
             StatsError(
               'Error al guardar estadísticas',
@@ -81,19 +74,14 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
           );
         },
         (_) async {
-          print('✅ Estadísticas guardadas exitosamente');
           emit(const StatsSaved('Estadísticas guardadas correctamente'));
 
-          // CRÍTICO: Esperar un momento antes de recargar
           await Future.delayed(const Duration(milliseconds: 300));
 
-          // Recargar las colecciones automáticamente
-          print('🔄 Recargando colecciones...');
           add(LoadAllStatsCollectionsEvent());
         },
       );
     } catch (e) {
-      print('❌ ERROR INESPERADO: $e');
       emit(StatsError('Error inesperado', errorDetails: e.toString()));
     }
   }
@@ -102,9 +90,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     LoadAllStatsCollectionsEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n📚 CARGANDO TODAS LAS COLECCIONES');
-
-    // Solo mostrar loading si no hay estado previo
     if (state is! StatsCollectionsLoaded) {
       emit(StatsLoading());
     }
@@ -113,7 +98,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
     result.fold(
       (failure) {
-        print('❌ Error al cargar: ${failure.message}');
         emit(
           StatsError(
             'Error al cargar estadísticas',
@@ -122,15 +106,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (collections) {
-        print('✅ Colecciones cargadas: ${collections.length}');
-
-        // Imprimir detalles de cada colección
-        for (int i = 0; i < collections.length; i++) {
-          print(
-            '  [$i] ${collections[i].createdAt} - ${collections[i].availableStats.length} modos - "${collections[i].displayName}"',
-          );
-        }
-
         emit(StatsCollectionsLoaded(collections));
       },
     );
@@ -140,15 +115,12 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     LoadLatestStatsCollectionEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n🔍 CARGANDO ÚLTIMA COLECCIÓN');
-
     emit(StatsLoading());
 
     final result = await getLatestStatsCollection(NoParams());
 
     result.fold(
       (failure) {
-        print('❌ Error al cargar última: ${failure.message}');
         emit(
           StatsError(
             'Error al cargar últimas estadísticas',
@@ -157,11 +129,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (collection) {
-        if (collection != null) {
-          print('✅ Última colección cargada: ${collection.createdAt}');
-        } else {
-          print('ℹ No hay colecciones');
-        }
         emit(LatestStatsLoaded(collection));
       },
     );
@@ -171,15 +138,12 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     DeleteStatsCollectionEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n🗑️ ELIMINANDO COLECCIÓN: ${event.createdAt}');
-
     emit(StatsLoading());
 
     final result = await statsRepository.deleteStatsCollection(event.createdAt);
 
     await result.fold(
       (failure) async {
-        print('❌ Error al eliminar: ${failure.message}');
         emit(
           StatsError(
             'Error al eliminar estadísticas',
@@ -188,12 +152,10 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (_) async {
-        print('✅ Colección eliminada exitosamente');
         emit(const StatsDeleted('Estadística eliminada correctamente'));
 
         await Future.delayed(const Duration(milliseconds: 300));
 
-        print('🔄 Recargando colecciones...');
         add(LoadAllStatsCollectionsEvent());
       },
     );
@@ -203,15 +165,12 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     ClearAllStatsEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n🧹 LIMPIANDO TODAS LAS ESTADÍSTICAS');
-
     emit(StatsLoading());
 
     final result = await statsRepository.clearAllStats();
 
     result.fold(
       (failure) {
-        print('❌ Error al limpiar: ${failure.message}');
         emit(
           StatsError(
             'Error al limpiar estadísticas',
@@ -220,7 +179,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (_) {
-        print('✅ Todas las estadísticas eliminadas');
         emit(const StatsCleared('Todas las estadísticas han sido eliminadas'));
         add(LoadAllStatsCollectionsEvent());
       },
@@ -231,11 +189,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     UpdateStatsCollectionNameEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n✏️ ACTUALIZANDO NOMBRE DE COLECCIÓN');
-    print('📅 Fecha: ${event.createdAt}');
-    print('📝 Nuevo nombre: "${event.newName}"');
-
-    // No emitir loading para no interrumpir la UI
     final params = UpdateNameParams(
       createdAt: event.createdAt,
       newName: event.newName,
@@ -245,7 +198,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
     await result.fold(
       (failure) async {
-        print('❌ Error al actualizar nombre: ${failure.message}');
         emit(
           StatsError(
             'Error al actualizar nombre',
@@ -254,7 +206,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (_) async {
-        print('✅ Nombre actualizado exitosamente');
         emit(
           StatsNameUpdated(
             message: 'Nombre actualizado a "${event.newName}"',
@@ -264,7 +215,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
         await Future.delayed(const Duration(milliseconds: 200));
 
-        print('🔄 Recargando colecciones...');
         add(LoadAllStatsCollectionsEvent());
       },
     );
@@ -274,8 +224,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     GetStatsCollectionByDateEvent event,
     Emitter<StatsState> emit,
   ) async {
-    print('\n🔍 BUSCANDO COLECCIÓN POR FECHA: ${event.createdAt}');
-
     emit(StatsLoading());
 
     final result = await statsRepository.getStatsCollectionByDate(
@@ -284,7 +232,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
     result.fold(
       (failure) {
-        print('❌ Error al buscar colección: ${failure.message}');
         emit(
           StatsError(
             'Error al buscar estadística',
@@ -293,11 +240,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         );
       },
       (collection) {
-        if (collection != null) {
-          print('✅ Colección encontrada');
-        } else {
-          print('❌ Colección no encontrada');
-        }
         emit(StatsCollectionByDateLoaded(collection));
       },
     );

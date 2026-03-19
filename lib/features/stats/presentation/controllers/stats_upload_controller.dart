@@ -13,14 +13,14 @@ class OcrProcessingResult {
   final ValidationResult? validation;
   final String? imagePath;
   final List<String> extractionLog;
-  final GameMode? processedMode; // ✅ NUEVO: guardar el modo procesado
+  final GameMode? processedMode;
 
   const OcrProcessingResult({
     required this.stats,
     required this.validation,
     required this.imagePath,
     required this.extractionLog,
-    this.processedMode, // ✅ NUEVO
+    this.processedMode,
   });
 
   bool get hasValidStats => stats != null && validation != null;
@@ -38,7 +38,7 @@ class StatsUploadController extends ChangeNotifier {
   late final Map<GameMode, List<String>> _extractionLogs;
 
   GameMode? _currentProcessingMode;
-  GameMode? _lastProcessedMode; // ✅ NUEVO: guardar el último modo procesado
+  GameMode? _lastProcessedMode;
 
   bool _isDisposed = false;
 
@@ -46,7 +46,6 @@ class StatsUploadController extends ChangeNotifier {
     _initializeState();
   }
 
-  // Getters
   Map<GameMode, String?> get uploadedImages =>
       Map.unmodifiable(_uploadedImages);
   Map<GameMode, PlayerStats?> get parsedStats => Map.unmodifiable(_parsedStats);
@@ -54,7 +53,7 @@ class StatsUploadController extends ChangeNotifier {
       Map.unmodifiable(_validationResults);
   Map<GameMode, bool> get isProcessing => Map.unmodifiable(_isProcessing);
   GameMode? get currentProcessingMode => _currentProcessingMode;
-  GameMode? get lastProcessedMode => _lastProcessedMode; // ✅ NUEVO
+  GameMode? get lastProcessedMode => _lastProcessedMode;
 
   List<GameMode> get availableModes {
     if (uploadType == StatsUploadType.total) {
@@ -91,14 +90,12 @@ class StatsUploadController extends ChangeNotifier {
     }
   }
 
-  /// Iniciar procesamiento con validación
   void startProcessing(GameMode mode) {
     _assertNotDisposed();
     if (!availableModes.contains(mode)) {
       throw ArgumentError('Mode $mode not available for this upload type');
     }
 
-    // ✅ Guardar AMBOS modos
     _currentProcessingMode = mode;
     _lastProcessedMode = mode;
     _isProcessing[mode] = true;
@@ -106,56 +103,43 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Procesa el resultado de OCR con diagnóstico completo
   OcrProcessingResult handleOcrSuccessWithDiagnostics(
-      String text,
-      String? imagePath,
-      ) {
+    String text,
+    String? imagePath,
+  ) {
     _assertNotDisposed();
 
-    // ✅ Usar lastProcessedMode como fallback
     final mode = _currentProcessingMode ?? _lastProcessedMode;
 
     if (mode == null) {
-      debugPrint('❌ ERROR CRÍTICO: No hay modo de procesamiento disponible');
       return const OcrProcessingResult(
         stats: null,
         validation: null,
         imagePath: null,
-        extractionLog: ['ERROR: No se pudo determinar el modo de procesamiento'],
+        extractionLog: [
+          'ERROR: No se pudo determinar el modo de procesamiento',
+        ],
         processedMode: null,
       );
     }
 
     try {
-      debugPrint('🔄 Procesando OCR para modo: ${mode.fullDisplayName}');
-
-      // Limpiar logs anteriores
       StatsParser.clearLog();
 
-      // Usar el parser mejorado con diagnóstico
       final parseResult = StatsParser.parseStatsWithDiagnostics(text, mode);
 
-      // Validar las estadísticas si se pudieron extraer
       ValidationResult? validation;
       if (parseResult.stats != null) {
         validation = StatsValidator.validate(parseResult.stats!);
-        debugPrint('✅ Validación completada: ${validation.isValid ? "VÁLIDA" : "INVÁLIDA"}');
-      } else {
-        debugPrint('⚠️ No se pudieron extraer estadísticas');
       }
 
-      // Guardar los resultados de forma segura
       _uploadedImages[mode] = imagePath;
       _parsedStats[mode] = parseResult.stats;
       _validationResults[mode] = validation;
       _extractionLogs[mode] = List.from(parseResult.extractionLog);
       _isProcessing[mode] = false;
 
-      // ✅ NO resetear _lastProcessedMode aquí
-      _currentProcessingMode = null; // Solo resetear el actual
-
-      debugPrint('💾 Resultados guardados para ${mode.fullDisplayName}');
+      _currentProcessingMode = null;
 
       notifyListeners();
 
@@ -164,15 +148,11 @@ class StatsUploadController extends ChangeNotifier {
         validation: validation,
         imagePath: imagePath,
         extractionLog: parseResult.extractionLog,
-        processedMode: mode, // ✅ Incluir el modo en el resultado
+        processedMode: mode,
       );
-    } catch (e, stackTrace) {
-      debugPrint('❌ Error en handleOcrSuccessWithDiagnostics: $e');
-      debugPrint('📍 Stack trace: $stackTrace');
-
+    } catch (e) {
       _isProcessing[mode] = false;
       _currentProcessingMode = null;
-      // ✅ NO resetear _lastProcessedMode en caso de error
 
       notifyListeners();
 
@@ -186,35 +166,24 @@ class StatsUploadController extends ChangeNotifier {
     }
   }
 
-  /// Método legacy para compatibilidad
   void handleOcrSuccess(String text, String? imagePath) {
     handleOcrSuccessWithDiagnostics(text, imagePath);
   }
 
-  /// Manejo de errores de OCR
   void handleOcrError() {
     _assertNotDisposed();
 
     final mode = _currentProcessingMode ?? _lastProcessedMode;
-    if (mode == null) {
-      debugPrint('⚠️ handleOcrError: No hay modo para limpiar');
-      return;
-    }
-
-    debugPrint('🔄 Limpiando estado de error para ${mode.fullDisplayName}');
+    if (mode == null) return;
 
     _isProcessing[mode] = false;
     _currentProcessingMode = null;
-    // ✅ Mantener _lastProcessedMode para referencia
 
     notifyListeners();
   }
 
-  /// Remover estadísticas con limpieza completa
   void removeStats(GameMode mode) {
     _assertNotDisposed();
-
-    debugPrint('🗑️ Removiendo estadísticas para ${mode.fullDisplayName}');
 
     _uploadedImages[mode] = null;
     _parsedStats[mode] = null;
@@ -233,7 +202,6 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Crear colección con validación
   StatsCollection createCollection() {
     _assertNotDisposed();
 
@@ -246,7 +214,6 @@ class StatsUploadController extends ChangeNotifier {
     );
   }
 
-  /// Obtener mensaje de éxito personalizado
   String getSuccessMessage(GameMode mode) {
     final validation = _validationResults[mode];
     if (validation == null) {
@@ -310,7 +277,7 @@ class StatsUploadController extends ChangeNotifier {
     _isProcessing.clear();
     _extractionLogs.clear();
     _currentProcessingMode = null;
-    _lastProcessedMode = null; // ✅ Limpiar también este
+    _lastProcessedMode = null;
 
     super.dispose();
   }
