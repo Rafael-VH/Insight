@@ -97,9 +97,17 @@ Cada registro del historial tiene una pantalla de gráficos con cuatro visualiza
 
 El historial soporta búsqueda en tiempo real por nombre o fecha, ordenamiento ascendente/descendente por fecha o nombre alfabético, y carga paginada de 10 elementos para mantener la fluidez con grandes colecciones. La sesión más reciente tiene una tarjeta destacada al inicio de la lista.
 
-### 🔄 Exportar e importar historial
+### 💾 Gestión de datos desde Configuración
 
-Todo el historial se exporta a un archivo `.json` con metadatos de versión y fecha (`ml_stats_YYYYMMDD_HHMMSS.json`). El archivo puede compartirse directamente desde la app y luego importarse en otro dispositivo. La importación soporta dos modos:
+La sección **Datos** en Configuración centraliza todas las operaciones sobre el historial en tres acciones independientes, cada una con su propio bottom sheet:
+
+- **Exportar estadísticas** — Muestra un resumen previo con el número de colecciones, la fecha del registro más reciente y el tamaño estimado del archivo antes de confirmar. Al exportar genera un `.json` y abre el menú nativo de compartir para guardarlo o enviarlo.
+- **Importar estadísticas** — Permite elegir entre dos modos antes de seleccionar el archivo: *Fusionar* (agrega las colecciones del archivo sin tocar las existentes, omitiendo duplicados) o *Reemplazar* (borra el historial actual y carga únicamente el contenido del archivo). Tras una importación exitosa navega automáticamente al Historial.
+- **Eliminar todo el historial** — Flujo de dos pasos: el primero muestra el número exacto de colecciones que se perderán y un consejo para exportar antes; el segundo pide confirmación final para prevenir eliminaciones accidentales.
+
+### 🔄 Formato de exportación e importación
+
+El archivo exportado es un `.json` con metadatos de versión y fecha (`ml_stats_YYYYMMDD_HHMMSS.json`). El formato es compatible entre dispositivos y soporta importación con dos estrategias:
 
 - **Fusionar** — Añade las colecciones del archivo sin tocar las existentes, omitiendo duplicados por timestamp.
 - **Reemplazar** — Limpia el historial actual antes de importar.
@@ -169,6 +177,12 @@ lib/
 └── features/
     ├── navigation/                     # NavigationBloc — bottom nav y back stack
     ├── settings/                       # ThemeBloc · SettingsBloc · pantalla de ajustes
+    │   └── presentation/
+    │       └── screens/
+    │           └── widgets/
+    │               ├── settings_export_bottom_sheet.dart   # Exportar con resumen previo
+    │               ├── settings_import_bottom_sheet.dart   # Importar con modo fusionar/reemplazar
+    │               └── settings_delete_all_bottom_sheet.dart # Eliminar con confirmación en dos pasos
     └── stats/
         ├── data/
         │   ├── datasources/            # OcrDataSourceImpl · LocalStorageDataSourceImpl
@@ -210,6 +224,13 @@ lib/
 ```
 
 El manejo de errores usa el tipo `Either<Failure, T>` de **dartz**. Cualquier fallo en cualquier capa sube como `Left(Failure)` sin lanzar excepciones no controladas. El BLoC convierte ese `Left` en un estado de error concreto que la UI renderiza con información útil para el usuario.
+
+### Separación de responsabilidades entre módulos
+
+La gestión de datos está dividida entre dos módulos con roles distintos:
+
+- **`settings/`** — Punto de entrada visual. Los tres bottom sheets de exportar, importar y eliminar viven aquí porque son operaciones de configuración global que el usuario espera encontrar en Ajustes.
+- **`stats/`** — Lógica de negocio. `StatsBloc`, los casos de uso y los repositorios permanecen intactos en este módulo. Los bottom sheets de settings los consumen directamente sin duplicar código.
 
 ---
 
