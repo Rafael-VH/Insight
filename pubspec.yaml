@@ -44,6 +44,8 @@ dependencies:
   # Permisos
   permission_handler: ^12.0.1
 
+  http: ^1.2.0
+
   # Exportar / Importar / Compartir
   awesome_snackbar_content: ^0.1.8
   share_plus: ^12.0.1

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/core/injection/injection_container.dart';
+import 'package:insight/features/heroes/presentation/bloc/hero_list/hero_list_bloc.dart';
+import 'package:insight/features/heroes/presentation/screens/hero_list_screen.dart';
 import 'package:insight/features/navigation/domain/entities/navigation_item.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
@@ -50,6 +53,17 @@ class _MainScreenState extends State<MainScreen>
         icon: Icons.home_rounded,
         color: const Color(0xFF3B82F6),
         page: const HomeScreen(),
+      ),
+      NavigationItem(
+        id: 'heroes',
+        title: 'Héroes',
+        icon: Icons.sports_esports_rounded,
+        color: const Color(0xFFDC2626),
+        // HeroListBloc es Singleton, se lee directamente del sl
+        page: BlocProvider.value(
+          value: sl<HeroListBloc>(),
+          child: const HeroListScreen(),
+        ),
       ),
       NavigationItem(
         id: 'history',
