@@ -4,6 +4,7 @@ import 'package:insight/features/settings/domain/entities/app_theme.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
+import 'package:insight/features/settings/presentation/screens/widgets/create_custom_theme_bottom_sheet.dart';
 
 class ThemeSelectorWidget extends StatelessWidget {
   const ThemeSelectorWidget({super.key});
@@ -90,20 +91,19 @@ class ThemeSelectorWidget extends StatelessWidget {
   }
 
   Widget _buildCreateCustomThemeButton(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Función de crear tema personalizado próximamente'),
-            behavior: SnackBarBehavior.floating,
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => CreateCustomThemeBottomSheet.show(context),
+        icon: const Icon(Icons.add),
+        label: const Text('Crear Tema Personalizado'),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        );
-      },
-      icon: const Icon(Icons.add),
-      label: const Text('Crear Tema Personalizado'),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        side: BorderSide(color: Theme.of(context).primaryColor),
+        ),
       ),
     );
   }
