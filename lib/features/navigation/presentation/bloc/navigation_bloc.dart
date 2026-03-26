@@ -95,8 +95,6 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
         badge: event.badge,
       ),
     );
-
-    emit(NavigationChanged(state.currentIndex));
   }
 
   int get currentIndex => state.currentIndex;

@@ -29,18 +29,18 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
   }
 
   void _onSearchHeroes(SearchHeroesEvent event, Emitter<HeroState> emit) {
-  if (state is! HeroesLoaded) return;
-  final current = state as HeroesLoaded;
-  final query = event.query.toLowerCase().trim();
+    if (state is! HeroesLoaded) return;
+    final current = state as HeroesLoaded;
+    final query = event.query.toLowerCase().trim();
 
-  final List<MlbbHero> filtered = query.isEmpty
-      ? current.heroes
-      : current.heroes
-          .where((h) => h.name.toLowerCase().contains(query))
-          .toList();
+    final List<MlbbHero> filtered = query.isEmpty
+        ? current.heroes
+        : current.heroes
+              .where((h) => h.name.toLowerCase().contains(query))
+              .toList();
 
-  emit(current.copyWith(filtered: filtered, searchQuery: event.query));
-}
+    emit(current.copyWith(filtered: filtered, searchQuery: event.query));
+  }
 
   Future<void> _onLoadHeroDetail(
     LoadHeroDetailEvent event,
