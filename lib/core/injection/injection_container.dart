@@ -64,9 +64,8 @@ import 'package:insight/features/heroes/domain/repositories/hero_repository.dart
 import 'package:insight/features/heroes/domain/usecases/get_heroes.dart';
 import 'package:insight/features/heroes/domain/usecases/get_hero_detail.dart';
 
-// ── Heroes — Presentation ─────────────────────────────────────────
-import 'package:insight/features/heroes/presentation/bloc/hero_list/hero_list_bloc.dart';
-import 'package:insight/features/heroes/presentation/bloc/hero_detail/hero_detail_bloc.dart';
+// ── Heroes — Bloc ───────────────────────────────────────────────────
+import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -197,7 +196,7 @@ Future<void> init() async {
   sl.registerLazySingleton<HeroCacheDataSource>(
     () => HeroCacheDataSourceImpl(prefs: sl<SharedPreferences>()),
   );
-  // Singleton para que el cache en memoria persista entre navegaciones
+  // Singleton: el caché en memoria persiste entre navegaciones.
   sl.registerLazySingleton<HeroRepository>(
     () => HeroRepositoryImpl(remote: sl(), cache: sl()),
   );
@@ -207,11 +206,17 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetHeroDetail(sl()));
 
   // Presentation
-  // Singleton: la lista no pierde estado al navegar al detalle
-  sl.registerLazySingleton(() => HeroListBloc(getHeroes: sl()));
-  // Factory: instancia limpia por cada héroe que se abre
-  sl.registerFactory(() => HeroDetailBloc(getHeroDetail: sl()));
-
+  //
+  // HeroBloc es Singleton para que:
+  //   1. La lista no se pierda al entrar al detalle y volver.
+  //   2. El detalle ya cargado se cachee mientras la pantalla
+  //      permanezca en el stack de navegación.
+  //
+  // Si necesitas un detalle completamente fresco en cada apertura,
+  // usa registerFactory() en su lugar.
+  sl.registerLazySingleton(
+    () => HeroBloc(getHeroes: sl(), getHeroDetail: sl()),
+  );
   // ================================================================
   // NAVIGATION
   // ================================================================

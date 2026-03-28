@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart';
 import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
-import 'package:insight/features/heroes/presentation/bloc/hero_detail/hero_detail_bloc.dart';
-import 'package:insight/features/heroes/presentation/bloc/hero_list/hero_list_bloc.dart';
+import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
+import 'package:insight/features/heroes/presentation/bloc/hero_event.dart';
+import 'package:insight/features/heroes/presentation/bloc/hero_state.dart';
 import 'package:insight/features/heroes/presentation/screens/hero_detail_screen.dart';
 import 'package:insight/features/heroes/presentation/widgets/hero_card.dart';
 import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
@@ -17,11 +18,16 @@ class HeroListScreen extends StatefulWidget {
 
 class _HeroListScreenState extends State<HeroListScreen> {
   final _searchController = TextEditingController();
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    context.read<HeroListBloc>().add(LoadHeroListEvent());
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Lanzar la carga una sola vez, de forma segura tras el primer build.
+    if (!_initialized) {
+      _initialized = true;
+      context.read<HeroBloc>().add(const LoadHeroListEvent());
+    }
   }
 
   @override
@@ -31,9 +37,9 @@ class _HeroListScreenState extends State<HeroListScreen> {
   }
 
   void _navigateToDetail(BuildContext context, int heroId) {
-    // Construir el mapa aquí, donde el HeroListBloc sí es accesible
-    final state = context.read<HeroListBloc>().state;
+    final state = context.read<HeroBloc>().state;
     final heroMap = <int, MlbbHero>{};
+
     if (state is HeroListLoaded) {
       for (final h in state.heroes) {
         heroMap[h.heroId] = h;
@@ -43,12 +49,11 @@ class _HeroListScreenState extends State<HeroListScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => sl<HeroDetailBloc>(),
-          child: HeroDetailScreen(
-            heroId: heroId,
-            heroMap: heroMap, // pasamos el mapa ya construido
-          ),
+        builder: (_) => BlocProvider.value(
+          // Reutiliza el mismo Singleton — el detalle se carga sobre el
+          // estado de lista existente sin crear una nueva instancia.
+          value: sl<HeroBloc>(),
+          child: HeroDetailScreen(heroId: heroId, heroMap: heroMap),
         ),
       ),
     );
@@ -70,7 +75,7 @@ class _HeroListScreenState extends State<HeroListScreen> {
               child: TextField(
                 controller: _searchController,
                 onChanged: (q) =>
-                    context.read<HeroListBloc>().add(SearchHeroListEvent(q)),
+                    context.read<HeroBloc>().add(SearchHeroListEvent(q)),
                 decoration: InputDecoration(
                   hintText: 'Buscar héroe...',
                   prefixIcon: const Icon(Icons.search),
@@ -79,8 +84,8 @@ class _HeroListScreenState extends State<HeroListScreen> {
                           icon: const Icon(Icons.clear),
                           onPressed: () {
                             _searchController.clear();
-                            context.read<HeroListBloc>().add(
-                              SearchHeroListEvent(''),
+                            context.read<HeroBloc>().add(
+                              const SearchHeroListEvent(''),
                             );
                           },
                         )
@@ -94,7 +99,12 @@ class _HeroListScreenState extends State<HeroListScreen> {
               ),
             ),
           ),
-          BlocBuilder<HeroListBloc, HeroListState>(
+          // buildWhen evita rebuilds cuando el BLoC emite estados de detalle.
+          BlocBuilder<HeroBloc, HeroState>(
+            buildWhen: (_, s) =>
+                s is HeroListLoading ||
+                s is HeroListLoaded ||
+                s is HeroListError,
             builder: (context, state) {
               if (state is HeroListLoading) {
                 return const SliverFillRemaining(
@@ -113,8 +123,8 @@ class _HeroListScreenState extends State<HeroListScreen> {
                         Text(state.message, textAlign: TextAlign.center),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
-                          onPressed: () => context.read<HeroListBloc>().add(
-                            LoadHeroListEvent(),
+                          onPressed: () => context.read<HeroBloc>().add(
+                            const LoadHeroListEvent(forceRefresh: true),
                           ),
                           icon: const Icon(Icons.refresh),
                           label: const Text('Reintentar'),

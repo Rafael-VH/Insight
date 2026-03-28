@@ -80,6 +80,22 @@ class HeroRepositoryImpl implements HeroRepository {
     }
   }
 
+  // ── Precarga builds con fallback a caché ─────────────────────
+  Future<void> fetchBuildsWithFallback() async {
+    try {
+      final data = await remote.fetchGuideBuilds();
+      await cache.saveBuildsCache(json.encode(data));
+      _buildsMemory = data;
+    } catch (_) {
+      final cb = await cache.getCachedBuilds();
+      if (cb != null) {
+        try {
+          _buildsMemory = json.decode(cb);
+        } catch (_) {}
+      }
+    }
+  }
+
   // ── Precarga lazy: builds + equipment en paralelo ─────────
   Future<void> _ensureBuildsAndEquipmentLoaded() async {
     final needsBuilds = _buildsMemory == null;
@@ -108,41 +124,11 @@ class HeroRepositoryImpl implements HeroRepository {
     final futures = <Future>[];
 
     if (_buildsMemory == null) {
-      futures.add(
-        remote
-            .fetchGuideBuilds()
-            .then((data) async {
-              await cache.saveBuildsCache(json.encode(data));
-              _buildsMemory = data;
-            })
-            .catchError((_) async {
-              final cb = await cache.getCachedBuilds();
-              if (cb != null) {
-                try {
-                  _buildsMemory = json.decode(cb);
-                } catch (_) {}
-              }
-            }),
-      );
+      futures.add(fetchBuildsWithFallback());
     }
 
     if (_equipmentMemory == null) {
-      futures.add(
-        remote
-            .fetchEquipment()
-            .then((data) async {
-              await cache.saveEquipmentCache(json.encode(data));
-              _equipmentMemory = _parseEquipmentMap(data);
-            })
-            .catchError((_) async {
-              final ce = await cache.getCachedEquipment();
-              if (ce != null) {
-                try {
-                  _equipmentMemory = _parseEquipmentMap(json.decode(ce));
-                } catch (_) {}
-              }
-            }),
-      );
+      futures.add(fetchBuildsWithFallback());
     }
 
     if (futures.isNotEmpty) await Future.wait(futures);
