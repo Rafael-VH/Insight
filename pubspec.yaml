@@ -56,6 +56,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Testing de BLoC
+  bloc_test: ^10.0.0
+  # Mocks sin code generation
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true
