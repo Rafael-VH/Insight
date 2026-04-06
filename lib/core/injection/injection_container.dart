@@ -217,9 +217,10 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => HeroBloc(getHeroes: sl(), getHeroDetail: sl()),
   );
+
   // ================================================================
   // NAVIGATION
   // ================================================================
 
-  sl.registerFactory(() => NavigationBloc(totalDestinations: 4));
+  sl.registerFactory(() => NavigationBloc(totalDestinations: 7));
 }

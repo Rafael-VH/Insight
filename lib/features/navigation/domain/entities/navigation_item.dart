@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Entidad que representa un item del sistema de navegación
-///
-/// Esta entidad encapsula toda la información necesaria para
-/// renderizar y manejar un destino de navegación en la aplicación.
 class NavigationItem {
   /// Título que se muestra en el navigation bar
   final String title;
@@ -23,6 +19,9 @@ class NavigationItem {
   /// Badge opcional para mostrar notificaciones
   final String? badge;
 
+  /// Sección opcional para agrupar destinos en el drawer
+  final String? section;
+
   const NavigationItem({
     required this.title,
     required this.icon,
@@ -30,6 +29,7 @@ class NavigationItem {
     required this.page,
     this.id,
     this.badge,
+    this.section,
   });
 
   /// Crea una copia del NavigationItem con campos actualizados
@@ -40,6 +40,7 @@ class NavigationItem {
     Widget? page,
     String? id,
     String? badge,
+    String? section,
   }) {
     return NavigationItem(
       title: title ?? this.title,
@@ -48,6 +49,7 @@ class NavigationItem {
       page: page ?? this.page,
       id: id ?? this.id,
       badge: badge ?? this.badge,
+      section: section ?? this.section,
     );
   }
 
@@ -60,20 +62,20 @@ class NavigationItem {
         other.icon == icon &&
         other.color == color &&
         other.id == id &&
-        other.badge == badge;
+        other.badge == badge &&
+        other.section == section;
   }
 
   @override
-  int get hashCode {
-    return title.hashCode ^
-        icon.hashCode ^
-        color.hashCode ^
-        id.hashCode ^
-        badge.hashCode;
-  }
+  int get hashCode =>
+      title.hashCode ^
+      icon.hashCode ^
+      color.hashCode ^
+      id.hashCode ^
+      badge.hashCode ^
+      section.hashCode;
 
   @override
-  String toString() {
-    return 'NavigationItem(title: $title, id: $id, badge: $badge)';
-  }
+  String toString() =>
+      'NavigationItem(title: $title, id: $id, section: $section)';
 }
