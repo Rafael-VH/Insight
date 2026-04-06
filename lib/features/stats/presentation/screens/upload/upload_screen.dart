@@ -2,18 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/image_source_type.dart';
 import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_event.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_state.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 import 'package:insight/features/stats/presentation/controllers/stats_upload_controller.dart';
 
-// Widgets locales de esta pantalla
 import 'widgets/upload_app_bar.dart';
 import 'widgets/upload_image_card_with_overlay.dart';
 import 'widgets/upload_save_button.dart';
@@ -34,11 +32,10 @@ class _UploadScreenState extends State<UploadScreen>
     with UploadStateHandlerMixin {
   late final StatsUploadController _controller;
 
-  // Campos backing — no llevan @override, son campos privados del State
   bool _isSaving = false;
   GameMode? _currentValidatingMode;
+  Timer? _saveTimeoutTimer;
 
-  // Implementaciones de la interfaz del mixin
   @override
   StatsUploadController get uploadController => _controller;
 
@@ -55,9 +52,16 @@ class _UploadScreenState extends State<UploadScreen>
   set currentValidatingMode(GameMode? value) =>
       setState(() => _currentValidatingMode = value);
 
-  Timer? _saveTimeoutTimer;
-
-  // ==================== LIFECYCLE ====================
+  // ── Paso actual de la barra de progreso ───────────────────────
+  // 0 = sin nada · 1 = imagen(s) cargada(s) · 2 = stats extraídas
+  int get _currentStep {
+    if (_controller.hasAnyParsedStats) return 2;
+    final anyImage = _controller.availableModes.any(
+      (m) => _controller.uploadedImages[m] != null,
+    );
+    if (anyImage) return 1;
+    return 0;
+  }
 
   @override
   void initState() {
@@ -73,7 +77,7 @@ class _UploadScreenState extends State<UploadScreen>
     super.dispose();
   }
 
-  // ==================== ACCIONES ====================
+  // ── Acciones ──────────────────────────────────────────────────
 
   void _onImageUploadPressed(ImageSourceType source, GameMode mode) {
     _controller.startProcessing(mode);
@@ -88,7 +92,7 @@ class _UploadScreenState extends State<UploadScreen>
     );
   }
 
-  // ==================== BUILD ====================
+  // ── Build ─────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +104,17 @@ class _UploadScreenState extends State<UploadScreen>
           appBar: UploadAppBar(
             title: widget.uploadType.appBarTitle,
             hasStats: _controller.hasAnyParsedStats,
+            completedSteps: _currentStep,
             onShowSummary: _showValidationSummary,
           ),
           body: ListenableBuilder(
             listenable: _controller,
-            builder: (_, _) => _buildBody(),
+            builder: (_, __) => _buildBody(),
           ),
+          // ── Botón de guardar fijo en el bottom ────────────
+          bottomNavigationBar: _controller.hasAnyParsedStats
+              ? _buildBottomBar()
+              : null,
         ),
       ),
     );
@@ -113,23 +122,23 @@ class _UploadScreenState extends State<UploadScreen>
 
   Widget _buildBody() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // ── Tarjetas de imagen por modo ───────────────────
           ..._buildImageCards(),
-          const SizedBox(height: 16),
+
+          // ── Estadísticas extraídas ────────────────────────
           if (_controller.hasAnyParsedStats) ...[
+            const SizedBox(height: 20),
             UploadStatsSection(
               parsedStats: _controller.parsedStats,
               hasInvalidStats: _controller.hasInvalidStats(),
             ),
+            // Espacio para el bottomBar
             const SizedBox(height: 16),
-            UploadSaveButton(
-              isSaving: _isSaving,
-              hasInvalidStats: _controller.hasInvalidStats(),
-              onSave: saveStats,
-            ),
           ],
         ],
       ),
@@ -137,9 +146,12 @@ class _UploadScreenState extends State<UploadScreen>
   }
 
   List<Widget> _buildImageCards() {
-    return _controller.availableModes.map((mode) {
+    return _controller.availableModes.asMap().entries.map((entry) {
+      final mode = entry.value;
+      final isLast = entry.key == _controller.availableModes.length - 1;
+
       return Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
         child: UploadImageCardWithOverlay(
           key: ValueKey(mode),
           mode: mode,
@@ -156,5 +168,28 @@ class _UploadScreenState extends State<UploadScreen>
         ),
       );
     }).toList();
+  }
+
+  Widget _buildBottomBar() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.12),
+            ),
+          ),
+        ),
+        child: UploadSaveButton(
+          isSaving: _isSaving,
+          hasInvalidStats: _controller.hasInvalidStats(),
+          onSave: saveStats,
+        ),
+      ),
+    );
   }
 }
