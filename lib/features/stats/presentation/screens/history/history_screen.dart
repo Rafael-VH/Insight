@@ -12,19 +12,18 @@ import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart'
 import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 import 'package:insight/features/stats/presentation/screens/details/detail_screen.dart';
 import 'package:insight/features/stats/presentation/services/dialog_service.dart';
-import 'package:insight/features/stats/presentation/widgets/empty_state_widget.dart';
-import 'package:insight/features/stats/presentation/widgets/error_state_widget.dart';
 import 'package:insight/features/stats/presentation/widgets/export_import_bottom_sheet.dart';
-import 'package:insight/features/stats/presentation/widgets/stats_collection_card.dart';
 
-// Widgets locales de esta pantalla
-import 'widgets/history_app_bar.dart';
 import 'widgets/history_delete_dialog.dart';
 import 'widgets/history_filter_bar.dart';
-import 'widgets/history_latest_card.dart';
 import 'widgets/history_options_menu.dart';
 import 'widgets/history_rename_dialog.dart';
 import 'widgets/history_search_bar.dart';
+
+// Widgets locales rediseñados
+import 'widgets/history_hero_section.dart';
+import 'widgets/history_latest_card.dart';
+import 'widgets/history_list_card.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -48,7 +47,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _sortBy = 'date';
   bool _isAscending = false;
 
-  // ==================== LIFECYCLE ====================
+  // ── Lifecycle ─────────────────────────────────────────────────
 
   @override
   void initState() {
@@ -66,7 +65,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  // ==================== PAGINACIÓN Y FILTRADO ====================
+  // ── Paginación y filtrado ─────────────────────────────────────
 
   void _onScroll() {
     if (_isLoadingMore || !_hasMoreData) return;
@@ -124,7 +123,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((c) {
         final name = c.displayName.toLowerCase();
-        final date = _formatDate(c.createdAt).toLowerCase();
+        final date = _formatDateShort(c.createdAt).toLowerCase();
         final query = _searchQuery.toLowerCase();
         return name.contains(query) || date.contains(query);
       }).toList();
@@ -164,12 +163,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // ==================== ACCIONES ====================
+  // ── Acciones ──────────────────────────────────────────────────
 
   void _showDetail(StatsCollection collection) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => DetailScreen(collection: collection)),
+      MaterialPageRoute(
+        builder: (_) => DetailScreen(collection: collection),
+      ),
     );
   }
 
@@ -187,7 +188,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       currentName: collection.displayName,
     );
-
     if (newName != null &&
         newName.isNotEmpty &&
         newName != collection.displayName) {
@@ -204,9 +204,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final confirmed = await HistoryDeleteDialog.show(
       context: context,
       collection: collection,
-      formattedDate: _formatDate(collection.createdAt),
+      formattedDate: _formatDateShort(collection.createdAt),
     );
-
     if (confirmed == true) {
       context.read<StatsBloc>().add(
         DeleteStatsCollectionEvent(collection.createdAt),
@@ -214,21 +213,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // ==================== HELPERS ====================
+  // ── Helpers ───────────────────────────────────────────────────
 
-  String _formatDate(DateTime date) {
-    final difference = DateTime.now().difference(date);
-
-    if (difference.inMinutes < 1) return 'Hace unos segundos';
-    if (difference.inMinutes < 60) return 'Hace ${difference.inMinutes} min';
-    if (difference.inHours < 24) return 'Hace ${difference.inHours}h';
-    if (difference.inDays == 1) return 'Ayer';
-    if (difference.inDays < 7) return 'Hace ${difference.inDays} días';
-
+  String _formatDateShort(DateTime date) {
     final d = date.day.toString().padLeft(2, '0');
     final m = date.month.toString().padLeft(2, '0');
     final y = date.year.toString().substring(2);
-    return '$d/$m/$y';
+    final h = date.hour.toString().padLeft(2, '0');
+    final min = date.minute.toString().padLeft(2, '0');
+    return '$d/$m/$y · $h:$min';
+  }
+
+  String _relativeTime(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inMinutes < 1) return 'Hace unos segundos';
+    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'Hace ${diff.inHours}h';
+    if (diff.inDays == 1) return 'Ayer';
+    if (diff.inDays < 7) return 'Hace ${diff.inDays} días';
+    return _formatDateShort(date);
   }
 
   bool get _useAwesomeSnackbar {
@@ -236,7 +239,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return state is SettingsLoaded ? state.settings.useAwesomeSnackbar : true;
   }
 
-  // ==================== BLOC LISTENERS ====================
+  // ── Métricas globales para el hero section ────────────────────
+
+  _GlobalMetrics _computeGlobalMetrics(List<StatsCollection> collections) {
+    if (collections.isEmpty) {
+      return _GlobalMetrics(total: 0, avgWr: 0, avgKda: 0);
+    }
+
+    double totalWr = 0;
+    double totalKda = 0;
+    int countWr = 0;
+    int countKda = 0;
+
+    for (final c in collections) {
+      final stats = c.totalStats ?? c.rankedStats ?? c.classicStats ?? c.brawlStats;
+      if (stats != null) {
+        if (stats.winRate > 0) { totalWr += stats.winRate; countWr++; }
+        if (stats.kda > 0) { totalKda += stats.kda; countKda++; }
+      }
+    }
+
+    return _GlobalMetrics(
+      total: collections.length,
+      avgWr: countWr > 0 ? totalWr / countWr : 0,
+      avgKda: countKda > 0 ? totalKda / countKda : 0,
+    );
+  }
+
+  // ── BLoC listeners ────────────────────────────────────────────
 
   void _handleStatsState(BuildContext context, StatsState state) {
     if (state is StatsCollectionsLoaded) {
@@ -264,7 +294,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  void _handleExportImportState(BuildContext context, StatsState state) async {
+  void _handleExportImportState(
+    BuildContext context,
+    StatsState state,
+  ) async {
     if (state is StatsExported) {
       await SharePlus.instance.share(
         ShareParams(
@@ -276,8 +309,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     } else if (state is StatsImported) {
       if (!context.mounted) return;
       final msg = state.skippedCount > 0
-          ? '✅ ${state.importedCount} importada(s), ${state.skippedCount} duplicada(s) omitida(s)'
-          : '✅ ${state.importedCount} colección(es) importada(s)'
+          ? '${state.importedCount} importada(s), ${state.skippedCount} duplicada(s) omitida(s)'
+          : '${state.importedCount} colección(es) importada(s)'
                 '${state.merged ? ' y fusionada(s)' : ', datos anteriores reemplazados'}.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -292,7 +325,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // ==================== BUILD ====================
+  // ── Build ─────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -302,23 +335,48 @@ class _HistoryScreenState extends State<HistoryScreen> {
         listener: _handleStatsState,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Scaffold(
-            resizeToAvoidBottomInset: true,
-            body: CustomScrollView(
-              controller: _scrollController,
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              slivers: [
-                HistoryAppBar(
-                  sortBy: _sortBy,
-                  isAscending: _isAscending,
-                  onRefresh: _loadCollections,
-                  onToggleSort: _onToggleSort,
+          child: CustomScrollView(
+            controller: _scrollController,
+            keyboardDismissBehavior:
+                ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              // ── Hero section (reemplaza AppBar) ──────────────
+              BlocBuilder<StatsBloc, StatsState>(
+                buildWhen: (_, s) => s is StatsCollectionsLoaded,
+                builder: (context, state) {
+                  final metrics = _computeGlobalMetrics(
+                    state is StatsCollectionsLoaded
+                        ? state.collections
+                        : _allCollections,
+                  );
+                  return SliverToBoxAdapter(
+                    child: HistoryHeroSection(
+                      metrics: metrics,
+                      sortBy: _sortBy,
+                      isAscending: _isAscending,
+                      onRefresh: _loadCollections,
+                      onToggleSort: _onToggleSort,
+                      onExportImport: () =>
+                          ExportImportBottomSheet.show(context),
+                    ),
+                  );
+                },
+              ),
+
+              // ── Buscador ──────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                  child: HistorySearchBar(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                  ),
                 ),
-                HistorySearchBar(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                ),
-                HistoryFilterBar(
+              ),
+
+              // ── Filter bar ────────────────────────────────────
+              SliverToBoxAdapter(
+                child: HistoryFilterBar(
                   totalResults: _allCollections.length,
                   searchQuery: _searchQuery,
                   onClearSearch: () {
@@ -326,9 +384,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     _onSearchChanged('');
                   },
                 ),
-                _buildContent(),
-              ],
-            ),
+              ),
+
+              // ── Contenido principal ───────────────────────────
+              _buildContent(),
+            ],
           ),
         ),
       ),
@@ -338,43 +398,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildContent() {
     return BlocBuilder<StatsBloc, StatsState>(
       builder: (context, state) {
+        // Loading inicial
         if (state is StatsLoading && _displayedCollections.isEmpty) {
           return const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           );
         }
 
+        // Error sin datos previos
         if (state is StatsError && _displayedCollections.isEmpty) {
           return SliverFillRemaining(
-            child: ErrorStateWidget(
-              title: 'Error al cargar estadísticas',
+            child: _HistoryErrorState(
               message: state.message,
               onRetry: _loadCollections,
             ),
           );
         }
 
+        // Sin datos
         if (_allCollections.isEmpty && state is! StatsLoading) {
           return SliverFillRemaining(
-            child: EmptyStateWidget(
-              icon: Icons.analytics_outlined,
-              title: _searchQuery.isNotEmpty
-                  ? 'No se encontraron resultados'
-                  : 'No hay estadísticas guardadas',
-              subtitle: _searchQuery.isNotEmpty
-                  ? 'Intenta con otros términos de búsqueda'
-                  : 'Importa tus estadísticas desde un archivo JSON',
-              actionButton: _searchQuery.isEmpty
-                  ? ElevatedButton.icon(
-                      onPressed: () => ExportImportBottomSheet.show(context),
-                      icon: const Icon(Icons.download_rounded),
-                      label: const Text('Importar Estadísticas'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
-                        foregroundColor: Colors.white,
-                      ),
-                    )
-                  : null,
+            child: _HistoryEmptyState(
+              hasSearch: _searchQuery.isNotEmpty,
+              onImport: () => ExportImportBottomSheet.show(context),
+              onClear: () {
+                _searchController.clear();
+                _onSearchChanged('');
+              },
             ),
           );
         }
@@ -385,13 +435,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildList() {
-    if (_displayedCollections.isEmpty && _allCollections.isNotEmpty) {
-      return const SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     final colorScheme = Theme.of(context).colorScheme;
+
     final latest = _displayedCollections.isNotEmpty
         ? _displayedCollections.first
         : null;
@@ -401,65 +446,51 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return SliverList(
       delegate: SliverChildListDelegate([
-        // --- Última estadística ---
+        // ── Latest card ─────────────────────────────────────
         if (latest != null && _searchQuery.isEmpty) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              'Última Estadística',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF059669),
-              ),
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+            child: _SectionLabel(label: 'Más reciente'),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             child: HistoryLatestCard(
               collection: latest,
-              formattedDate: _formatDate(latest.createdAt),
+              formattedDate: _formatDateShort(latest.createdAt),
+              relativeTime: _relativeTime(latest.createdAt),
               onTap: () => _showDetail(latest),
               onOptionsPressed: () => _showOptions(latest),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(height: 32, thickness: 2),
-          ),
         ],
 
-        // --- Historial completo ---
+        // ── Historial completo ───────────────────────────────
         if (history.isNotEmpty || _searchQuery.isNotEmpty) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _searchQuery.isNotEmpty
-                      ? 'Resultados de Búsqueda'
-                      : 'Historial Completo',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1E3A8A),
-                  ),
+                _SectionLabel(
+                  label: _searchQuery.isNotEmpty
+                      ? 'Resultados de búsqueda'
+                      : 'Historial completo',
                 ),
+                const SizedBox(width: 8),
                 if (_searchQuery.isEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                        horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      color: colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${_allCollections.length - 1}',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.primary,
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
@@ -467,72 +498,249 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
 
-          // Items
+          // Cards del historial
           if (_searchQuery.isNotEmpty)
             ..._displayedCollections.asMap().entries.map(
-              (e) => _buildCard(e.value, e.key),
+              (e) => _buildListCard(e.value, e.key + 1),
             )
           else
             ...history.asMap().entries.map(
-              (e) => _buildCard(e.value, e.key + 1),
+              (e) => _buildListCard(e.value, e.key + 2),
             ),
 
+          // Loading paginación
           if (_isLoadingMore)
             const Padding(
               padding: EdgeInsets.all(16),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
             ),
 
+          // Fin de lista
           if (!_hasMoreData && history.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Center(
                 child: Text(
-                  'No hay más estadísticas',
+                  '— Fin del historial —',
                   style: TextStyle(
-                    fontSize: 14,
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    fontSize: 12,
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
             ),
-        ] else if (_searchQuery.isEmpty)
+        ] else if (_searchQuery.isEmpty && _displayedCollections.length == 1)
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Center(
               child: Text(
-                'No hay más estadísticas guardadas',
+                'Solo hay una sesión guardada',
                 style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontSize: 13,
+                  color: colorScheme.onSurface.withValues(alpha: 0.35),
                   fontStyle: FontStyle.italic,
                 ),
               ),
             ),
           ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 32),
       ]),
     );
   }
 
-  Widget _buildCard(StatsCollection collection, int index) {
-    final badgeNumber = _allCollections.length - index;
-
+  Widget _buildListCard(StatsCollection collection, int number) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        index == 0 && _searchQuery.isEmpty ? 0 : 8,
-        16,
-        8,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
       child: GestureDetector(
         onLongPress: () => _showOptions(collection),
-        child: StatsCollectionCard(
+        child: HistoryListCard(
           collection: collection,
+          number: number,
+          totalCount: _allCollections.length,
+          relativeTime: _relativeTime(collection.createdAt),
+          formattedDate: _formatDateShort(collection.createdAt),
           onTap: () => _showDetail(collection),
-          badge: _searchQuery.isEmpty ? '$badgeNumber' : null,
+          onOptionsPressed: () => _showOptions(collection),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Helpers internos ──────────────────────────────────────────────
+
+class _GlobalMetrics {
+  final int total;
+  final double avgWr;
+  final double avgKda;
+  const _GlobalMetrics({
+    required this.total,
+    required this.avgWr,
+    required this.avgKda,
+  });
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.1,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
+      ),
+    );
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────
+
+class _HistoryEmptyState extends StatelessWidget {
+  const _HistoryEmptyState({
+    required this.hasSearch,
+    required this.onImport,
+    required this.onClear,
+  });
+  final bool hasSearch;
+  final VoidCallback onImport;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.analytics_outlined,
+                size: 28,
+                color: colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              hasSearch
+                  ? 'Sin resultados para tu búsqueda'
+                  : 'Aún no hay sesiones guardadas',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hasSearch
+                  ? 'Prueba con otro término o limpia el filtro'
+                  : 'Importa un archivo .json o captura tus primeras estadísticas',
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.onSurface.withValues(alpha: 0.35),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+            if (hasSearch)
+              OutlinedButton(
+                onPressed: onClear,
+                child: const Text('Limpiar búsqueda'),
+              )
+            else
+              ElevatedButton.icon(
+                onPressed: onImport,
+                icon: const Icon(Icons.download_rounded, size: 16),
+                label: const Text('Importar estadísticas'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Error state ───────────────────────────────────────────────────
+
+class _HistoryErrorState extends StatelessWidget {
+  const _HistoryErrorState({
+    required this.message,
+    required this.onRetry,
+  });
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: colorScheme.error.withValues(alpha: 0.6),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No se pudo cargar el historial',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded, size: 16),
+              label: const Text('Reintentar'),
+            ),
+          ],
         ),
       ),
     );
