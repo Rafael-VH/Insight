@@ -19,26 +19,12 @@ import 'hero_state.dart';
 /// Ambos flujos emiten sus propios estados concretos, por lo que los widgets
 /// pueden usar `BlocBuilder` con `buildWhen` para reaccionar solo a los estados
 /// que les conciernen y evitar rebuilds innecesarios.
-///
-/// ```dart
-/// // En HeroListScreen — solo escucha estados de lista
-/// BlocBuilder<HeroBloc, HeroState>(
-///   buildWhen: (_, s) => s is HeroListLoading || s is HeroListLoaded || s is HeroListError,
-///   builder: (context, state) { ... },
-/// )
-///
-/// // En HeroDetailScreen — solo escucha estados de detalle
-/// BlocBuilder<HeroBloc, HeroState>(
-///   buildWhen: (_, s) => s is HeroDetailLoading || s is HeroDetailLoaded || s is HeroDetailError,
-///   builder: (context, state) { ... },
-/// )
-/// ```
 class HeroBloc extends Bloc<HeroEvent, HeroState> {
   final GetHeroes getHeroes;
   final GetHeroDetail getHeroDetail;
 
   HeroBloc({required this.getHeroes, required this.getHeroDetail})
-    : super(HeroInitial()) {
+      : super(HeroInitial()) {
     on<LoadHeroListEvent>(_onLoadList);
     on<SearchHeroListEvent>(_onSearch);
     on<LoadHeroDetailEvent>(_onLoadDetail);
@@ -83,8 +69,8 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
     final filtered = query.isEmpty
         ? current.heroes
         : current.heroes
-              .where((h) => h.name.toLowerCase().contains(query))
-              .toList();
+            .where((h) => h.name.toLowerCase().contains(query))
+            .toList();
 
     emit(current.copyWith(filtered: filtered, searchQuery: event.query));
   }

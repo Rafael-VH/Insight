@@ -10,6 +10,7 @@ import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_event.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_state.dart';
+import 'package:insight/features/heroes/presentation/utils/hero_role_utils.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class HeroDetailScreen extends StatefulWidget {
@@ -37,24 +38,26 @@ class _HeroDetailScreenState extends State<HeroDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0A0C10) : colorScheme.surface,
       body: BlocBuilder<HeroBloc, HeroState>(
-        // buildWhen evita rebuilds cuando el BLoC emite estados de lista
-        // (por ejemplo si el usuario regresa y SearchHeroListEvent se dispara).
         buildWhen: (_, s) =>
             s is HeroDetailLoading ||
             s is HeroDetailLoaded ||
             s is HeroDetailError,
         builder: (context, state) {
           if (state is HeroDetailLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const _LoadingView();
           }
           if (state is HeroDetailError) {
             return _ErrorView(
               message: state.message,
-              onRetry: () => context.read<HeroBloc>().add(
-                LoadHeroDetailEvent(widget.heroId),
-              ),
+              onRetry: () => context
+                  .read<HeroBloc>()
+                  .add(LoadHeroDetailEvent(widget.heroId)),
             );
           }
           if (state is HeroDetailLoaded) {
@@ -63,6 +66,7 @@ class _HeroDetailScreenState extends State<HeroDetailScreen> {
               heroMap: widget.heroMap,
               currentIndex: _currentIndex,
               onTabChanged: (i) => setState(() => _currentIndex = i),
+              isDark: isDark,
             );
           }
           return const SizedBox.shrink();
@@ -72,38 +76,9 @@ class _HeroDetailScreenState extends State<HeroDetailScreen> {
   }
 }
 
-// ── Vistas internas ───────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(message, textAlign: TextAlign.center),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reintentar'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// ══════════════════════════════════════════════════════════════════
+// Vista principal de detalle
+// ══════════════════════════════════════════════════════════════════
 
 class _DetailContent extends StatelessWidget {
   const _DetailContent({
@@ -111,369 +86,906 @@ class _DetailContent extends StatelessWidget {
     required this.heroMap,
     required this.currentIndex,
     required this.onTabChanged,
+    required this.isDark,
   });
 
   final HeroDetail detail;
   final Map<int, MlbbHero> heroMap;
   final int currentIndex;
   final ValueChanged<int> onTabChanged;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final pages = [
-      _InfoTab(hero: detail),
-      _StatsTab(stats: detail.stats),
-      _BuildsTab(builds: detail.builds),
-      _CountersTab(relation: detail.relation, heroMap: heroMap),
+      _InfoTab(hero: detail, isDark: isDark),
+      _StatsTab(stats: detail.stats, isDark: isDark),
+      _BuildsTab(builds: detail.builds, isDark: isDark),
+      _CountersTab(
+          relation: detail.relation, heroMap: heroMap, isDark: isDark),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              detail.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            if (detail.roles.isNotEmpty)
-              Text(
-                detail.roles.join(' · '),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+    return Stack(
+      children: [
+        // Contenido scrolleable
+        CustomScrollView(
+          slivers: [
+            // ── SliverAppBar con header expandible ────────────
+            _HeroSliverHeader(detail: detail, isDark: isDark),
+
+            // ── Cuerpo del tab activo ──────────────────────────
+            SliverToBoxAdapter(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                transitionBuilder: (child, anim) => FadeTransition(
+                  opacity: anim,
+                  child: child,
+                ),
+                child: KeyedSubtree(
+                  key: ValueKey(currentIndex),
+                  child: Padding(
+                    // Espacio para el bottom bar flotante
+                    padding: const EdgeInsets.only(bottom: 100),
+                    child: pages[currentIndex],
+                  ),
                 ),
               ),
+            ),
           ],
         ),
-      ),
-      body: Stack(
-        children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: KeyedSubtree(
-              key: ValueKey(currentIndex),
-              child: pages[currentIndex],
+
+        // ── Bottom bar flotante ────────────────────────────────
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: 16,
+          child: SafeArea(
+            child: _FloatingTabBar(
+              currentIndex: currentIndex,
+              onChanged: onTabChanged,
+              colorScheme: colorScheme,
+              isDark: isDark,
             ),
           ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: isDark ? 0.4 : 0.12,
-                      ),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                child: SalomonBottomBar(
-                  currentIndex: currentIndex,
-                  onTap: onTabChanged,
-                  selectedItemColor: colorScheme.primary,
-                  unselectedItemColor: colorScheme.onSurface.withValues(
-                    alpha: 0.5,
-                  ),
-                  items: [
-                    SalomonBottomBarItem(
-                      icon: const Icon(Icons.person_outline),
-                      title: const Text('Info'),
-                      selectedColor: colorScheme.primary,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: const Icon(Icons.bar_chart),
-                      title: const Text('Stats'),
-                      selectedColor: colorScheme.primary,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: const Icon(Icons.build_outlined),
-                      title: const Text('Builds'),
-                      selectedColor: colorScheme.primary,
-                    ),
-                    SalomonBottomBarItem(
-                      icon: const Icon(Icons.compare_arrows),
-                      title: const Text('Counters'),
-                      selectedColor: colorScheme.primary,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Tab: Info ─────────────────────────────────────────────────────
-
-class _InfoTab extends StatelessWidget {
-  const _InfoTab({required this.hero});
-
-  final HeroDetail hero;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListView(
-      physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      children: [
-        if (hero.roles.isNotEmpty || hero.lane.isNotEmpty) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (hero.roles.isNotEmpty)
-                Expanded(
-                  child: _ChipGroup(
-                    label: 'Rol',
-                    items: hero.roles,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              if (hero.lane.isNotEmpty)
-                Expanded(
-                  child: _ChipGroup(
-                    label: 'Lane',
-                    items: [hero.lane],
-                    color: colorScheme.secondary,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (hero.specialties.isNotEmpty) ...[
-          _ChipGroup(
-            label: 'Especialidades',
-            items: hero.specialties,
-            color: colorScheme.tertiary,
-          ),
-          const SizedBox(height: 16),
-        ],
-        if (hero.story.isNotEmpty) ...[
-          _SectionTitle(title: 'Historia', icon: Icons.auto_stories),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? colorScheme.surfaceContainerHighest
-                  : colorScheme.surfaceContainerLowest,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Text(
-              hero.story,
-              style: const TextStyle(height: 1.6, fontSize: 14),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-        if (hero.skills.isNotEmpty) ...[
-          _SectionTitle(title: 'Habilidades', icon: Icons.flash_on),
-          const SizedBox(height: 12),
-          ...hero.skills.map((s) => _SkillCard(skill: s)),
-        ],
+        ),
       ],
     );
   }
 }
 
-// ── Tab: Stats ────────────────────────────────────────────────────
+// ── Sliver header ─────────────────────────────────────────────────
 
-class _StatsTab extends StatelessWidget {
-  const _StatsTab({required this.stats});
+class _HeroSliverHeader extends StatelessWidget {
+  const _HeroSliverHeader({required this.detail, required this.isDark});
 
-  final List<HeroStat> stats;
+  final HeroDetail detail;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    if (stats.isEmpty) {
-      return const Center(child: Text('Sin estadísticas disponibles'));
-    }
-
     final colorScheme = Theme.of(context).colorScheme;
-    final statColors = [
-      colorScheme.primary,
-      colorScheme.primary.withValues(alpha: 0.85),
-      colorScheme.secondary,
-      colorScheme.tertiary,
-    ];
+    final surfaceColor =
+        isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
 
-    return ListView(
-      physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+    return SliverAppBar(
+      expandedHeight: 220,
+      pinned: true,
+      backgroundColor: surfaceColor,
+      surfaceTintColor: Colors.transparent,
+      leading: IconButton(
+        icon: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: colorScheme.onSurface.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Icon(
+            Icons.arrow_back_rounded,
+            size: 18,
+            color: colorScheme.onSurface,
+          ),
+        ),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      title: Text(
+        detail.name.toUpperCase(),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+          color: colorScheme.onSurface,
+        ),
+      ),
+      flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
+        background: _HeroHeaderBackground(
+          detail: detail,
+          isDark: isDark,
+          colorScheme: colorScheme,
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroHeaderBackground extends StatelessWidget {
+  const _HeroHeaderBackground({
+    required this.detail,
+    required this.isDark,
+    required this.colorScheme,
+  });
+
+  final HeroDetail detail;
+  final bool isDark;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final heroColor = HeroRoleUtils.avatarColorForId(detail.heroId);
+    final surfaceColor =
+        isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
+
+    return Container(
+      color: surfaceColor,
+      padding: const EdgeInsets.fromLTRB(20, 80, 20, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Avatar + meta
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Avatar
+              _HeroAvatarLarge(detail: detail, heroColor: heroColor),
+              const SizedBox(width: 16),
+              // Nombre, roles, lane
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text(
+                      detail.name.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                        color: colorScheme.onSurface,
+                        height: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (detail.roles.isNotEmpty)
+                      HeroRoleUtils.buildRoleChips(detail.roles),
+                    const SizedBox(height: 8),
+                    if (detail.lane.isNotEmpty)
+                      _LaneIndicator(
+                          lane: detail.lane, colorScheme: colorScheme),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Stat pills
+          if (detail.stats.isNotEmpty)
+            Row(
+              children: detail.stats
+                  .take(4)
+                  .map((s) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _StatPillSmall(
+                              stat: s,
+                              isDark: isDark,
+                              colorScheme: colorScheme),
+                        ),
+                      ))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroAvatarLarge extends StatelessWidget {
+  const _HeroAvatarLarge({required this.detail, required this.heroColor});
+
+  final HeroDetail detail;
+  final Color heroColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: heroColor.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14.5),
+        child: detail.iconUrl.isNotEmpty
+            ? Image.network(
+                detail.iconUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    _AvatarFallback(detail: detail, heroColor: heroColor),
+              )
+            : _AvatarFallback(detail: detail, heroColor: heroColor),
+      ),
+    );
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  const _AvatarFallback({required this.detail, required this.heroColor});
+
+  final HeroDetail detail;
+  final Color heroColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: heroColor.withValues(alpha: 0.15),
+      child: Center(
+        child: Text(
+          detail.name.isNotEmpty ? detail.name[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: heroColor,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LaneIndicator extends StatelessWidget {
+  const _LaneIndicator({required this.lane, required this.colorScheme});
+
+  final String lane;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        _SectionTitle(title: 'Atributos del héroe', icon: Icons.bar_chart),
-        const SizedBox(height: 20),
-        ...stats.asMap().entries.map((entry) {
-          final color = statColors[entry.key % statColors.length];
-          final stat = entry.value;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 20),
+        Icon(
+          Icons.place_rounded,
+          size: 12,
+          color: colorScheme.onSurface.withValues(alpha: 0.4),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          lane,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatPillSmall extends StatelessWidget {
+  const _StatPillSmall({
+    required this.stat,
+    required this.isDark,
+    required this.colorScheme,
+  });
+
+  final HeroStat stat;
+  final bool isDark;
+  final ColorScheme colorScheme;
+
+  Color get _valueColor {
+    switch (stat.label) {
+      case 'Durabilidad':
+        return const Color(0xFFEF4444);
+      case 'Ofensa':
+        return const Color(0xFFF59E0B);
+      case 'Habilidad':
+        return const Color(0xFF8B5CF6);
+      case 'Dificultad':
+        return const Color(0xFF10B981);
+      default:
+        return colorScheme.primary;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF181C24)
+            : colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.12),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            stat.value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: _valueColor,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            stat.label,
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface.withValues(alpha: 0.35),
+              letterSpacing: 0.3,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Bottom bar flotante ───────────────────────────────────────────
+
+class _FloatingTabBar extends StatelessWidget {
+  const _FloatingTabBar({
+    required this.currentIndex,
+    required this.onChanged,
+    required this.colorScheme,
+    required this.isDark,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onChanged;
+  final ColorScheme colorScheme;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color:
+            isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.12 : 0.15),
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: SalomonBottomBar(
+        currentIndex: currentIndex,
+        onTap: onChanged,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.45),
+        items: [
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.person_outline_rounded),
+            title: const Text('Info'),
+            selectedColor: colorScheme.primary,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.bar_chart_rounded),
+            title: const Text('Stats'),
+            selectedColor: colorScheme.primary,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.build_outlined),
+            title: const Text('Builds'),
+            selectedColor: colorScheme.primary,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.compare_arrows_rounded),
+            title: const Text('Counters'),
+            selectedColor: colorScheme.primary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Tab: INFO
+// ══════════════════════════════════════════════════════════════════
+
+class _InfoTab extends StatelessWidget {
+  const _InfoTab({required this.hero, required this.isDark});
+
+  final HeroDetail hero;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Historia
+          if (hero.story.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF111318)
+                    : colorScheme.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(12),
+                border: Border(
+                  left: BorderSide(
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Text(
+                hero.story,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.7,
+                  color: colorScheme.onSurface.withValues(alpha: 0.65),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // Especialidades
+          if (hero.specialties.isNotEmpty) ...[
+            _SectionLabel(label: 'Especialidades', colorScheme: colorScheme),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: hero.specialties
+                  .map((s) => _SpecialtyChip(
+                      label: s, colorScheme: colorScheme, isDark: isDark))
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // Habilidades
+          if (hero.skills.isNotEmpty) ...[
+            _SectionLabel(label: 'Habilidades', colorScheme: colorScheme),
+            const SizedBox(height: 12),
+            ...hero.skills.map((s) => _SkillCard(
+                skill: s, colorScheme: colorScheme, isDark: isDark)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SpecialtyChip extends StatelessWidget {
+  const _SpecialtyChip({
+    required this.label,
+    required this.colorScheme,
+    required this.isDark,
+  });
+
+  final String label;
+  final ColorScheme colorScheme;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF181C24)
+            : colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkillCard extends StatelessWidget {
+  const _SkillCard({
+    required this.skill,
+    required this.colorScheme,
+    required this.isDark,
+  });
+
+  final HeroSkill skill;
+  final ColorScheme colorScheme;
+  final bool isDark;
+
+  static const List<Color> _skillColors = [
+    Color(0xFF3B82F6),
+    Color(0xFF6366F1),
+    Color(0xFF8B5CF6),
+    Color(0xFFF59E0B),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF111318)
+            : colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Ícono de habilidad
+          ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: skill.iconUrl.isNotEmpty
+                ? Image.network(
+                    skill.iconUrl,
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _SkillIconFallback(
+                      color: _skillColors[0],
+                      label: skill.name.isNotEmpty ? skill.name[0] : '?',
+                    ),
+                  )
+                : _SkillIconFallback(
+                    color: _skillColors[0],
+                    label: skill.name.isNotEmpty ? skill.name[0] : '?',
+                  ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      stat.label,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                    Expanded(
+                      child: Text(
+                        skill.name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                    Text(
-                      stat.value,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: color,
+                    if (skill.cooldownAndCost.isNotEmpty)
+                      Text(
+                        skill.cooldownAndCost,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: colorScheme.onSurface.withValues(alpha: 0.35),
+                        ),
                       ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: stat.normalizedValue,
-                    minHeight: 10,
-                    backgroundColor: colorScheme.onSurface.withValues(
-                      alpha: 0.1,
-                    ),
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                const SizedBox(height: 5),
+                Text(
+                  skill.description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.6,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
             ),
-          );
-        }),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ── Tab: Builds ───────────────────────────────────────────────────
+class _SkillIconFallback extends StatelessWidget {
+  const _SkillIconFallback({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
+      ),
+      child: Center(
+        child: Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Tab: STATS
+// ══════════════════════════════════════════════════════════════════
+
+class _StatsTab extends StatelessWidget {
+  const _StatsTab({required this.stats, required this.isDark});
+
+  final List<HeroStat> stats;
+  final bool isDark;
+
+  static const List<Color> _statColors = [
+    Color(0xFFEF4444),
+    Color(0xFFF59E0B),
+    Color(0xFF8B5CF6),
+    Color(0xFF10B981),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (stats.isEmpty) {
+      return const _TabEmptyState(message: 'Sin estadísticas disponibles');
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionLabel(label: 'Atributos del héroe', colorScheme: colorScheme),
+          const SizedBox(height: 20),
+          ...stats.asMap().entries.map((e) {
+            final color = _statColors[e.key % _statColors.length];
+            return _StatBarRow(
+              stat: e.value,
+              color: color,
+              colorScheme: colorScheme,
+              isDark: isDark,
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatBarRow extends StatelessWidget {
+  const _StatBarRow({
+    required this.stat,
+    required this.color,
+    required this.colorScheme,
+    required this.isDark,
+  });
+
+  final HeroStat stat;
+  final Color color;
+  final ColorScheme colorScheme;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                stat.label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              Text(
+                stat.value,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: stat.normalizedValue,
+              minHeight: 6,
+              backgroundColor: colorScheme.onSurface.withValues(alpha: 0.08),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Tab: BUILDS
+// ══════════════════════════════════════════════════════════════════
 
 class _BuildsTab extends StatelessWidget {
-  const _BuildsTab({required this.builds});
+  const _BuildsTab({required this.builds, required this.isDark});
 
   final List<HeroBuild> builds;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     if (builds.isEmpty) {
-      return const Center(child: Text('Sin builds disponibles'));
+      return const _TabEmptyState(message: 'Sin builds disponibles');
     }
-    return ListView.separated(
-      physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      itemCount: builds.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, i) => _BuildCard(heroBuild: builds[i], index: i),
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Column(
+        children: builds.asMap().entries
+            .map((e) => _BuildCard(
+                heroBuild: e.value,
+                index: e.key,
+                isDark: isDark))
+            .toList(),
+      ),
     );
   }
 }
 
 class _BuildCard extends StatelessWidget {
-  const _BuildCard({required this.heroBuild, required this.index});
+  const _BuildCard({
+    required this.heroBuild,
+    required this.index,
+    required this.isDark,
+  });
 
   final HeroBuild heroBuild;
   final int index;
+  final bool isDark;
+
+  static const _buildLabels = ['Meta', 'Burst', 'Tank'];
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final winPct = (heroBuild.winRate * 100).toStringAsFixed(1);
     final pickPct = (heroBuild.pickRate * 100).toStringAsFixed(1);
+    final label = index < _buildLabels.length ? _buildLabels[index] : '${index + 1}';
 
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHighest
+            ? const Color(0xFF111318)
             : colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             children: [
               Text(
-                'Build ${index + 1}',
+                'Build ${index + 1} — $label',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                   color: colorScheme.primary,
-                  fontSize: 15,
+                  letterSpacing: 0.3,
                 ),
               ),
               const Spacer(),
-              _StatPill('WR $winPct%', colorScheme.primary),
+              _BuildRateBadge(
+                label: 'WR $winPct%',
+                color: const Color(0xFF10B981),
+              ),
               const SizedBox(width: 6),
-              _StatPill('Pick $pickPct%', colorScheme.secondary),
+              _BuildRateBadge(
+                label: 'Pick $pickPct%',
+                color: colorScheme.primary,
+              ),
             ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            'Ítems',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+          const SizedBox(height: 12),
+
+          // Ítems
+          _SectionLabel(
+            label: 'Ítems',
+            colorScheme: colorScheme,
+            small: true,
           ),
           const SizedBox(height: 8),
           Row(
             children: heroBuild.items.isNotEmpty
                 ? heroBuild.items
-                      .map(
-                        (item) => Padding(
+                    .map((item) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: _ItemIcon(item: item),
-                        ),
-                      )
-                      .toList()
+                        ))
+                    .toList()
                 : heroBuild.equipIds
-                      .map(
-                        (id) => Padding(
+                    .map((id) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: _ItemIconPlaceholder(id: id),
-                        ),
-                      )
-                      .toList(),
+                        ))
+                    .toList(),
           ),
           const SizedBox(height: 14),
-          Text(
-            'Hechizo & Emblema',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+
+          // Hechizo y emblema
+          _SectionLabel(
+            label: 'Hechizo y Emblema',
+            colorScheme: colorScheme,
+            small: true,
           ),
           const SizedBox(height: 8),
           Row(
@@ -484,7 +996,7 @@ class _BuildCard extends StatelessWidget {
                   iconUrl: heroBuild.spellIconUrl,
                   name: heroBuild.spellName,
                 ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               if (heroBuild.emblemIconUrl.isNotEmpty)
                 Expanded(
                   child: _EmblemCard(
@@ -501,315 +1013,28 @@ class _BuildCard extends StatelessWidget {
   }
 }
 
-// ── Tab: Counters ─────────────────────────────────────────────────
-
-class _CountersTab extends StatelessWidget {
-  const _CountersTab({required this.relation, required this.heroMap});
-
-  final HeroRelation? relation;
-  final Map<int, MlbbHero> heroMap;
-
-  @override
-  Widget build(BuildContext context) {
-    if (relation == null) {
-      return const Center(child: Text('Sin datos de counters'));
-    }
-    return ListView(
-      physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      children: [
-        if (relation!.strongAgainst.isNotEmpty) ...[
-          _CounterSection(
-            title: 'Fuerte contra',
-            icon: Icons.arrow_upward,
-            sectionType: _CounterType.strong,
-            ids: relation!.strongAgainst,
-            heroMap: heroMap,
-          ),
-          const SizedBox(height: 20),
-        ],
-        if (relation!.weakAgainst.isNotEmpty) ...[
-          _CounterSection(
-            title: 'Débil contra',
-            icon: Icons.arrow_downward,
-            sectionType: _CounterType.weak,
-            ids: relation!.weakAgainst,
-            heroMap: heroMap,
-          ),
-          const SizedBox(height: 20),
-        ],
-        if (relation!.bestWith.isNotEmpty)
-          _CounterSection(
-            title: 'Mejores compañeros',
-            icon: Icons.people,
-            sectionType: _CounterType.ally,
-            ids: relation!.bestWith,
-            heroMap: heroMap,
-          ),
-      ],
-    );
-  }
-}
-
-enum _CounterType { strong, weak, ally }
-
-class _CounterSection extends StatelessWidget {
-  const _CounterSection({
-    required this.title,
-    required this.icon,
-    required this.sectionType,
-    required this.ids,
-    required this.heroMap,
-  });
-
-  final String title;
-  final IconData icon;
-  final _CounterType sectionType;
-  final List<int> ids;
-  final Map<int, MlbbHero> heroMap;
-
-  Color _color(ColorScheme cs) {
-    switch (sectionType) {
-      case _CounterType.strong:
-        return cs.primary;
-      case _CounterType.weak:
-        return cs.error;
-      case _CounterType.ally:
-        return cs.secondary;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = _color(colorScheme);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: ids.map((id) {
-            final hero = heroMap[id];
-            return SizedBox(
-              width: 72,
-              child: Column(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: color.withValues(alpha: 0.3)),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(9),
-                      child: hero?.iconUrl.isNotEmpty == true
-                          ? Image.network(
-                              hero!.iconUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  _HeroPlaceholder(color: color),
-                            )
-                          : _HeroPlaceholder(color: color),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    hero?.name ?? 'ID $id',
-                    style: const TextStyle(fontSize: 10),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Widgets de soporte ────────────────────────────────────────────
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: colorScheme.primary),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.primary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ChipGroup extends StatelessWidget {
-  const _ChipGroup({
-    required this.label,
-    required this.items,
-    required this.color,
-  });
+class _BuildRateBadge extends StatelessWidget {
+  const _BuildRateBadge({required this.label, required this.color});
 
   final String label;
-  final List<String> items;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Wrap(
-          spacing: 6,
-          runSpacing: 4,
-          children: items
-              .map(
-                (r) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: color.withValues(alpha: 0.4)),
-                  ),
-                  child: Text(
-                    r,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: color,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _SkillCard extends StatelessWidget {
-  const _SkillCard({required this.skill});
-
-  final HeroSkill skill;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (skill.iconUrl.isNotEmpty)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                skill.iconUrl,
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Icon(Icons.flash_on, size: 48, color: colorScheme.primary),
-              ),
-            ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        skill.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    if (skill.cooldownAndCost.isNotEmpty)
-                      Flexible(
-                        child: Text(
-                          skill.cooldownAndCost,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: colorScheme.onSurface.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  skill.description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 1.5,
-                    color: colorScheme.onSurface.withValues(alpha: 0.75),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }
@@ -828,16 +1053,17 @@ class _ItemIcon extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(9),
               border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.3),
+                color: colorScheme.outline.withValues(alpha: 0.2),
+                width: 0.5,
               ),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(8.5),
               child: item.iconUrl.isNotEmpty
                   ? Image.network(
                       item.iconUrl,
@@ -850,7 +1076,7 @@ class _ItemIcon extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           SizedBox(
-            width: 48,
+            width: 44,
             child: Text(
               item.name,
               style: const TextStyle(fontSize: 9),
@@ -874,19 +1100,22 @@ class _ItemIconPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      width: 48,
-      height: 48,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
-        color: colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+        color: colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.2),
+          width: 0.5,
+        ),
       ),
       child: Center(
         child: Text(
           '$id',
           style: TextStyle(
             fontSize: 10,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: colorScheme.primary,
           ),
         ),
@@ -904,39 +1133,42 @@ class _SpellCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.3),
-            ),
-          ),
-          child: ClipRRect(
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.15),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          ClipRRect(
             borderRadius: BorderRadius.circular(7),
             child: Image.network(
               iconUrl,
+              width: 40,
+              height: 40,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   Icon(Icons.flash_on, size: 28, color: colorScheme.primary),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        SizedBox(
-          width: 48,
-          child: Text(
-            name,
-            style: const TextStyle(fontSize: 9),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 4),
+          SizedBox(
+            width: 48,
+            child: Text(
+              name,
+              style: const TextStyle(fontSize: 9),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -967,31 +1199,26 @@ class _EmblemCard extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surface
+            ? const Color(0xFF181C24)
             : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.15),
+          width: 0.5,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: colorScheme.primary.withValues(alpha: 0.4),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-              child: Image.network(
-                iconUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Icon(Icons.star, color: colorScheme.primary),
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              iconUrl,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  Icon(Icons.star_rounded, color: colorScheme.primary),
             ),
           ),
           const SizedBox(width: 10),
@@ -1002,8 +1229,8 @@ class _EmblemCard extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
                     fontSize: 13,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
                   ),
                 ),
@@ -1014,7 +1241,7 @@ class _EmblemCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       height: 1.5,
-                      color: colorScheme.onSurface.withValues(alpha: 0.65),
+                      color: colorScheme.onSurface.withValues(alpha: 0.55),
                     ),
                   ),
                 ],
@@ -1027,44 +1254,312 @@ class _EmblemCard extends StatelessWidget {
   }
 }
 
-class _StatPill extends StatelessWidget {
-  const _StatPill(this.text, this.color);
+// ══════════════════════════════════════════════════════════════════
+// Tab: COUNTERS
+// ══════════════════════════════════════════════════════════════════
 
-  final String text;
+class _CountersTab extends StatelessWidget {
+  const _CountersTab({
+    required this.relation,
+    required this.heroMap,
+    required this.isDark,
+  });
+
+  final HeroRelation? relation;
+  final Map<int, MlbbHero> heroMap;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    if (relation == null) {
+      return const _TabEmptyState(message: 'Sin datos de counters');
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (relation!.strongAgainst.isNotEmpty) ...[
+            _CounterSection(
+              title: 'Fuerte contra',
+              dotColor: const Color(0xFF10B981),
+              titleColor: const Color(0xFF34D399),
+              ids: relation!.strongAgainst,
+              borderColor: const Color(0xFFEF4444),
+              heroMap: heroMap,
+              isDark: isDark,
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (relation!.weakAgainst.isNotEmpty) ...[
+            _CounterSection(
+              title: 'Débil contra',
+              dotColor: const Color(0xFFEF4444),
+              titleColor: const Color(0xFFF87171),
+              ids: relation!.weakAgainst,
+              borderColor: const Color(0xFF8B5CF6),
+              heroMap: heroMap,
+              isDark: isDark,
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (relation!.bestWith.isNotEmpty)
+            _CounterSection(
+              title: 'Mejores compañeros',
+              dotColor: const Color(0xFF3B82F6),
+              titleColor: const Color(0xFF60A5FA),
+              ids: relation!.bestWith,
+              borderColor: const Color(0xFF3B82F6),
+              heroMap: heroMap,
+              isDark: isDark,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CounterSection extends StatelessWidget {
+  const _CounterSection({
+    required this.title,
+    required this.dotColor,
+    required this.titleColor,
+    required this.ids,
+    required this.borderColor,
+    required this.heroMap,
+    required this.isDark,
+  });
+
+  final String title;
+  final Color dotColor;
+  final Color titleColor;
+  final List<int> ids;
+  final Color borderColor;
+  final Map<int, MlbbHero> heroMap;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: titleColor,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 12,
+          children: ids.map((id) {
+            final hero = heroMap[id];
+            final avatarColor = HeroRoleUtils.avatarColorForId(id);
+            return _CounterHeroAvatar(
+              heroId: id,
+              name: hero?.name ?? 'ID $id',
+              iconUrl: hero?.iconUrl ?? '',
+              avatarColor: avatarColor,
+              borderColor: borderColor,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _CounterHeroAvatar extends StatelessWidget {
+  const _CounterHeroAvatar({
+    required this.heroId,
+    required this.name,
+    required this.iconUrl,
+    required this.avatarColor,
+    required this.borderColor,
+  });
+
+  final int heroId;
+  final String name;
+  final String iconUrl;
+  final Color avatarColor;
+  final Color borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 60,
+      child: Column(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: borderColor.withValues(alpha: 0.35),
+                width: 1.5,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.5),
+              child: iconUrl.isNotEmpty
+                  ? Image.network(
+                      iconUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          _CounterPlaceholder(color: avatarColor, name: name),
+                    )
+                  : _CounterPlaceholder(color: avatarColor, name: name),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CounterPlaceholder extends StatelessWidget {
+  const _CounterPlaceholder({required this.color, required this.name});
+
   final Color color;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: color,
+      color: color.withValues(alpha: 0.15),
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
         ),
       ),
     );
   }
 }
 
-class _HeroPlaceholder extends StatelessWidget {
-  const _HeroPlaceholder({required this.color});
+// ══════════════════════════════════════════════════════════════════
+// Widgets compartidos
+// ══════════════════════════════════════════════════════════════════
 
-  final Color color;
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({
+    required this.label,
+    required this.colorScheme,
+    this.small = false,
+  });
+
+  final String label;
+  final ColorScheme colorScheme;
+  final bool small;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: TextStyle(
+        fontSize: small ? 10 : 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.9,
+        color: colorScheme.onSurface.withValues(alpha: 0.35),
+      ),
+    );
+  }
+}
+
+class _TabEmptyState extends StatelessWidget {
+  const _TabEmptyState({required this.message});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      color: colorScheme.surfaceContainerHighest,
-      child: Icon(Icons.sports_esports, color: color),
+    return SizedBox(
+      height: 200,
+      child: Center(
+        child: Text(
+          message,
+          style: TextStyle(
+            fontSize: 14,
+            color: colorScheme.onSurface.withValues(alpha: 0.35),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline_rounded, size: 56, color: colorScheme.error),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(message, textAlign: TextAlign.center),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 16),
+            label: const Text('Reintentar'),
+          ),
+        ],
+      ),
     );
   }
 }

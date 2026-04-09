@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:insight/features/heroes/domain/entities/hero_build.dart';
 import 'package:insight/features/heroes/domain/entities/hero_detail.dart';
 import 'package:insight/features/heroes/domain/entities/hero_equipment.dart';
