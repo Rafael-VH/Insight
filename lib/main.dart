@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart' as di;
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
@@ -12,10 +14,47 @@ import 'package:insight/features/settings/presentation/config/theme_config.dart'
 import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await di.init();
-  runApp(const MyApp());
+void main() {
+  // Captura errores de Flutter (widgets, rendering, etc.)
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('=== FLUTTER ERROR ===');
+    debugPrint(details.toString());
+  };
+
+  // Captura errores fuera del contexto de Flutter (async, Dart puro)
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      // Orientación fija para evitar reflows durante el inicio
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+
+      await _initializeDependencies();
+      runApp(const MyApp());
+    },
+    (error, stackTrace) {
+      debugPrint('=== UNHANDLED ERROR ===');
+      debugPrint('Error: $error');
+      debugPrint('Stack: $stackTrace');
+    },
+  );
+}
+
+/// Inicialización de dependencias con manejo de errores y fallback
+Future<void> _initializeDependencies() async {
+  try {
+    await di.init();
+    debugPrint('✓ Dependencias inicializadas correctamente');
+  } catch (e, stack) {
+    debugPrint('✗ Error en di.init(): $e');
+    debugPrint(stack.toString());
+    // Re-lanzar para que runZonedGuarded lo capture y lo muestre
+    rethrow;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -48,17 +87,10 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {
-          // Mientras carga el tema, mostrar splash
           if (themeState is ThemeLoading || themeState is ThemeInitial) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              ),
-            );
+            return const _SplashApp();
           }
 
-          // Si hay error, usar tema por defecto
           if (themeState is ThemeError) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -70,25 +102,17 @@ class MyApp extends StatelessWidget {
             );
           }
 
-          // Tema cargado correctamente
           if (themeState is ThemeLoaded) {
-            final appTheme = themeState.currentTheme;
-            final themeMode = themeState.themeMode.flutterThemeMode;
-
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'Insight',
-
-              // Temas personalizados
-              theme: ThemeConfig.buildLightTheme(appTheme),
-              darkTheme: ThemeConfig.buildDarkTheme(appTheme),
-              themeMode: themeMode,
-
+              theme: ThemeConfig.buildLightTheme(themeState.currentTheme),
+              darkTheme: ThemeConfig.buildDarkTheme(themeState.currentTheme),
+              themeMode: themeState.themeMode.flutterThemeMode,
               home: const MainScreen(),
             );
           }
 
-          // Fallback
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Insight',
@@ -96,6 +120,33 @@ class MyApp extends StatelessWidget {
             home: const MainScreen(),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Splash minimalista mientras cargan las dependencias
+class _SplashApp extends StatelessWidget {
+  const _SplashApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Color(0xFF059669),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.insights_rounded, size: 64, color: Colors.white),
+              SizedBox(height: 24),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

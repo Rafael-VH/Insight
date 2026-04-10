@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,16 +72,33 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // ================================================================
-  // EXTERNAL
+  // EXTERNAL — orden importa, cada await puede fallar
   // ================================================================
 
-  final sharedPreferences = await SharedPreferences.getInstance();
+  // SharedPreferences primero — es la base de todo
+  late final SharedPreferences sharedPreferences;
+  try {
+    sharedPreferences = await SharedPreferences.getInstance();
+    debugPrint('✓ SharedPreferences OK');
+  } catch (e) {
+    debugPrint('✗ SharedPreferences failed: $e');
+    rethrow;
+  }
+
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => ImagePicker());
-  sl.registerLazySingleton(
-    () => TextRecognizer(script: TextRecognitionScript.latin),
-  );
+
+  // TextRecognizer — puede fallar si ML Kit no está disponible
+  try {
+    sl.registerLazySingleton(
+      () => TextRecognizer(script: TextRecognitionScript.latin),
+    );
+    debugPrint('✓ TextRecognizer registrado');
+  } catch (e) {
+    debugPrint('✗ TextRecognizer failed: $e');
+    rethrow;
+  }
 
   // ================================================================
   // THEME
@@ -137,8 +155,10 @@ Future<void> init() async {
     () => JsonExportDataSourceImpl(),
   );
   sl.registerLazySingleton<StatsRepository>(
-    () =>
-        StatsRepositoryImpl(localDataSource: sl(), jsonExportDataSource: sl()),
+    () => StatsRepositoryImpl(
+      localDataSource: sl(),
+      jsonExportDataSource: sl(),
+    ),
   );
 
   // Domain — Use cases
@@ -182,7 +202,10 @@ Future<void> init() async {
 
   // Presentation
   sl.registerFactory(
-    () => OcrBloc(pickImageAndRecognizeText: sl(), copyTextToClipboard: sl()),
+    () => OcrBloc(
+      pickImageAndRecognizeText: sl(),
+      copyTextToClipboard: sl(),
+    ),
   );
 
   // ================================================================
@@ -223,4 +246,6 @@ Future<void> init() async {
   // ================================================================
 
   sl.registerFactory(() => NavigationBloc(totalDestinations: 7));
+
+  debugPrint('✓ Todos los servicios registrados');
 }
