@@ -168,9 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _showDetail(StatsCollection collection) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => DetailScreen(collection: collection),
-      ),
+      MaterialPageRoute(builder: (_) => DetailScreen(collection: collection)),
     );
   }
 
@@ -241,9 +239,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   // ── Métricas globales para el hero section ────────────────────
 
-  _GlobalMetrics _computeGlobalMetrics(List<StatsCollection> collections) {
+  HistoryGlobalMetrics _computeGlobalMetrics(
+    List<StatsCollection> collections,
+  ) {
     if (collections.isEmpty) {
-      return _GlobalMetrics(total: 0, avgWr: 0, avgKda: 0);
+      return HistoryGlobalMetrics(total: 0, avgWr: 0, avgKda: 0);
     }
 
     double totalWr = 0;
@@ -252,14 +252,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
     int countKda = 0;
 
     for (final c in collections) {
-      final stats = c.totalStats ?? c.rankedStats ?? c.classicStats ?? c.brawlStats;
+      final stats =
+          c.totalStats ?? c.rankedStats ?? c.classicStats ?? c.brawlStats;
       if (stats != null) {
-        if (stats.winRate > 0) { totalWr += stats.winRate; countWr++; }
-        if (stats.kda > 0) { totalKda += stats.kda; countKda++; }
+        if (stats.winRate > 0) {
+          totalWr += stats.winRate;
+          countWr++;
+        }
+        if (stats.kda > 0) {
+          totalKda += stats.kda;
+          countKda++;
+        }
       }
     }
 
-    return _GlobalMetrics(
+    return HistoryGlobalMetrics(
       total: collections.length,
       avgWr: countWr > 0 ? totalWr / countWr : 0,
       avgKda: countKda > 0 ? totalKda / countKda : 0,
@@ -294,10 +301,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  void _handleExportImportState(
-    BuildContext context,
-    StatsState state,
-  ) async {
+  void _handleExportImportState(BuildContext context, StatsState state) async {
     if (state is StatsExported) {
       await SharePlus.instance.share(
         ShareParams(
@@ -337,8 +341,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: CustomScrollView(
             controller: _scrollController,
-            keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior.onDrag,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               // ── Hero section (reemplaza AppBar) ──────────────
               BlocBuilder<StatsBloc, StatsState>(
@@ -479,7 +482,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 if (_searchQuery.isEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
@@ -577,17 +582,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
 // ── Helpers internos ──────────────────────────────────────────────
 
-class _GlobalMetrics {
-  final int total;
-  final double avgWr;
-  final double avgKda;
-  const _GlobalMetrics({
-    required this.total,
-    required this.avgWr,
-    required this.avgKda,
-  });
-}
-
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel({required this.label});
   final String label;
@@ -679,7 +673,9 @@ class _HistoryEmptyState extends StatelessWidget {
                   backgroundColor: const Color(0xFF059669),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -695,10 +691,7 @@ class _HistoryEmptyState extends StatelessWidget {
 // ── Error state ───────────────────────────────────────────────────
 
 class _HistoryErrorState extends StatelessWidget {
-  const _HistoryErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _HistoryErrorState({required this.message, required this.onRetry});
   final String message;
   final VoidCallback onRetry;
 
