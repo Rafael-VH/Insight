@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/navigation/domain/entities/navigation_item.dart';
-import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
-import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
 
 /// Drawer lateral con agrupación por secciones y soporte de badges.
 ///
