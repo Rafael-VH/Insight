@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:insight/features/history/presentation/screens/widgets/history_export_import_bottom_sheet.dart';
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
 import 'package:insight/features/stats/presentation/screens/charts/charts_screen.dart';
-import 'package:insight/features/stats/presentation/widgets/export_import_bottom_sheet.dart';
 
 class HistoryOptionsMenu {
   const HistoryOptionsMenu._();
@@ -62,7 +62,8 @@ class HistoryOptionsMenu {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChartsScreen(collection: collection),
+                    builder: (_) =>
+                        ChartsScreen(collection: collection),
                   ),
                 );
               },
@@ -73,7 +74,7 @@ class HistoryOptionsMenu {
               label: 'Exportar / Importar',
               onTap: () {
                 Navigator.pop(bottomSheetContext);
-                ExportImportBottomSheet.show(context);
+                HistoryExportImportBottomSheet.show(context);
               },
             ),
             _OptionTile(
@@ -133,7 +134,8 @@ class _OptionTile extends StatelessWidget {
       ),
       title: Text(
         label,
-        style: TextStyle(color: labelColor ?? colorScheme.onSurface),
+        style:
+            TextStyle(color: labelColor ?? colorScheme.onSurface),
       ),
       onTap: onTap,
     );

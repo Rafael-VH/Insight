@@ -1,24 +1,26 @@
 import 'package:dartz/dartz.dart';
 import 'package:insight/core/errors/failures.dart';
-import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
+import 'package:insight/features/history/domain/repositories/history_repository.dart';
 
 class UpdateStatsCollectionName {
-  final StatsRepository repository;
+  final HistoryRepository repository;
 
   UpdateStatsCollectionName(this.repository);
 
-  Future<Either<Failure, void>> call(UpdateNameParams params) async {
+  Future<Either<Failure, void>> call(UpdateNameParams params) {
     if (params.newName.isEmpty) {
-      return const Left(FileSystemFailure('El nombre no puede estar vacío'));
-    }
-
-    if (params.newName.length > 50) {
-      return const Left(
-        FileSystemFailure('El nombre no puede exceder 50 caracteres'),
+      return Future.value(
+        const Left(FileSystemFailure('El nombre no puede estar vacío')),
       );
     }
-
-    return await repository.updateStatsCollectionName(
+    if (params.newName.length > 50) {
+      return Future.value(
+        const Left(
+          FileSystemFailure('El nombre no puede exceder 50 caracteres'),
+        ),
+      );
+    }
+    return repository.updateStatsCollectionName(
       params.createdAt,
       params.newName,
     );

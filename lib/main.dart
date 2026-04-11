@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart' as di;
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/navigation/presentation/screens/main_screen.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
@@ -11,8 +13,8 @@ import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dar
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
 import 'package:insight/features/settings/presentation/config/theme_config.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 
 void main() {
   // Captura errores de Flutter (widgets, rendering, etc.)
@@ -64,26 +66,33 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // ========== THEME BLOC (DEBE SER PRIMERO) ==========
+        // ── Theme (primero) ──────────────────────────────────
         BlocProvider<ThemeBloc>(
-          create: (context) => di.sl<ThemeBloc>()..add(LoadTheme()),
+          create: (_) => di.sl<ThemeBloc>()..add(LoadTheme()),
         ),
 
-        // ========== SETTINGS BLOC (DEPENDE DE THEME) ==========
+        // ── Settings ─────────────────────────────────────────
         BlocProvider<SettingsBloc>(
-          create: (context) => di.sl<SettingsBloc>()..add(LoadSettings()),
+          create: (_) => di.sl<SettingsBloc>()..add(LoadSettings()),
         ),
 
-        // ========== NAVIGATION BLOC ==========
-        BlocProvider<NavigationBloc>(
-          create: (context) => di.sl<NavigationBloc>(),
+        // ── Navigation ────────────────────────────────────────
+        BlocProvider<NavigationBloc>(create: (_) => di.sl<NavigationBloc>()),
+
+        // ── History ───────────────────────────────────────────
+        // LazySingleton → la misma instancia en toda la app.
+        // Se precarga la lista al iniciar para que la tab de
+        // Historial esté lista sin espera perceptible.
+        BlocProvider<HistoryBloc>(
+          create: (_) =>
+              di.sl<HistoryBloc>()..add(LoadAllStatsCollectionsEvent()),
         ),
 
-        // ========== ML STATS BLOC ==========
-        BlocProvider<StatsBloc>(create: (context) => di.sl<StatsBloc>()),
+        // ── Stats (solo guardado post-OCR) ────────────────────
+        BlocProvider<StatsBloc>(create: (_) => di.sl<StatsBloc>()),
 
-        // ========== OCR BLOC ==========
-        BlocProvider<OcrBloc>(create: (context) => di.sl<OcrBloc>()),
+        // ── OCR ───────────────────────────────────────────────
+        BlocProvider<OcrBloc>(create: (_) => di.sl<OcrBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {

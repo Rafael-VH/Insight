@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
+import 'package:insight/features/history/presentation/bloc/history_state.dart';
 
-/// Bottom sheet de dos pasos para eliminar permanentemente todas las
-/// estadísticas guardadas. El primer paso muestra la advertencia con
-/// estadísticas del impacto; el segundo pide confirmación explícita.
-/// Toda la lógica de eliminación permanece en [StatsBloc].
+/// Bottom sheet de eliminación total desde el módulo Settings.
+///
+/// Migrado para consumir [HistoryBloc] en lugar del antiguo [StatsBloc].
 class SettingsDeleteAllBottomSheet extends StatefulWidget {
   const SettingsDeleteAllBottomSheet({super.key});
 
-  /// Método de conveniencia para mostrar el bottom sheet desde cualquier
-  /// pantalla. Reutiliza el [StatsBloc] del contexto padre.
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
       context: context,
@@ -21,7 +18,7 @@ class SettingsDeleteAllBottomSheet extends StatefulWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
-        value: context.read<StatsBloc>(),
+        value: context.read<HistoryBloc>(),
         child: const SettingsDeleteAllBottomSheet(),
       ),
     );
@@ -34,51 +31,44 @@ class SettingsDeleteAllBottomSheet extends StatefulWidget {
 
 class _SettingsDeleteAllBottomSheetState
     extends State<SettingsDeleteAllBottomSheet> {
-  /// Paso actual: 0 = advertencia, 1 = confirmación final.
   int _step = 0;
   bool _isDeleting = false;
-
-  /// Colecciones actuales para mostrar el impacto.
   int _totalCollections = 0;
   bool _loadingCount = true;
 
   @override
   void initState() {
     super.initState();
-    final state = context.read<StatsBloc>().state;
-    if (state is StatsCollectionsLoaded) {
+    final state = context.read<HistoryBloc>().state;
+    if (state is HistoryCollectionsLoaded) {
       _totalCollections = state.collections.length;
       _loadingCount = false;
     } else {
-      context.read<StatsBloc>().add(LoadAllStatsCollectionsEvent());
+      context.read<HistoryBloc>().add(LoadAllStatsCollectionsEvent());
     }
   }
 
-  // ── Acciones ─────────────────────────────────────────────
-
   void _confirmDelete() {
     setState(() => _isDeleting = true);
-    context.read<StatsBloc>().add(ClearAllStatsEvent());
+    context.read<HistoryBloc>().add(ClearAllStatsEvent());
   }
-
-  // ── Build ────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<StatsBloc, StatsState>(
+    return BlocListener<HistoryBloc, HistoryState>(
       listener: (context, state) {
-        if (state is StatsCollectionsLoaded && _loadingCount) {
+        if (state is HistoryCollectionsLoaded && _loadingCount) {
           setState(() {
             _totalCollections = state.collections.length;
             _loadingCount = false;
           });
         }
 
-        if (state is StatsCleared) {
+        if (state is HistoryCleared) {
           Navigator.of(context, rootNavigator: true).pop();
         }
 
-        if (state is StatsError && _isDeleting) {
+        if (state is HistoryError && _isDeleting) {
           setState(() => _isDeleting = false);
           Navigator.of(context, rootNavigator: true).pop();
         }
@@ -89,7 +79,7 @@ class _SettingsDeleteAllBottomSheetState
     );
   }
 
-  // ── Paso 1: Advertencia ──────────────────────────────────
+  // ── Paso 1: Advertencia ──────────────────────────────────────
 
   Widget _buildWarningStep(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -98,7 +88,8 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -111,8 +102,6 @@ class _SettingsDeleteAllBottomSheetState
         children: [
           _buildHandle(colorScheme),
           const SizedBox(height: 20),
-
-          // Ícono de advertencia
           Container(
             width: 64,
             height: 64,
@@ -127,7 +116,6 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 12),
-
           const Text(
             'Eliminar todo el historial',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -142,16 +130,10 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 24),
-
-          // Tarjeta de impacto
           _buildImpactCard(colorScheme, isDark),
           const SizedBox(height: 24),
-
-          // Sugerencia de exportar primero
           _buildExportSuggestion(colorScheme, isDark),
           const SizedBox(height: 28),
-
-          // Botón continuar al paso 2
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -163,9 +145,8 @@ class _SettingsDeleteAllBottomSheetState
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: colorScheme.onSurface.withValues(
-                  alpha: 0.12,
-                ),
+                disabledBackgroundColor:
+                    colorScheme.onSurface.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -178,7 +159,6 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 12),
-
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
@@ -235,12 +215,14 @@ class _SettingsDeleteAllBottomSheetState
                         'Se eliminarán permanentemente',
                         style: TextStyle(
                           fontSize: 12,
-                          color: colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$_totalCollections colección${_totalCollections == 1 ? '' : 'es'}',
+                        '$_totalCollections colección'
+                        '${_totalCollections == 1 ? '' : 'es'}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -259,12 +241,12 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.07),
+        color: const Color(0xFF059669)
+            .withValues(alpha: isDark ? 0.12 : 0.07),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(
-            0xFF059669,
-          ).withValues(alpha: isDark ? 0.35 : 0.25),
+          color: const Color(0xFF059669)
+              .withValues(alpha: isDark ? 0.35 : 0.25),
         ),
       ),
       child: Row(
@@ -277,7 +259,8 @@ class _SettingsDeleteAllBottomSheetState
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Consejo: Exporta tus estadísticas antes de eliminarlas para poder restaurarlas después.',
+              'Consejo: Exporta tus estadísticas antes de eliminarlas '
+              'para poder restaurarlas después.',
               style: TextStyle(
                 fontSize: 12,
                 height: 1.4,
@@ -290,7 +273,7 @@ class _SettingsDeleteAllBottomSheetState
     );
   }
 
-  // ── Paso 2: Confirmación final ───────────────────────────
+  // ── Paso 2: Confirmación final ───────────────────────────────
 
   Widget _buildConfirmStep(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -299,7 +282,8 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -312,8 +296,6 @@ class _SettingsDeleteAllBottomSheetState
         children: [
           _buildHandle(colorScheme),
           const SizedBox(height: 20),
-
-          // Ícono de peligro
           Container(
             width: 72,
             height: 72,
@@ -332,16 +314,16 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 14),
-
           const Text(
             '¿Estás completamente seguro?',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-
           Text(
-            'Estás a punto de eliminar $_totalCollections colección${_totalCollections == 1 ? '' : 'es'}.\nEsta acción no tiene vuelta atrás.',
+            'Estás a punto de eliminar $_totalCollections '
+            'colección${_totalCollections == 1 ? '' : 'es'}.\n'
+            'Esta acción no tiene vuelta atrás.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -350,8 +332,6 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 32),
-
-          // Botón de confirmación final
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -366,13 +346,14 @@ class _SettingsDeleteAllBottomSheetState
                       ),
                     )
                   : const Icon(Icons.delete_forever_rounded),
-              label: Text(_isDeleting ? 'Eliminando...' : 'Sí, eliminar todo'),
+              label: Text(
+                _isDeleting ? 'Eliminando...' : 'Sí, eliminar todo',
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: colorScheme.onSurface.withValues(
-                  alpha: 0.12,
-                ),
+                disabledBackgroundColor:
+                    colorScheme.onSurface.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -385,22 +366,20 @@ class _SettingsDeleteAllBottomSheetState
             ),
           ),
           const SizedBox(height: 12),
-
-          // Volver al paso anterior
           TextButton.icon(
-            onPressed: _isDeleting ? null : () => setState(() => _step = 0),
+            onPressed:
+                _isDeleting ? null : () => setState(() => _step = 0),
             icon: const Icon(Icons.arrow_back_rounded, size: 18),
             label: const Text('Volver'),
             style: TextButton.styleFrom(
-              foregroundColor: colorScheme.onSurface.withValues(alpha: 0.6),
+              foregroundColor:
+                  colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
       ),
     );
   }
-
-  // ── Helpers ──────────────────────────────────────────────
 
   Widget _buildHandle(ColorScheme colorScheme) {
     return Container(

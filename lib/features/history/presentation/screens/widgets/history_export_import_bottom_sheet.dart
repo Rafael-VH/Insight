@@ -1,12 +1,16 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
+import 'package:insight/features/history/presentation/bloc/history_state.dart';
 
-class ExportImportBottomSheet extends StatefulWidget {
-  const ExportImportBottomSheet({super.key});
+/// Bottom sheet de exportación / importación del módulo History.
+///
+/// Versión migrada de [ExportImportBottomSheet] que consume [HistoryBloc]
+/// en lugar del antiguo [StatsBloc].
+class HistoryExportImportBottomSheet extends StatefulWidget {
+  const HistoryExportImportBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
@@ -16,30 +20,30 @@ class ExportImportBottomSheet extends StatefulWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) => BlocProvider.value(
-        value: context.read<StatsBloc>(),
-        child: const ExportImportBottomSheet(),
+        value: context.read<HistoryBloc>(),
+        child: const HistoryExportImportBottomSheet(),
       ),
     );
   }
 
   @override
-  State<ExportImportBottomSheet> createState() =>
-      _ExportImportBottomSheetState();
+  State<HistoryExportImportBottomSheet> createState() =>
+      _HistoryExportImportBottomSheetState();
 }
 
-class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
+class _HistoryExportImportBottomSheetState
+    extends State<HistoryExportImportBottomSheet> {
   bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<StatsBloc, StatsState>(
+    return BlocListener<HistoryBloc, HistoryState>(
       listener: (context, state) {
-        if (state is StatsExporting || state is StatsImporting) {
+        if (state is HistoryExporting || state is HistoryImporting) {
           if (mounted) setState(() => _isLoading = true);
-        } else if (state is StatsExported ||
-            state is StatsImported ||
-            state is StatsError) {
-          // Cerrar el sheet; HistoryScreen mostrará el resultado
+        } else if (state is HistoryExported ||
+            state is HistoryImported ||
+            state is HistoryError) {
           if (mounted && Navigator.canPop(context)) {
             Navigator.of(context, rootNavigator: true).pop();
           }
@@ -59,7 +63,6 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
 
   Widget _buildLoading() {
     final colorScheme = Theme.of(context).colorScheme;
-
     return SizedBox(
       key: const ValueKey('loading'),
       height: 140,
@@ -86,7 +89,6 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
       key: const ValueKey('content'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Handle bar
         Container(
           width: 40,
           height: 4,
@@ -98,9 +100,10 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
         const SizedBox(height: 20),
         Text(
           'Exportar / Importar',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
@@ -116,8 +119,9 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
           color: const Color(0xFF059669),
           title: 'Exportar estadísticas',
           subtitle: 'Genera un archivo .json para compartir o respaldar',
-          onTap: () =>
-              context.read<StatsBloc>().add(const ExportStatsToJsonEvent()),
+          onTap: () => context
+              .read<HistoryBloc>()
+              .add(const ExportStatsToJsonEvent()),
         ),
         const SizedBox(height: 12),
         _ActionTile(
@@ -152,7 +156,7 @@ class _ExportImportBottomSheetState extends State<ExportImportBottomSheet> {
     if (result == null || result.files.single.path == null) return;
     if (!context.mounted) return;
 
-    context.read<StatsBloc>().add(
+    context.read<HistoryBloc>().add(
       ImportStatsFromJsonEvent(
         filePath: result.files.single.path!,
         mergeWithExisting: merge,

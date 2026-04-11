@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
+import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get_it/get_it.dart';
@@ -35,25 +36,32 @@ import 'package:insight/features/stats/data/datasources/local_storage_datasource
 import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
 import 'package:insight/features/stats/data/datasources/json_export_datasource.dart';
 import 'package:insight/features/stats/data/repositories/ocr_repository_impl.dart';
-import 'package:insight/features/stats/data/repositories/stats_repository_impl.dart';
 
 // ── Stats — Domain ────────────────────────────────────────────────
 import 'package:insight/features/stats/domain/repositories/ocr_repository.dart';
-import 'package:insight/features/stats/domain/repositories/stats_repository.dart';
 import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
 import 'package:insight/features/stats/domain/usecases/copy_text_to_clipboard.dart';
-import 'package:insight/features/stats/domain/usecases/export_stats_to_json.dart';
-import 'package:insight/features/stats/domain/usecases/get_all_stats_collections.dart';
-import 'package:insight/features/stats/domain/usecases/get_latest_stats_collection.dart';
-import 'package:insight/features/stats/domain/usecases/import_stats_from_json.dart';
 import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_text.dart';
-import 'package:insight/features/stats/domain/usecases/save_collections_batch.dart';
 import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
-import 'package:insight/features/stats/domain/usecases/update_stats_collection_name.dart';
 
 // ── Stats — Presentation ──────────────────────────────────────────
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
 import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
+import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
+
+// ── History — Data ────────────────────────────────────────────────
+import 'package:insight/features/history/data/repositories/history_repository_impl.dart';
+
+// ── History — Domain ──────────────────────────────────────────────
+import 'package:insight/features/history/domain/repositories/history_repository.dart';
+import 'package:insight/features/history/domain/usecases/export_stats_to_json.dart';
+import 'package:insight/features/history/domain/usecases/get_all_stats_collections.dart';
+import 'package:insight/features/history/domain/usecases/get_latest_stats_collection.dart';
+import 'package:insight/features/history/domain/usecases/import_stats_from_json.dart';
+import 'package:insight/features/history/domain/usecases/save_collections_batch.dart';
+import 'package:insight/features/history/domain/usecases/update_stats_collection_name.dart';
+
+// ── History — Presentation ────────────────────────────────────────
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 
 // ── Heroes — Data ─────────────────────────────────────────────────
 import 'package:insight/features/heroes/data/datasources/hero_cache_datasource.dart';
@@ -65,14 +73,14 @@ import 'package:insight/features/heroes/domain/repositories/hero_repository.dart
 import 'package:insight/features/heroes/domain/usecases/get_heroes.dart';
 import 'package:insight/features/heroes/domain/usecases/get_hero_detail.dart';
 
-// ── Heroes — Bloc ───────────────────────────────────────────────────
+// ── Heroes — Presentation ──────────────────────────────────────────
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // ================================================================
-  // EXTERNAL — orden importa, cada await puede fallar
+  // EXTERNAL
   // ================================================================
 
   // SharedPreferences primero — es la base de todo
@@ -144,7 +152,8 @@ Future<void> init() async {
   sl.registerFactory(() => SettingsBloc(repository: sl()));
 
   // ================================================================
-  // STATS
+  // SHARED DATA SOURCES
+  // Registrados aquí porque tanto Stats como History los necesitan.
   // ================================================================
 
   // Data
@@ -154,15 +163,20 @@ Future<void> init() async {
   sl.registerLazySingleton<JsonExportDataSource>(
     () => JsonExportDataSourceImpl(),
   );
-  sl.registerLazySingleton<StatsRepository>(
-    () => StatsRepositoryImpl(
+
+  // ================================================================
+  // HISTORY
+  // ================================================================
+
+  // Data
+  sl.registerLazySingleton<HistoryRepository>(
+    () => HistoryRepositoryImpl(
       localDataSource: sl(),
       jsonExportDataSource: sl(),
     ),
   );
 
   // Domain — Use cases
-  sl.registerLazySingleton(() => SaveStatsCollection(sl()));
   sl.registerLazySingleton(() => GetAllStatsCollections(sl()));
   sl.registerLazySingleton(() => GetLatestStatsCollection(sl()));
   sl.registerLazySingleton(() => UpdateStatsCollectionName(sl()));
@@ -171,16 +185,31 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SaveCollectionsBatch(sl()));
 
   // Presentation
-  sl.registerFactory(
-    () => StatsBloc(
-      saveStatsCollection: sl(),
+  // LazySingleton: la lista no se pierde al navegar entre tabs.
+  sl.registerLazySingleton(
+    () => HistoryBloc(
       getAllStatsCollections: sl(),
       getLatestStatsCollection: sl(),
       updateStatsCollectionName: sl(),
-      statsRepository: sl(),
       exportStatsToJson: sl(),
       importStatsFromJson: sl(),
       saveCollectionsBatch: sl(),
+      historyRepository: sl(),
+    ),
+  );
+
+  // ================================================================
+  // STATS
+  // Solo mantiene SaveStatsCollection para el flujo post-OCR.
+  // El resto se movió a History.
+  // ================================================================
+
+  sl.registerLazySingleton(() => SaveStatsCollection(sl<HistoryRepository>()));
+
+  sl.registerFactory(
+    () => StatsBloc(
+      saveStatsCollection: sl(),
+      historyBloc: sl(),
     ),
   );
 

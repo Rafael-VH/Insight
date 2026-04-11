@@ -27,11 +27,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const AppSliverBar(
-            title: 'Configuración',
-            colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
-            icon: Icons.settings,
-          ),
           BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, state) {
               if (state is SettingsLoading) {

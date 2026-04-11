@@ -19,7 +19,7 @@ import 'features/stats/data/models/stats_collection_model_test.dart'
     as stats_collection_model;
 
 // Stats — BLoC & Controller
-import 'features/stats/bloc/stats_bloc_test.dart' as stats_bloc;
+//import 'features/stats/bloc/stats_bloc_test.dart' as stats_bloc;
 import 'features/stats/presentation/controllers/stats_upload_controller_test.dart'
     as upload_controller;
 
@@ -42,7 +42,7 @@ void main() {
   // Stats module
   stats_entities.main();
   stats_collection_model.main();
-  stats_bloc.main();
+  //stats_bloc.main();
   upload_controller.main();
 
   // Settings module

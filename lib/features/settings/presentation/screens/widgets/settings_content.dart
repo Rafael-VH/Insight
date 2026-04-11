@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_state.dart';
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_event.dart';
 import 'package:insight/features/settings/presentation/widgets/theme_selector_widget.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 
 import 'settings_delete_all_bottom_sheet.dart';
 import 'settings_export_bottom_sheet.dart';
@@ -18,7 +18,9 @@ import 'settings_switch_tile.dart';
 import 'settings_theme_mode_selector.dart';
 
 /// Lista completa de configuraciones organizada en secciones.
-/// Recibe [settings] del BLoC padre y delega cada acción al BLoC correspondiente.
+///
+/// Actualizada para escuchar [HistoryBloc] (antes escuchaba [StatsBloc])
+/// en la sección de Datos.
 class SettingsContent extends StatelessWidget {
   const SettingsContent({super.key, required this.settings});
 
@@ -26,18 +28,13 @@ class SettingsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<StatsBloc, StatsState>(
-      // Escuchamos solo los estados relevantes para dar feedback
-      // cuando el usuario opera desde esta pantalla.
+    return BlocListener<HistoryBloc, HistoryState>(
       listenWhen: (_, state) =>
-          state is StatsCleared ||
-          state is StatsImported ||
-          state is StatsError,
+          state is HistoryCleared ||
+          state is HistoryImported ||
+          state is HistoryError,
       listener: (context, state) {
-        // El feedback detallado lo manejan los propios bottom sheets.
-        // Aquí solo actuamos ante errores inesperados que los sheets
-        // no pudieron capturar (p.ej. sheet cerrado antes de recibir el estado).
-        if (state is StatsError) {
+        if (state is HistoryError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -54,7 +51,7 @@ class SettingsContent extends StatelessWidget {
         delegate: SliverChildListDelegate([
           const SizedBox(height: 16),
 
-          // ── Apariencia ──────────────────────────────────────────
+          // ── Apariencia ────────────────────────────────────────
           const SettingsSectionHeader(title: 'Apariencia'),
           const SizedBox(height: 12),
           SettingsThemeModeSelector(currentMode: settings.themeMode),
@@ -93,23 +90,25 @@ class SettingsContent extends StatelessWidget {
 
           const Divider(height: 32),
 
-          // ── General ─────────────────────────────────────────────
+          // ── General ───────────────────────────────────────────
           const SettingsSectionHeader(title: 'General'),
           SettingsSwitchTile(
             icon: Icons.notifications_outlined,
             title: 'Notificaciones',
             subtitle: 'Recibir alertas y recordatorios',
             value: settings.enableNotifications,
-            onChanged: (value) =>
-                context.read<SettingsBloc>().add(UpdateNotifications(value)),
+            onChanged: (value) => context
+                .read<SettingsBloc>()
+                .add(UpdateNotifications(value)),
           ),
           SettingsSwitchTile(
             icon: Icons.vibration,
             title: 'Vibración',
             subtitle: 'Feedback háptico en interacciones',
             value: settings.enableHapticFeedback,
-            onChanged: (value) =>
-                context.read<SettingsBloc>().add(UpdateHapticFeedback(value)),
+            onChanged: (value) => context
+                .read<SettingsBloc>()
+                .add(UpdateHapticFeedback(value)),
           ),
           SettingsSwitchTile(
             icon: Icons.save_outlined,
@@ -122,45 +121,41 @@ class SettingsContent extends StatelessWidget {
           SettingsSwitchTile(
             icon: Icons.chat_bubble_outline,
             title: 'Diálogos Mejorados',
-            subtitle: 'Usar estilo Awesome Snackbar para notificaciones',
+            subtitle:
+                'Usar estilo Awesome Snackbar para notificaciones',
             value: settings.useAwesomeSnackbar,
-            onChanged: (value) =>
-                context.read<SettingsBloc>().add(UpdateAwesomeSnackbar(value)),
+            onChanged: (value) => context
+                .read<SettingsBloc>()
+                .add(UpdateAwesomeSnackbar(value)),
             onPreviewStyle: SettingsStylePreview.show,
           ),
 
           const Divider(height: 32),
 
-          // ── Datos ────────────────────────────────────────────────
-          // Cada tile abre su propio bottom sheet especializado.
-          // La lógica real (StatsBloc, parseo, IO) permanece en el
-          // módulo Stats. Settings solo actúa como punto de entrada visual.
+          // ── Datos ─────────────────────────────────────────────
           const SettingsSectionHeader(title: 'Datos'),
-
-          // Exportar
           SettingsInfoTile(
             icon: Icons.upload_file_rounded,
             title: 'Exportar estadísticas',
             subtitle:
-                'Genera un archivo .json con todo tu historial para respaldar o compartir',
+                'Genera un archivo .json con todo tu historial para '
+                'respaldar o compartir',
             onTap: () => SettingsExportBottomSheet.show(context),
           ),
-
-          // Importar
           SettingsInfoTile(
             icon: Icons.download_rounded,
             title: 'Importar estadísticas',
             subtitle:
-                'Carga estadísticas desde un archivo .json externo, fusionando o reemplazando',
+                'Carga estadísticas desde un archivo .json externo, '
+                'fusionando o reemplazando',
             onTap: () => SettingsImportBottomSheet.show(context),
           ),
-
-          // Eliminar todo — color rojo para indicar acción destructiva
           SettingsInfoTile(
             icon: Icons.delete_sweep_outlined,
             title: 'Eliminar todo el historial',
             subtitle:
-                'Borra permanentemente todas las estadísticas guardadas en la app',
+                'Borra permanentemente todas las estadísticas guardadas '
+                'en la app',
             iconColor: Colors.red,
             titleColor: Colors.red,
             onTap: () => SettingsDeleteAllBottomSheet.show(context),
@@ -168,7 +163,7 @@ class SettingsContent extends StatelessWidget {
 
           const Divider(height: 32),
 
-          // ── Acerca de ────────────────────────────────────────────
+          // ── Acerca de ─────────────────────────────────────────
           const SettingsSectionHeader(title: 'Acerca de'),
           const SettingsInfoTile(
             icon: Icons.info_outline,
@@ -186,7 +181,7 @@ class SettingsContent extends StatelessWidget {
 
           const Divider(height: 32),
 
-          // ── Reset ────────────────────────────────────────────────
+          // ── Reset ─────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(16),
             child: OutlinedButton.icon(

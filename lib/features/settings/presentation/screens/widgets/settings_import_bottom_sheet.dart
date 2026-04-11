@@ -2,20 +2,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
+import 'package:insight/features/history/presentation/bloc/history_state.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 
-/// Bottom sheet flotante que permite al usuario elegir el modo de importación
-/// (fusionar o reemplazar) antes de abrir el selector de archivos .json.
-/// Toda la lógica de parseo y guardado permanece en [StatsBloc].
+/// Bottom sheet de importación desde el módulo Settings.
+///
+/// Migrado para consumir [HistoryBloc] en lugar del antiguo [StatsBloc].
 class SettingsImportBottomSheet extends StatefulWidget {
   const SettingsImportBottomSheet({super.key});
 
-  /// Método de conveniencia para mostrar el bottom sheet desde cualquier
-  /// pantalla. Reutiliza el [StatsBloc] y el [NavigationBloc] del contexto padre.
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
       context: context,
@@ -24,7 +22,7 @@ class SettingsImportBottomSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => MultiBlocProvider(
         providers: [
-          BlocProvider.value(value: context.read<StatsBloc>()),
+          BlocProvider.value(value: context.read<HistoryBloc>()),
           BlocProvider.value(value: context.read<NavigationBloc>()),
         ],
         child: const SettingsImportBottomSheet(),
@@ -37,12 +35,12 @@ class SettingsImportBottomSheet extends StatefulWidget {
       _SettingsImportBottomSheetState();
 }
 
-class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
-  /// Modo seleccionado: true = fusionar, false = reemplazar.
+class _SettingsImportBottomSheetState
+    extends State<SettingsImportBottomSheet> {
   bool _mergeMode = true;
   bool _isImporting = false;
 
-  // ── Acciones ─────────────────────────────────────────────
+  // ── Acciones ─────────────────────────────────────────────────
 
   Future<void> _pickAndImport() async {
     final result = await FilePicker.platform.pickFiles(
@@ -56,7 +54,7 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
 
     setState(() => _isImporting = true);
 
-    context.read<StatsBloc>().add(
+    context.read<HistoryBloc>().add(
       ImportStatsFromJsonEvent(
         filePath: result.files.single.path!,
         mergeWithExisting: _mergeMode,
@@ -64,22 +62,21 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
     );
   }
 
-  // ── Build ────────────────────────────────────────────────
+  // ── Build ────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<StatsBloc, StatsState>(
+    return BlocListener<HistoryBloc, HistoryState>(
       listener: (context, state) {
-        if (state is StatsImported) {
-          // Cerramos el sheet
+        if (state is HistoryImported) {
           Navigator.of(context, rootNavigator: true).pop();
-
-          // Navegamos al Historial (índice 1) para que el usuario
-          // vea inmediatamente las colecciones importadas.
-          context.read<NavigationBloc>().add(const NavigationItemSelected(1));
+          // Navegar al Historial (índice 1)
+          context
+              .read<NavigationBloc>()
+              .add(const NavigationItemSelected(1));
         }
 
-        if (state is StatsError && _isImporting) {
+        if (state is HistoryError && _isImporting) {
           setState(() => _isImporting = false);
           Navigator.of(context, rootNavigator: true).pop();
         }
@@ -95,7 +92,8 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -106,24 +104,17 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle
           _buildHandle(colorScheme),
           const SizedBox(height: 20),
-
-          // Ícono y título
           _buildHeader(isDark),
           const SizedBox(height: 24),
-
-          // Selector de modo
           _buildModeSelector(colorScheme, isDark),
           const SizedBox(height: 28),
-
-          // Botón principal
           _buildImportButton(colorScheme),
           const SizedBox(height: 12),
-
           TextButton(
-            onPressed: _isImporting ? null : () => Navigator.of(context).pop(),
+            onPressed:
+                _isImporting ? null : () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -154,9 +145,8 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(
-              0xFF3B82F6,
-            ).withValues(alpha: isDark ? 0.2 : 0.1),
+            color: const Color(0xFF3B82F6)
+                .withValues(alpha: isDark ? 0.2 : 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -176,9 +166,10 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -218,12 +209,10 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
   }
 
   Widget _buildImportButton(ColorScheme colorScheme) {
-    final color = _mergeMode
-        ? const Color(0xFF3B82F6)
-        : const Color(0xFFDC2626);
-    final label = _mergeMode
-        ? 'Fusionar desde archivo'
-        : 'Reemplazar desde archivo';
+    final color =
+        _mergeMode ? const Color(0xFF3B82F6) : const Color(0xFFDC2626);
+    final label =
+        _mergeMode ? 'Fusionar desde archivo' : 'Reemplazar desde archivo';
 
     return SizedBox(
       width: double.infinity,
@@ -243,21 +232,23 @@ class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: colorScheme.onSurface.withValues(
-            alpha: 0.12,
-          ),
+          disabledBackgroundColor:
+              colorScheme.onSurface.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Widget interno de opción de modo ─────────────────────────────────────────
+// ── Widget interno de opción de modo ─────────────────────────────
 
 class _ModeOption extends StatelessWidget {
   const _ModeOption({
@@ -304,18 +295,16 @@ class _ModeOption extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Ícono
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: selected ? 0.2 : 0.1),
+                color:
+                    color.withValues(alpha: selected ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 22, color: color),
             ),
             const SizedBox(width: 14),
-
-            // Texto
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,7 +314,8 @@ class _ModeOption extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: selected ? color : colorScheme.onSurface,
+                      color:
+                          selected ? color : colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -334,14 +324,13 @@ class _ModeOption extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.4,
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: colorScheme.onSurface
+                          .withValues(alpha: 0.6),
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Radio visual
             const SizedBox(width: 8),
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -356,7 +345,11 @@ class _ModeOption extends StatelessWidget {
                 color: selected ? color : Colors.transparent,
               ),
               child: selected
-                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  ? const Icon(
+                      Icons.check,
+                      size: 12,
+                      color: Colors.white,
+                    )
                   : null,
             ),
           ],

@@ -4,23 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
+import 'package:insight/features/history/presentation/bloc/history_state.dart';
 import 'package:insight/features/stats/data/model/stats_collection_model.dart';
 import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_event.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_state.dart';
 
-/// Bottom sheet flotante que muestra un resumen de las estadísticas
-/// actuales —colecciones totales, fecha más reciente y tamaño estimado
-/// del archivo— y permite exportarlas a un archivo JSON.
+/// Bottom sheet de exportación desde el módulo Settings.
 ///
-/// Toda la lógica de exportación permanece en [StatsBloc]; este widget
-/// solo calcula el tamaño estimado localmente antes de confirmar.
+/// Migrado para consumir [HistoryBloc] en lugar del antiguo [StatsBloc].
 class SettingsExportBottomSheet extends StatefulWidget {
   const SettingsExportBottomSheet({super.key});
 
-  /// Método de conveniencia para mostrar el bottom sheet desde cualquier
-  /// pantalla. Reutiliza el [StatsBloc] del contexto padre.
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
       context: context,
@@ -28,7 +23,7 @@ class SettingsExportBottomSheet extends StatefulWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
-        value: context.read<StatsBloc>(),
+        value: context.read<HistoryBloc>(),
         child: const SettingsExportBottomSheet(),
       ),
     );
@@ -39,30 +34,26 @@ class SettingsExportBottomSheet extends StatefulWidget {
       _SettingsExportBottomSheetState();
 }
 
-class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
+class _SettingsExportBottomSheetState
+    extends State<SettingsExportBottomSheet> {
   List<StatsCollection> _collections = [];
   bool _isLoadingPreview = true;
   bool _isExporting = false;
-
-  /// Tamaño estimado del JSON en bytes, calculado localmente.
-  /// Se computa una sola vez al cargar las colecciones.
   int _estimatedBytes = 0;
 
   @override
   void initState() {
     super.initState();
-    final state = context.read<StatsBloc>().state;
-    if (state is StatsCollectionsLoaded) {
+    final state = context.read<HistoryBloc>().state;
+    if (state is HistoryCollectionsLoaded) {
       _initPreview(state.collections);
     } else {
-      context.read<StatsBloc>().add(LoadAllStatsCollectionsEvent());
+      context.read<HistoryBloc>().add(LoadAllStatsCollectionsEvent());
     }
   }
 
-  // ── Helpers ──────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────
 
-  /// Inicializa el resumen y calcula el tamaño estimado serializando
-  /// las colecciones a JSON en memoria. No escribe ningún archivo.
   void _initPreview(List<StatsCollection> collections) {
     final estimatedBytes = _calculateJsonBytes(collections);
     setState(() {
@@ -72,8 +63,6 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
     });
   }
 
-  /// Serializa las colecciones al mismo formato que usa [StatsRepositoryImpl]
-  /// y devuelve el tamaño en bytes sin tocar el disco.
   int _calculateJsonBytes(List<StatsCollection> collections) {
     try {
       final exportMap = <String, dynamic>{
@@ -85,73 +74,64 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
             .map((c) => StatsCollectionModel.fromEntity(c).toJson())
             .toList(),
       };
-      final jsonString = const JsonEncoder.withIndent('  ').convert(exportMap);
+      final jsonString =
+          const JsonEncoder.withIndent('  ').convert(exportMap);
       return utf8.encode(jsonString).length;
     } catch (_) {
       return 0;
     }
   }
 
-  /// Formatea bytes a una cadena legible: B, KB o MB.
   String _formatSize(int bytes) {
     if (bytes <= 0) return '—';
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) {
-      final kb = (bytes / 1024).toStringAsFixed(1);
-      return '$kb KB';
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
     }
-    final mb = (bytes / (1024 * 1024)).toStringAsFixed(2);
-    return '$mb MB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
 
   String _formatDate(DateTime date) {
     final d = date.day.toString().padLeft(2, '0');
     final m = date.month.toString().padLeft(2, '0');
-    final y = date.year;
-    return '$d/$m/$y';
+    return '$d/$m/${date.year}';
   }
 
   String get _latestDate {
     if (_collections.isEmpty) return '—';
-    // Las colecciones ya llegan ordenadas de más reciente a más antigua.
     return _formatDate(_collections.first.createdAt);
   }
 
-  // ── Acciones ─────────────────────────────────────────────
-
   void _export() {
     setState(() => _isExporting = true);
-    context.read<StatsBloc>().add(
+    context.read<HistoryBloc>().add(
       ExportStatsToJsonEvent(collections: _collections),
     );
   }
 
-  // ── Build ────────────────────────────────────────────────
+  // ── Build ────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<StatsBloc, StatsState>(
+    return BlocListener<HistoryBloc, HistoryState>(
       listener: (context, state) {
-        // Actualizamos el preview si acaba de cargar desde el BLoC.
-        if (state is StatsCollectionsLoaded && _isLoadingPreview) {
+        if (state is HistoryCollectionsLoaded && _isLoadingPreview) {
           _initPreview(state.collections);
         }
 
-        // Exportación completada → abrir menú nativo de compartir y cerrar.
-        if (state is StatsExported) {
+        if (state is HistoryExported) {
           Navigator.of(context, rootNavigator: true).pop();
           SharePlus.instance.share(
             ShareParams(
               files: [XFile(state.filePath)],
-              subject: 'Insight — ${state.totalCollections} colección(es)',
+              subject:
+                  'Insight — ${state.totalCollections} colección(es)',
               text: 'Backup de estadísticas de Mobile Legends',
             ),
           );
         }
 
-        // Error durante exportación → cerrar el sheet (el BlocListener
-        // de SettingsContent mostrará el snackbar de error).
-        if (state is StatsError && _isExporting) {
+        if (state is HistoryError && _isExporting) {
           setState(() => _isExporting = false);
           Navigator.of(context, rootNavigator: true).pop();
         }
@@ -167,7 +147,8 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -182,8 +163,6 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
           const SizedBox(height: 20),
           _buildHeader(context, isDark),
           const SizedBox(height: 24),
-
-          // Resumen informativo con los tres datos solicitados.
           if (_isLoadingPreview)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
@@ -191,12 +170,12 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
             )
           else
             _buildSummaryCard(context, colorScheme, isDark),
-
           const SizedBox(height: 28),
           _buildExportButton(colorScheme),
           const SizedBox(height: 12),
           TextButton(
-            onPressed: _isExporting ? null : () => Navigator.of(context).pop(),
+            onPressed:
+                _isExporting ? null : () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -227,9 +206,8 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(
-              0xFF059669,
-            ).withValues(alpha: isDark ? 0.2 : 0.1),
+            color: const Color(0xFF059669)
+                .withValues(alpha: isDark ? 0.2 : 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -249,9 +227,10 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -273,10 +252,11 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
             ? colorScheme.surfaceContainerHighest
             : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.3),
+        ),
       ),
       child: isEmpty
-          // ── Estado vacío ──────────────────────────────────
           ? Row(
               children: [
                 Icon(
@@ -294,7 +274,6 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
                 ),
               ],
             )
-          // ── Resumen con los tres datos ────────────────────
           : Column(
               children: [
                 _SummaryRow(
@@ -314,9 +293,6 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
                 _SummaryRow(
                   icon: Icons.folder_zip_outlined,
                   label: 'Tamaño estimado del archivo',
-                  // El tamaño real puede diferir ligeramente porque
-                  // StatsRepositoryImpl agrega metadatos de fecha al exportar,
-                  // pero la diferencia es de unos pocos bytes.
                   value: _formatSize(_estimatedBytes),
                   valueColor: const Color(0xFF7C3AED),
                 ),
@@ -352,25 +328,29 @@ class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
                 ),
               )
             : const Icon(Icons.ios_share_rounded),
-        label: Text(_isExporting ? 'Exportando...' : 'Exportar y compartir'),
+        label: Text(
+          _isExporting ? 'Exportando...' : 'Exportar y compartir',
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF059669),
           foregroundColor: Colors.white,
-          disabledBackgroundColor: colorScheme.onSurface.withValues(
-            alpha: 0.12,
-          ),
+          disabledBackgroundColor:
+              colorScheme.onSurface.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
   }
 }
 
-// ── Widget interno de fila de resumen ────────────────────────────────────────
+// ── Widget interno de fila de resumen ────────────────────────────
 
 class _SummaryRow extends StatelessWidget {
   const _SummaryRow({

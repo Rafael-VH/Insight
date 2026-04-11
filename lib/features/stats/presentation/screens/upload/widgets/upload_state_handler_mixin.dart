@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:insight/core/utils/stats_validator.dart';
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
 import 'package:insight/features/stats/domain/entities/game_mode.dart';
@@ -15,24 +17,25 @@ import 'package:insight/features/stats/presentation/utils/game_mode_extensions.d
 import 'package:insight/features/stats/presentation/widgets/validation_result_dialog.dart';
 
 /// Mixin con toda la lógica de manejo de estados de OCR y Stats BLoC.
-/// Se aplica sobre el State de UploadScreen para separar la lógica
-/// de presentación sin duplicar código.
+///
+/// Tras la refactorización:
+/// - [StatsBloc] solo maneja [SaveStatsCollectionEvent] (guardado post-OCR).
+/// - [HistoryBloc] maneja la recarga del historial tras el guardado.
 mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
-  // Subclases deben proveer acceso al controlador y al flag de guardado
   StatsUploadController get uploadController;
   bool get isSaving;
   set isSaving(bool value);
   GameMode? get currentValidatingMode;
   set currentValidatingMode(GameMode? value);
 
-  // ==================== HELPERS ====================
+  // ── Helpers ───────────────────────────────────────────────────
 
   bool get _useAwesome {
     final state = context.read<SettingsBloc>().state;
     return state is SettingsLoaded ? state.settings.useAwesomeSnackbar : true;
   }
 
-  // ==================== OCR HANDLERS ====================
+  // ── OCR Handlers ──────────────────────────────────────────────
 
   void handleOcrState(OcrState state) {
     if (state is OcrSuccess) {
@@ -56,7 +59,8 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
         title: 'Error Interno',
         message: 'No se pudo determinar el modo de juego',
         errorDetails:
-            'Por favor, intenta nuevamente. Si el problema persiste, reinicia la aplicación.',
+            'Por favor, intenta nuevamente. Si el problema persiste, '
+            'reinicia la aplicación.',
         useAwesome: _useAwesome,
       );
       return;
@@ -74,10 +78,12 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
         context,
         title: 'Error en Extracción',
         message:
-            'No se pudieron extraer las estadísticas completas para ${mode.fullDisplayName}.',
+            'No se pudieron extraer las estadísticas completas para '
+            '${mode.fullDisplayName}.',
         errorDetails:
-            'Verifica que la imagen muestre claramente todas las estadísticas. '
-            'Intenta capturar la pantalla con buena iluminación.',
+            'Verifica que la imagen muestre claramente todas las '
+            'estadísticas. Intenta capturar la pantalla con buena '
+            'iluminación.',
         useAwesome: _useAwesome,
         onRetry: () => retryImageCapture(mode),
       );
@@ -95,16 +101,19 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
       title = 'No se Detectó Texto';
       message = 'La imagen no contiene texto legible';
       suggestion =
-          'Asegúrate de que la captura sea clara y que las estadísticas sean visibles';
+          'Asegúrate de que la captura sea clara y que las '
+          'estadísticas sean visibles';
     } else if (state.message.toLowerCase().contains('pick') ||
         state.message.toLowerCase().contains('image')) {
       title = 'Error al Seleccionar Imagen';
       message = 'No se pudo acceder a la imagen';
-      suggestion = 'Verifica los permisos de la aplicación en Configuración';
+      suggestion =
+          'Verifica los permisos de la aplicación en Configuración';
     } else if (state.message.toLowerCase().contains('permission')) {
       title = 'Permisos Requeridos';
       message =
-          'La aplicación necesita permisos para acceder a la cámara o galería';
+          'La aplicación necesita permisos para acceder a la cámara '
+          'o galería';
       suggestion =
           'Ve a Configuración > Aplicaciones > ML Stats OCR > Permisos';
     }
@@ -118,15 +127,14 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     );
   }
 
-  // ==================== STATS BLOC HANDLERS ====================
+  // ── Stats BLoC Handlers ───────────────────────────────────────
 
   void handleStatsState(StatsState state) {
     if (state is StatsSaving) {
       _handleSavingState();
     } else {
-      if (isSaving) {
-        setState(() => isSaving = false);
-      }
+      if (isSaving) setState(() => isSaving = false);
+
       if (state is StatsSaved) {
         _handleSuccessfulSave(state);
       } else if (state is StatsError) {
@@ -153,7 +161,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
       context,
       message: state.message,
       useAwesome: _useAwesome,
-      onClose: () => _navigateBackToHome(),
+      onClose: _navigateBackToHome,
     );
   }
 
@@ -185,7 +193,8 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
   void _navigateBackToHome() {
     if (!mounted) return;
     Navigator.of(context).pop();
-    context.read<StatsBloc>().add(LoadAllStatsCollectionsEvent());
+    // Recargar el historial tras guardar
+    context.read<HistoryBloc>().add(LoadAllStatsCollectionsEvent());
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
@@ -193,7 +202,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     });
   }
 
-  // ==================== ACCIONES PÚBLICAS ====================
+  // ── Acciones públicas ─────────────────────────────────────────
 
   Future<void> saveStats() async {
     if (isSaving) {
@@ -216,7 +225,9 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     await Future.delayed(const Duration(milliseconds: 100));
 
     if (mounted) {
-      context.read<StatsBloc>().add(SaveStatsCollectionEvent(collection));
+      context
+          .read<StatsBloc>()
+          .add(SaveStatsCollectionEvent(collection));
     }
   }
 
@@ -239,7 +250,9 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
               uploadController.getSuccessMessage(currentValidatingMode!),
             );
           } else {
-            _showWarning('Estadísticas guardadas con datos incompletos');
+            _showWarning(
+              'Estadísticas guardadas con datos incompletos',
+            );
           }
         }
       },
@@ -254,7 +267,11 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
 
   void _showSuccess(String message) {
     if (_useAwesome) {
-      DialogService.showSuccess(context, message: message, useAwesome: true);
+      DialogService.showSuccess(
+        context,
+        message: message,
+        useAwesome: true,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

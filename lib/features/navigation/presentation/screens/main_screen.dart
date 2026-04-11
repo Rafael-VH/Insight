@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 import 'package:insight/features/heroes/presentation/screens/hero_list_screen.dart';
+import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
+import 'package:insight/features/history/presentation/screens/history_screen.dart';
 import 'package:insight/features/navigation/domain/entities/navigation_item.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_state.dart';
 import 'package:insight/features/settings/presentation/screens/settings_screen.dart';
-import 'package:insight/features/stats/presentation/screens/history/history_screen.dart';
 import 'package:insight/features/stats/presentation/screens/home/home_screen.dart';
 
 import 'widgets/main_back_handler.dart';
@@ -47,7 +48,7 @@ class _MainScreenState extends State<MainScreen>
 
   void _initializeNavigationItems() {
     _navigationItems = [
-      // ── Sección: General ──────────────────────────────────────
+      // ── General ──────────────────────────────────────────────
       NavigationItem(
         id: 'home',
         title: 'Inicio',
@@ -61,11 +62,17 @@ class _MainScreenState extends State<MainScreen>
         title: 'Historial',
         icon: Icons.history_rounded,
         color: const Color(0xFF059669),
-        page: const HistoryScreen(),
+        // HistoryBloc ya está en el árbol de widgets desde main.dart.
+        // BlocProvider.value lo hace disponible para HistoryScreen y
+        // todos sus hijos (bottom sheets, diálogos, etc.).
+        page: BlocProvider.value(
+          value: sl<HistoryBloc>(),
+          child: const HistoryScreen(),
+        ),
         section: 'General',
       ),
 
-      // ── Sección: Enciclopedia ─────────────────────────────────
+      // ── Enciclopedia ──────────────────────────────────────────
       NavigationItem(
         id: 'heroes',
         title: 'Héroes',
@@ -83,7 +90,10 @@ class _MainScreenState extends State<MainScreen>
         title: 'Ítems',
         icon: Icons.shield_rounded,
         color: const Color(0xFF7C3AED),
-        page: const _PlaceholderPage(title: 'Ítems', icon: Icons.shield_rounded),
+        page: const _PlaceholderPage(
+          title: 'Ítems',
+          icon: Icons.shield_rounded,
+        ),
         section: 'Enciclopedia',
         badge: 'Pronto',
       ),
@@ -112,13 +122,19 @@ class _MainScreenState extends State<MainScreen>
         badge: 'Pronto',
       ),
 
-      // ── Sección: App ──────────────────────────────────────────
+      // ── App ───────────────────────────────────────────────────
       NavigationItem(
         id: 'settings',
         title: 'Configuración',
         icon: Icons.settings_rounded,
         color: const Color(0xFF6B7280),
-        page: const SettingsScreen(),
+        // SettingsScreen necesita HistoryBloc para los bottom sheets
+        // de exportar, importar y eliminar. Se propaga con .value
+        // para reutilizar la misma instancia del árbol raíz.
+        page: BlocProvider.value(
+          value: sl<HistoryBloc>(),
+          child: const SettingsScreen(),
+        ),
         section: 'App',
       ),
     ];
@@ -138,7 +154,7 @@ class _MainScreenState extends State<MainScreen>
     _animationController.forward();
   }
 
-  // ── Acciones ─────────────────────────────────────────────────
+  // ── Acciones ──────────────────────────────────────────────────
 
   void _handleTabChange(int index) {
     _animationController.reverse().then((_) {
@@ -217,7 +233,10 @@ class _MainScreenState extends State<MainScreen>
           const SizedBox(width: 10),
           Text(
             item.title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
           ),
         ],
       ),
@@ -241,8 +260,6 @@ class _MainScreenState extends State<MainScreen>
 }
 
 // ── Página placeholder ────────────────────────────────────────────
-// Se usa para las secciones que aún no están implementadas.
-// Eliminar y reemplazar con las pantallas reales cuando estén listas.
 
 class _PlaceholderPage extends StatelessWidget {
   const _PlaceholderPage({required this.title, required this.icon});
