@@ -14,7 +14,6 @@ import 'package:insight/features/stats/presentation/controllers/stats_upload_con
 
 import 'widgets/upload_app_bar.dart';
 import 'widgets/upload_image_card_with_overlay.dart';
-import 'widgets/upload_save_button.dart';
 import 'widgets/upload_state_handler_mixin.dart';
 import 'widgets/upload_stats_section.dart';
 import 'widgets/upload_validation_summary_dialog.dart';
@@ -50,8 +49,7 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
   @override
   set currentValidatingMode(GameMode? value) => setState(() => _currentValidatingMode = value);
 
-  // ── Paso actual de la barra de progreso ───────────────────────
-  // 0 = sin nada · 1 = imagen(s) cargada(s) · 2 = stats extraídas
+  /// 0 = sin nada · 1 = imagen(s) cargada(s) · 2 = stats extraídas
   int get _currentStep {
     if (_controller.hasAnyParsedStats) return 2;
     final anyImage = _controller.availableModes.any((m) => _controller.uploadedImages[m] != null);
@@ -92,6 +90,9 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<OcrBloc, OcrState>(
       listener: (_, state) => handleOcrState(state),
       child: BlocListener<StatsBloc, StatsState>(
@@ -104,17 +105,34 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
             onShowSummary: _showValidationSummary,
           ),
           body: ListenableBuilder(listenable: _controller, builder: (_, __) => _buildBody()),
-          // ── Botón de guardar fijo en el bottom ────────────
-          bottomNavigationBar: _controller.hasAnyParsedStats ? _buildBottomBar() : null,
+          // ── FAB de guardar ────────────────────────────────────
+          floatingActionButton: ListenableBuilder(
+            listenable: _controller,
+            builder: (_, __) {
+              if (!_controller.hasAnyParsedStats) return const SizedBox.shrink();
+              return _SaveFab(
+                isSaving: _isSaving,
+                hasInvalidStats: _controller.hasInvalidStats(),
+                onSave: saveStats,
+                colorScheme: colorScheme,
+                isDark: isDark,
+              );
+            },
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         ),
       ),
     );
   }
 
   Widget _buildBody() {
+    // Padding inferior extra cuando el FAB está visible, para que el
+    // contenido no quede debajo del botón flotante.
+    final bottomPadding = _controller.hasAnyParsedStats ? 88.0 : 24.0;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -128,8 +146,6 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
               parsedStats: _controller.parsedStats,
               hasInvalidStats: _controller.hasInvalidStats(),
             ),
-            // Espacio para el bottomBar
-            const SizedBox(height: 16),
           ],
         ],
       ),
@@ -160,21 +176,100 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
       );
     }).toList();
   }
+}
 
-  Widget _buildBottomBar() {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+// ══════════════════════════════════════════════════════════════════
+// FAB de guardar
+// ══════════════════════════════════════════════════════════════════
+
+class _SaveFab extends StatelessWidget {
+  const _SaveFab({
+    required this.isSaving,
+    required this.hasInvalidStats,
+    required this.onSave,
+    required this.colorScheme,
+    required this.isDark,
+  });
+
+  final bool isSaving;
+  final bool hasInvalidStats;
+  final VoidCallback onSave;
+  final ColorScheme colorScheme;
+  final bool isDark;
+
+  Color get _bgColor {
+    if (isSaving) return colorScheme.onSurface.withValues(alpha: 0.12);
+    if (hasInvalidStats) return Colors.orange;
+    return const Color(0xFF059669);
+  }
+
+  String get _label {
+    if (isSaving) return 'Guardando…';
+    if (hasInvalidStats) return 'Guardar con datos incompletos';
+    return 'Guardar estadísticas';
+  }
+
+  IconData get _icon {
+    if (hasInvalidStats) return Icons.save_outlined;
+    return Icons.check_circle_outline_rounded;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      // Margen horizontal para que el FAB no llegue a los bordes
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 54,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
-          ),
+          color: _bgColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isSaving
+              ? null
+              : [
+                  BoxShadow(
+                    color: _bgColor.withValues(alpha: 0.45),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
-        child: UploadSaveButton(
-          isSaving: _isSaving,
-          hasInvalidStats: _controller.hasInvalidStats(),
-          onSave: saveStats,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            onTap: isSaving ? null : onSave,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isSaving)
+                    SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    )
+                  else
+                    Icon(_icon, color: Colors.white, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    _label,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isSaving ? colorScheme.onSurface.withValues(alpha: 0.4) : Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

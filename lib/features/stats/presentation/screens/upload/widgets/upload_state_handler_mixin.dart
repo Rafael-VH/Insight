@@ -19,16 +19,12 @@ import 'package:insight/features/stats/presentation/widgets/validation_result_di
 
 /// Mixin con toda la lógica de manejo de estados de OCR y Stats BLoC.
 ///
-/// Comportamiento corregido:
-/// - [autoSaveStats] = true  → guarda automáticamente al aceptar la
-///   validación, pero NO navega fuera; el usuario sigue en la pantalla
-///   para poder cargar más modos de juego.
-/// - [autoSaveStats] = false → nunca guarda automáticamente; el usuario
-///   debe pulsar el botón "Guardar estadísticas" explícitamente.
-/// - El botón de guardar siempre está disponible mientras haya al menos
-///   una stat procesada, independientemente de [autoSaveStats].
-/// - Navegar de vuelta al historial ocurre únicamente cuando el usuario
-///   pulsa el botón de guardar y el guardado es exitoso.
+/// Comportamiento:
+/// - El auto-guardado ha sido **eliminado**. El guardado solo ocurre cuando
+///   el usuario pulsa explícitamente el botón "Guardar estadísticas".
+/// - Al aceptar el diálogo de validación, solo se muestra feedback visual.
+/// - La navegación de vuelta al historial ocurre únicamente cuando el
+///   guardado explícito es exitoso.
 mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
   StatsUploadController get uploadController;
   bool get isSaving;
@@ -38,17 +34,12 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
 
   // ── Helpers de configuración ───────────────────────────────────
 
-  /// Lee la configuración actual de forma segura.
   AppSettings? get _currentSettings {
     final state = context.read<SettingsBloc>().state;
     return state is SettingsLoaded ? state.settings : null;
   }
 
   bool get _useAwesome => _currentSettings?.useAwesomeSnackbar ?? true;
-
-  /// Determina si se debe guardar automáticamente al aceptar
-  /// el diálogo de validación.
-  bool get _autoSave => _currentSettings?.autoSaveStats ?? true;
 
   // ── OCR Handlers ───────────────────────────────────────────────
 
@@ -82,7 +73,6 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     }
 
     if (result.hasValidStats && result.validation != null) {
-      // Pequeño delay para que el widget de imagen termine de renderizar
       Future.delayed(const Duration(milliseconds: 300), () {
         if (mounted) {
           currentValidatingMode = mode;
@@ -166,7 +156,8 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     );
   }
 
-  /// Guardado exitoso — cierra el loading, muestra éxito y navega de vuelta. Solo se llega aquí cuando el usuario pulsó "Guardar".
+  /// Guardado exitoso — cierra el loading, muestra éxito y navega de vuelta.
+  /// Solo se llega aquí cuando el usuario pulsó "Guardar".
   void _handleSuccessfulSave(StatsSaved state) async {
     await _safelyCloseLoadingDialog();
     if (!mounted) return;
@@ -205,11 +196,9 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Navega de vuelta solo después de que el usuario pulsa "Guardar"
-  /// y el guardado es exitoso. NO se llama desde el diálogo de
-  /// validación automática.
+  /// y el guardado es exitoso.
   void _navigateBackAfterSave() {
     if (!mounted) return;
-    // Recargar historial y volver una sola pantalla atrás
     context.read<HistoryBloc>().add(LoadAllStatsCollectionsEvent());
     Navigator.of(context).pop();
   }
@@ -244,13 +233,8 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
 
   /// Muestra el diálogo de validación tras procesar una imagen.
   ///
-  /// Si [autoSaveStats] está activado en Settings, al aceptar el
-  /// diálogo se guarda automáticamente en segundo plano y se muestra
-  /// un snackbar — pero NO se navega fuera de la pantalla, permitiendo
-  /// al usuario cargar los demás modos de juego.
-  ///
-  /// Si [autoSaveStats] está desactivado, al aceptar solo se muestra
-  /// confirmación visual; el guardado real ocurre con el botón.
+  /// Al aceptar el diálogo, solo se muestra confirmación visual.
+  /// El guardado real ocurre únicamente con el botón explícito.
   void showValidationDialog(ValidationResult validation, GameMode? mode) {
     if (mode != null) currentValidatingMode = mode;
 
@@ -267,43 +251,24 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     );
   }
 
-  /// Lógica al aceptar el diálogo de validación.
-  ///
-  /// - Siempre muestra feedback visual del resultado de la extracción.
-  /// - Si autoSave está activo, guarda en segundo plano SIN navegar.
-  /// - Si autoSave está inactivo, solo muestra el feedback.
+  /// Al aceptar el diálogo de validación, solo muestra feedback visual.
+  /// No guarda ni navega automáticamente.
   void _onValidationAccepted(ValidationResult validation, GameMode? mode) {
     final modeName = mode?.fullDisplayName ?? 'el modo seleccionado';
 
     if (validation.isValid) {
-      _showSuccess('✓ Estadísticas de $modeName listas para guardar.');
+      _showSuccess('✓ Estadísticas de $modeName listas. Pulsa Guardar cuando estés listo.');
     } else {
-      _showWarning('Estadísticas de $modeName guardadas con datos incompletos.');
+      _showWarning(
+        'Estadísticas de $modeName incompletas. Puedes guardar igualmente o reintentar.',
+      );
     }
-
-    // Auto-guardado en segundo plano: guarda pero NO navega.
-    // La navegación solo ocurre con el botón explícito.
-    if (_autoSave && mounted) {
-      _autoSaveInBackground();
-    }
-  }
-
-  /// Guarda en segundo plano sin afectar la navegación.
-  /// El usuario sigue en la pantalla de upload para poder
-  /// cargar los demás modos de juego.
-  void _autoSaveInBackground() {
-    final collection = uploadController.createCollection();
-    if (!collection.hasAnyStats) return;
-
-    // Usamos el BLoC directamente sin esperar el estado de "saving"
-    // para no bloquear la UI ni mostrar el loading dialog.
-    context.read<StatsBloc>().add(SaveStatsCollectionEvent(collection));
   }
 
   void retryImageCapture(GameMode mode) {
     uploadController.removeStats(mode);
     currentValidatingMode = null;
-    _showSuccess('Imagen eliminada. Vuelve a capturar para $mode.');
+    _showSuccess('Imagen eliminada. Vuelve a capturar para ${mode.fullDisplayName}.');
   }
 
   // ── Helpers de feedback ────────────────────────────────────────
