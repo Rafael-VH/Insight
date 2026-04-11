@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart' as di;
+import 'package:insight/core/presentation/splash/splash_screen.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.dart';
@@ -107,7 +108,7 @@ class MyApp extends StatelessWidget {
               theme: ThemeData.light(useMaterial3: true),
               darkTheme: ThemeData.dark(useMaterial3: true),
               themeMode: ThemeMode.system,
-              home: const MainScreen(),
+              home: const SplashScreen(),
             );
           }
 
@@ -118,7 +119,7 @@ class MyApp extends StatelessWidget {
               theme: ThemeConfig.buildLightTheme(themeState.currentTheme),
               darkTheme: ThemeConfig.buildDarkTheme(themeState.currentTheme),
               themeMode: themeState.themeMode.flutterThemeMode,
-              home: const MainScreen(),
+              home: const SplashScreen(),
             );
           }
 
