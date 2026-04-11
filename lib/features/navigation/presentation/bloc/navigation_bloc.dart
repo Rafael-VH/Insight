@@ -9,25 +9,20 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
   final List<int> _history = [0];
   final Map<int, String?> _badges = {};
 
-  NavigationBloc({this.totalDestinations = 3})
-    : super(const NavigationInitial()) {
+  NavigationBloc({this.totalDestinations = 3}) : super(const NavigationInitial()) {
     on<NavigationItemSelected>(_onNavigationItemSelected);
     on<NavigationReset>(_onNavigationReset);
     on<NavigateBack>(_onNavigateBack);
     on<UpdateNavigationBadge>(_onUpdateNavigationBadge);
   }
 
-  void _onNavigationItemSelected(
-    NavigationItemSelected event,
-    Emitter<NavigationState> emit,
-  ) {
+  void _onNavigationItemSelected(NavigationItemSelected event, Emitter<NavigationState> emit) {
     if (event.index < 0 || event.index >= totalDestinations) {
       emit(
         NavigationError(
           currentIndex: state.currentIndex,
           message: 'Índice de navegación inválido: ${event.index}',
-          errorDetails:
-              'El índice debe estar entre 0 y ${totalDestinations - 1}',
+          errorDetails: 'El índice debe estar entre 0 y ${totalDestinations - 1}',
         ),
       );
       return;
@@ -50,10 +45,7 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     emit(NavigationChanged(event.index, previousIndex: previousIndex));
   }
 
-  void _onNavigationReset(
-    NavigationReset event,
-    Emitter<NavigationState> emit,
-  ) {
+  void _onNavigationReset(NavigationReset event, Emitter<NavigationState> emit) {
     _history.clear();
     _history.add(0);
     _badges.clear();
@@ -72,10 +64,7 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     }
   }
 
-  void _onUpdateNavigationBadge(
-    UpdateNavigationBadge event,
-    Emitter<NavigationState> emit,
-  ) {
+  void _onUpdateNavigationBadge(UpdateNavigationBadge event, Emitter<NavigationState> emit) {
     if (event.index < 0 || event.index >= totalDestinations) {
       emit(
         NavigationError(

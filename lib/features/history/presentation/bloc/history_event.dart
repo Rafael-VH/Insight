@@ -40,10 +40,7 @@ class UpdateStatsCollectionNameEvent extends HistoryEvent {
   final DateTime createdAt;
   final String newName;
 
-  const UpdateStatsCollectionNameEvent({
-    required this.createdAt,
-    required this.newName,
-  });
+  const UpdateStatsCollectionNameEvent({required this.createdAt, required this.newName});
 
   @override
   List<Object> get props => [createdAt, newName];
@@ -65,10 +62,7 @@ class ImportStatsFromJsonEvent extends HistoryEvent {
   final String filePath;
   final bool mergeWithExisting;
 
-  const ImportStatsFromJsonEvent({
-    required this.filePath,
-    this.mergeWithExisting = true,
-  });
+  const ImportStatsFromJsonEvent({required this.filePath, this.mergeWithExisting = true});
 
   @override
   List<Object> get props => [filePath, mergeWithExisting];

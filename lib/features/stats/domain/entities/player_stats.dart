@@ -110,8 +110,7 @@ class PlayerStats {
       maxDamageTaken: maxDamageTaken ?? this.maxDamageTaken,
       maxGold: maxGold ?? this.maxGold,
       kda: kda ?? this.kda,
-      teamFightParticipation:
-          teamFightParticipation ?? this.teamFightParticipation,
+      teamFightParticipation: teamFightParticipation ?? this.teamFightParticipation,
       goldPerMin: goldPerMin ?? this.goldPerMin,
       heroDamagePerMin: heroDamagePerMin ?? this.heroDamagePerMin,
       deathsPerGame: deathsPerGame ?? this.deathsPerGame,
@@ -169,10 +168,7 @@ class PlayerStats {
 
   factory PlayerStats.fromJson(Map<String, dynamic> json) {
     return PlayerStats(
-      mode: GameMode.values.firstWhere(
-        (e) => e.name == json['mode'],
-        orElse: () => GameMode.total,
-      ),
+      mode: GameMode.values.firstWhere((e) => e.name == json['mode'], orElse: () => GameMode.total),
       totalGames: _toInt(json['totalGames']),
       winRate: _toDouble(json['winRate']),
       mvpCount: _toInt(json['mvpCount']),

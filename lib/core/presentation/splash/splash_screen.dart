@@ -12,8 +12,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   // ── Controladores ─────────────────────────────────────────────
   late final AnimationController _particleController;
   late final AnimationController _iconController;
@@ -68,37 +67,23 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _initAnimations() {
     // Partículas — loop infinito
-    _particleController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
+    _particleController = AnimationController(vsync: this, duration: const Duration(seconds: 8))
+      ..repeat();
 
     // Ícono — 900ms
-    _iconController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
+    _iconController = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
 
     _iconScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(
-          begin: 0.0,
-          end: 1.15,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: 0.0, end: 1.15).chain(CurveTween(curve: Curves.easeOut)),
         weight: 60,
       ),
       TweenSequenceItem(
-        tween: Tween(
-          begin: 1.15,
-          end: 0.95,
-        ).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(begin: 1.15, end: 0.95).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 20,
       ),
       TweenSequenceItem(
-        tween: Tween(
-          begin: 0.95,
-          end: 1.0,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: 0.95, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
         weight: 20,
       ),
     ]).animate(_iconController);
@@ -112,17 +97,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _iconGlow = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(
-          begin: 0.0,
-          end: 1.0,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween(
-          begin: 1.0,
-          end: 0.4,
-        ).chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(begin: 1.0, end: 0.4).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_iconController);
@@ -155,10 +134,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     // Salida — 500ms
-    _exitController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
+    _exitController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
 
     _exitFade = Tween<double>(
       begin: 1.0,
@@ -280,10 +256,7 @@ class _SplashScreenState extends State<SplashScreen>
         gradient: RadialGradient(
           center: Alignment.center,
           radius: 1.2,
-          colors: [
-            Colors.transparent,
-            const Color(0xFF0A0C10).withValues(alpha: 0.7),
-          ],
+          colors: [Colors.transparent, const Color(0xFF0A0C10).withValues(alpha: 0.7)],
           stops: const [0.4, 1.0],
         ),
       ),
@@ -303,10 +276,7 @@ class _SplashScreenState extends State<SplashScreen>
           decoration: BoxDecoration(
             color: _accentColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: _accentColor.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
+            border: Border.all(color: _accentColor.withValues(alpha: 0.4), width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: _accentColor.withValues(alpha: 0.35 * _iconGlow.value),
@@ -339,12 +309,7 @@ class _SplashScreenState extends State<SplashScreen>
               fontWeight: FontWeight.w800,
               color: Colors.white,
               letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: _accentColor.withValues(alpha: 0.6),
-                  blurRadius: 12,
-                ),
-              ],
+              shadows: [Shadow(color: _accentColor.withValues(alpha: 0.6), blurRadius: 12)],
             ),
           ),
           // Letras todavía invisibles (mantienen el espacio)
@@ -358,8 +323,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
           // Cursor parpadeante mientras escribe
-          if (visibleChars < _appTitle.length)
-            _BlinkingCursor(color: _accentColor),
+          if (visibleChars < _appTitle.length) _BlinkingCursor(color: _accentColor),
         ],
       ),
     );
@@ -393,18 +357,15 @@ class _BlinkingCursor extends StatefulWidget {
   State<_BlinkingCursor> createState() => _BlinkingCursorState();
 }
 
-class _BlinkingCursorState extends State<_BlinkingCursor>
-    with SingleTickerProviderStateMixin {
+class _BlinkingCursorState extends State<_BlinkingCursor> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 450),
-    )..repeat(reverse: true);
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 450))
+      ..repeat(reverse: true);
     _fade = Tween<double>(begin: 0.0, end: 1.0).animate(_ctrl);
   }
 
@@ -422,10 +383,7 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
         width: 3,
         height: 38,
         margin: const EdgeInsets.only(left: 4, bottom: 2),
-        decoration: BoxDecoration(
-          color: widget.color,
-          borderRadius: BorderRadius.circular(2),
-        ),
+        decoration: BoxDecoration(color: widget.color, borderRadius: BorderRadius.circular(2)),
       ),
     );
   }

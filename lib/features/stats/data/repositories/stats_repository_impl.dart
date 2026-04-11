@@ -13,15 +13,10 @@ class StatsRepositoryImpl implements StatsRepository {
   final LocalStorageDataSource localDataSource;
   final JsonExportDataSource jsonExportDataSource;
 
-  StatsRepositoryImpl({
-    required this.localDataSource,
-    required this.jsonExportDataSource,
-  });
+  StatsRepositoryImpl({required this.localDataSource, required this.jsonExportDataSource});
 
   @override
-  Future<Either<Failure, void>> saveStatsCollection(
-    StatsCollection collection,
-  ) async {
+  Future<Either<Failure, void>> saveStatsCollection(StatsCollection collection) async {
     try {
       await localDataSource.saveStatsCollection(collection);
       return const Right(null);
@@ -33,8 +28,7 @@ class StatsRepositoryImpl implements StatsRepository {
   }
 
   @override
-  Future<Either<Failure, List<StatsCollection>>>
-  getAllStatsCollections() async {
+  Future<Either<Failure, List<StatsCollection>>> getAllStatsCollections() async {
     try {
       final collections = await localDataSource.getAllStatsCollections();
       return Right(collections);
@@ -58,9 +52,7 @@ class StatsRepositoryImpl implements StatsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteStatsCollection(
-    DateTime createdAt,
-  ) async {
+  Future<Either<Failure, void>> deleteStatsCollection(DateTime createdAt) async {
     try {
       await localDataSource.deleteStatsCollection(createdAt);
       return const Right(null);
@@ -99,13 +91,9 @@ class StatsRepositoryImpl implements StatsRepository {
   }
 
   @override
-  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(
-    DateTime createdAt,
-  ) async {
+  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(DateTime createdAt) async {
     try {
-      final collection = await localDataSource.getStatsCollectionByDate(
-        createdAt,
-      );
+      final collection = await localDataSource.getStatsCollectionByDate(createdAt);
       return Right(collection);
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
@@ -115,14 +103,10 @@ class StatsRepositoryImpl implements StatsRepository {
   }
 
   @override
-  Future<Either<Failure, String>> exportStatsToJson(
-    List<StatsCollection> collections,
-  ) async {
+  Future<Either<Failure, String>> exportStatsToJson(List<StatsCollection> collections) async {
     try {
       if (collections.isEmpty) {
-        return const Left(
-          FileSystemFailure('No hay colecciones para exportar'),
-        );
+        return const Left(FileSystemFailure('No hay colecciones para exportar'));
       }
 
       final exportMap = <String, dynamic>{
@@ -130,9 +114,7 @@ class StatsRepositoryImpl implements StatsRepository {
         'app': 'Insight',
         'exportedAt': DateTime.now().toUtc().toIso8601String(),
         'totalCollections': collections.length,
-        'collections': collections
-            .map((c) => StatsCollectionModel.fromEntity(c).toJson())
-            .toList(),
+        'collections': collections.map((c) => StatsCollectionModel.fromEntity(c).toJson()).toList(),
       };
 
       final jsonString = const JsonEncoder.withIndent('  ').convert(exportMap);
@@ -142,10 +124,7 @@ class StatsRepositoryImpl implements StatsRepository {
           'ml_stats_${now.year}${_pad(now.month)}${_pad(now.day)}'
           '_${_pad(now.hour)}${_pad(now.minute)}${_pad(now.second)}.json';
 
-      final filePath = await jsonExportDataSource.writeJsonFile(
-        fileName,
-        jsonString,
-      );
+      final filePath = await jsonExportDataSource.writeJsonFile(fileName, jsonString);
 
       return Right(filePath);
     } on FileSystemException catch (e) {
@@ -156,17 +135,13 @@ class StatsRepositoryImpl implements StatsRepository {
   }
 
   @override
-  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(
-    String filePath,
-  ) async {
+  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(String filePath) async {
     try {
       final jsonString = await jsonExportDataSource.readJsonFile(filePath);
 
       final dynamic decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) {
-        return const Left(
-          ParseFailure('El archivo no tiene el formato esperado'),
-        );
+        return const Left(ParseFailure('El archivo no tiene el formato esperado'));
       }
 
       final version = decoded['version'] as String?;
@@ -180,11 +155,7 @@ class StatsRepositoryImpl implements StatsRepository {
 
       final rawList = decoded['collections'];
       if (rawList == null || rawList is! List) {
-        return const Left(
-          ParseFailure(
-            'El campo "collections" falta o tiene formato incorrecto',
-          ),
-        );
+        return const Left(ParseFailure('El campo "collections" falta o tiene formato incorrecto'));
       }
       if (rawList.isEmpty) {
         return const Left(ParseFailure('El archivo no contiene colecciones'));
@@ -202,9 +173,7 @@ class StatsRepositoryImpl implements StatsRepository {
       }
 
       if (collections.isEmpty) {
-        return const Left(
-          ParseFailure('No se pudo parsear ninguna colección válida'),
-        );
+        return const Left(ParseFailure('No se pudo parsear ninguna colección válida'));
       }
 
       return Right(collections);
@@ -246,9 +215,7 @@ class StatsRepositoryImpl implements StatsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(
-        FileSystemFailure('Error en guardado batch: ${e.toString()}'),
-      );
+      return Left(FileSystemFailure('Error en guardado batch: ${e.toString()}'));
     }
   }
 

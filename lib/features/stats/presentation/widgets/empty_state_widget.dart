@@ -46,16 +46,10 @@ class EmptyStateWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 14,
-                color: colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
+              style: TextStyle(fontSize: 14, color: colorScheme.onSurface.withValues(alpha: 0.5)),
               textAlign: TextAlign.center,
             ),
-            if (actionButton != null) ...[
-              const SizedBox(height: 32),
-              actionButton!,
-            ],
+            if (actionButton != null) ...[const SizedBox(height: 32), actionButton!],
           ],
         ),
       ),

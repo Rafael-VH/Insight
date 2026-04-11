@@ -67,8 +67,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _onScroll() {
     if (_isLoadingMore || !_hasMoreData) return;
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent * 0.9) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.9) {
       _loadMoreCollections();
     }
   }
@@ -88,9 +87,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (startIndex < _allCollections.length) {
       setState(() {
-        _displayedCollections.addAll(
-          _allCollections.sublist(startIndex, endIndex),
-        );
+        _displayedCollections.addAll(_allCollections.sublist(startIndex, endIndex));
         _currentPage++;
         _isLoadingMore = false;
         _hasMoreData = endIndex < _allCollections.length;
@@ -113,9 +110,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (_allCollections.isNotEmpty) _loadMoreCollections();
   }
 
-  List<StatsCollection> _filterAndSortCollections(
-    List<StatsCollection> collections,
-  ) {
+  List<StatsCollection> _filterAndSortCollections(List<StatsCollection> collections) {
     var filtered = collections;
 
     if (_searchQuery.isNotEmpty) {
@@ -157,9 +152,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _reloadWithFilters() {
     final bloc = context.read<HistoryBloc>();
     if (bloc.state is HistoryCollectionsLoaded) {
-      _updateCollections(
-        (bloc.state as HistoryCollectionsLoaded).collections,
-      );
+      _updateCollections((bloc.state as HistoryCollectionsLoaded).collections);
     }
   }
 
@@ -168,9 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _showDetail(StatsCollection collection) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => DetailScreen(collection: collection),
-      ),
+      MaterialPageRoute(builder: (_) => DetailScreen(collection: collection)),
     );
   }
 
@@ -188,14 +179,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       currentName: collection.displayName,
     );
-    if (newName != null &&
-        newName.isNotEmpty &&
-        newName != collection.displayName) {
+    if (newName != null && newName.isNotEmpty && newName != collection.displayName) {
       context.read<HistoryBloc>().add(
-        UpdateStatsCollectionNameEvent(
-          createdAt: collection.createdAt,
-          newName: newName,
-        ),
+        UpdateStatsCollectionNameEvent(createdAt: collection.createdAt, newName: newName),
       );
     }
   }
@@ -207,9 +193,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       formattedDate: _formatDateShort(collection.createdAt),
     );
     if (confirmed == true) {
-      context.read<HistoryBloc>().add(
-        DeleteStatsCollectionEvent(collection.createdAt),
-      );
+      context.read<HistoryBloc>().add(DeleteStatsCollectionEvent(collection.createdAt));
     }
   }
 
@@ -239,9 +223,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return state is SettingsLoaded ? state.settings.useAwesomeSnackbar : true;
   }
 
-  HistoryGlobalMetrics _computeGlobalMetrics(
-    List<StatsCollection> collections,
-  ) {
+  HistoryGlobalMetrics _computeGlobalMetrics(List<StatsCollection> collections) {
     if (collections.isEmpty) {
       return HistoryGlobalMetrics(total: 0, avgWr: 0, avgKda: 0);
     }
@@ -252,8 +234,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     int countKda = 0;
 
     for (final c in collections) {
-      final stats =
-          c.totalStats ?? c.rankedStats ?? c.classicStats ?? c.brawlStats;
+      final stats = c.totalStats ?? c.rankedStats ?? c.classicStats ?? c.brawlStats;
       if (stats != null) {
         if (stats.winRate > 0) {
           totalWr += stats.winRate;
@@ -279,17 +260,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (state is HistoryCollectionsLoaded) {
       _updateCollections(state.collections);
     } else if (state is HistoryNameUpdated) {
-      DialogService.showSuccess(
-        context,
-        message: state.message,
-        useAwesome: _useAwesomeSnackbar,
-      );
+      DialogService.showSuccess(context, message: state.message, useAwesome: _useAwesomeSnackbar);
     } else if (state is HistoryDeleted) {
-      DialogService.showSuccess(
-        context,
-        message: state.message,
-        useAwesome: _useAwesomeSnackbar,
-      );
+      DialogService.showSuccess(context, message: state.message, useAwesome: _useAwesomeSnackbar);
     } else if (state is HistoryError) {
       DialogService.showError(
         context,
@@ -301,10 +274,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  void _handleExportImportState(
-    BuildContext context,
-    HistoryState state,
-  ) async {
+  void _handleExportImportState(BuildContext context, HistoryState state) async {
     if (state is HistoryExported) {
       await SharePlus.instance.share(
         ShareParams(
@@ -325,9 +295,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           content: Text(msg),
           backgroundColor: const Color(0xFF059669),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
     }
@@ -345,17 +313,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: CustomScrollView(
             controller: _scrollController,
-            keyboardDismissBehavior:
-                ScrollViewKeyboardDismissBehavior.onDrag,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               // ── Hero section ───────────────────────────────
               BlocBuilder<HistoryBloc, HistoryState>(
                 buildWhen: (_, s) => s is HistoryCollectionsLoaded,
                 builder: (context, state) {
                   final metrics = _computeGlobalMetrics(
-                    state is HistoryCollectionsLoaded
-                        ? state.collections
-                        : _allCollections,
+                    state is HistoryCollectionsLoaded ? state.collections : _allCollections,
                   );
                   return SliverToBoxAdapter(
                     child: HistoryHeroSection(
@@ -364,8 +329,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       isAscending: _isAscending,
                       onRefresh: _loadCollections,
                       onToggleSort: _onToggleSort,
-                      onExportImport: () =>
-                          HistoryExportImportBottomSheet.show(context),
+                      onExportImport: () => HistoryExportImportBottomSheet.show(context),
                     ),
                   );
                 },
@@ -407,17 +371,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return BlocBuilder<HistoryBloc, HistoryState>(
       builder: (context, state) {
         if (state is HistoryLoading && _displayedCollections.isEmpty) {
-          return const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
-          );
+          return const SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
         }
 
         if (state is HistoryError && _displayedCollections.isEmpty) {
           return SliverFillRemaining(
-            child: _HistoryErrorState(
-              message: state.message,
-              onRetry: _loadCollections,
-            ),
+            child: _HistoryErrorState(message: state.message, onRetry: _loadCollections),
           );
         }
 
@@ -425,8 +384,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           return SliverFillRemaining(
             child: _HistoryEmptyState(
               hasSearch: _searchQuery.isNotEmpty,
-              onImport: () =>
-                  HistoryExportImportBottomSheet.show(context),
+              onImport: () => HistoryExportImportBottomSheet.show(context),
               onClear: () {
                 _searchController.clear();
                 _onSearchChanged('');
@@ -443,9 +401,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildList() {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final latest = _displayedCollections.isNotEmpty
-        ? _displayedCollections.first
-        : null;
+    final latest = _displayedCollections.isNotEmpty ? _displayedCollections.first : null;
     final history = _displayedCollections.length > 1
         ? _displayedCollections.sublist(1)
         : <StatsCollection>[];
@@ -475,17 +431,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Row(
               children: [
                 _SectionLabel(
-                  label: _searchQuery.isNotEmpty
-                      ? 'Resultados de búsqueda'
-                      : 'Historial completo',
+                  label: _searchQuery.isNotEmpty ? 'Resultados de búsqueda' : 'Historial completo',
                 ),
                 const SizedBox(width: 8),
                 if (_searchQuery.isEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
@@ -496,8 +447,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         fontFamily: 'monospace',
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color:
-                            colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
@@ -505,13 +455,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           if (_searchQuery.isNotEmpty)
-            ..._displayedCollections.asMap().entries.map(
-              (e) => _buildListCard(e.value, e.key + 1),
-            )
+            ..._displayedCollections.asMap().entries.map((e) => _buildListCard(e.value, e.key + 1))
           else
-            ...history.asMap().entries.map(
-              (e) => _buildListCard(e.value, e.key + 2),
-            ),
+            ...history.asMap().entries.map((e) => _buildListCard(e.value, e.key + 2)),
 
           if (_isLoadingMore)
             const Padding(
@@ -533,15 +479,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   '— Fin del historial —',
                   style: TextStyle(
                     fontSize: 12,
-                    color:
-                        colorScheme.onSurface.withValues(alpha: 0.3),
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
             ),
-        ] else if (_searchQuery.isEmpty &&
-            _displayedCollections.length == 1)
+        ] else if (_searchQuery.isEmpty && _displayedCollections.length == 1)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Center(
@@ -594,10 +538,7 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 10,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.1,
-        color: Theme.of(context)
-            .colorScheme
-            .onSurface
-            .withValues(alpha: 0.35),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
       ),
     );
   }
@@ -637,9 +578,7 @@ class _HistoryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              hasSearch
-                  ? 'Sin resultados para tu búsqueda'
-                  : 'Aún no hay sesiones guardadas',
+              hasSearch ? 'Sin resultados para tu búsqueda' : 'Aún no hay sesiones guardadas',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -661,10 +600,7 @@ class _HistoryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             if (hasSearch)
-              OutlinedButton(
-                onPressed: onClear,
-                child: const Text('Limpiar búsqueda'),
-              )
+              OutlinedButton(onPressed: onClear, child: const Text('Limpiar búsqueda'))
             else
               ElevatedButton.icon(
                 onPressed: onImport,
@@ -673,13 +609,8 @@ class _HistoryEmptyState extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF059669),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
           ],
@@ -690,10 +621,7 @@ class _HistoryEmptyState extends StatelessWidget {
 }
 
 class _HistoryErrorState extends StatelessWidget {
-  const _HistoryErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _HistoryErrorState({required this.message, required this.onRetry});
   final String message;
   final VoidCallback onRetry;
 
@@ -723,10 +651,7 @@ class _HistoryErrorState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 13,
-                color: colorScheme.onSurface.withValues(alpha: 0.4),
-              ),
+              style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.4)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

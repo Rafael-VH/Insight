@@ -3,9 +3,5 @@ class MlbbHero {
   final String name;
   final String iconUrl;
 
-  const MlbbHero({
-    required this.heroId,
-    required this.name,
-    required this.iconUrl,
-  });
+  const MlbbHero({required this.heroId, required this.name, required this.iconUrl});
 }

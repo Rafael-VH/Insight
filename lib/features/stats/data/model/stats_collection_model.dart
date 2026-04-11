@@ -50,9 +50,7 @@ class StatsCollectionModel extends StatsCollection {
           ? PlayerStats.fromJson(json['brawlStats'] as Map<String, dynamic>)
           : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      name:
-          json['name'] as String? ??
-          '',
+      name: json['name'] as String? ?? '',
     );
   }
 }

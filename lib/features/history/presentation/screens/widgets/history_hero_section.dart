@@ -95,15 +95,13 @@ class HistoryHeroSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _MetricPill(
-                    value: metrics.avgWr > 0
-                        ? '${metrics.avgWr.toStringAsFixed(1)}%'
-                        : '—',
+                    value: metrics.avgWr > 0 ? '${metrics.avgWr.toStringAsFixed(1)}%' : '—',
                     label: 'WR prom.',
                     accent: metrics.avgWr >= 50
                         ? const Color(0xFF059669)
                         : metrics.avgWr > 0
-                            ? const Color(0xFFD97706)
-                            : null,
+                        ? const Color(0xFFD97706)
+                        : null,
                     colorScheme: colorScheme,
                     isDark: isDark,
                   ),
@@ -111,10 +109,7 @@ class HistoryHeroSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _MetricPill(
-                    value:
-                        metrics.avgKda > 0
-                        ? metrics.avgKda.toStringAsFixed(2)
-                        : '—',
+                    value: metrics.avgKda > 0 ? metrics.avgKda.toStringAsFixed(2) : '—',
                     label: 'KDA prom.',
                     colorScheme: colorScheme,
                     isDark: isDark,
@@ -151,11 +146,7 @@ class HistoryHeroSection extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Divisor sutil
-          Divider(
-            height: 1,
-            thickness: 0.5,
-            color: colorScheme.outline.withValues(alpha: 0.15),
-          ),
+          Divider(height: 1, thickness: 0.5, color: colorScheme.outline.withValues(alpha: 0.15)),
         ],
       ),
     );
@@ -184,14 +175,9 @@ class _MetricPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.12),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.12), width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +228,6 @@ class _SortChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -252,9 +237,7 @@ class _SortChip extends StatelessWidget {
           color: isActive ? colorScheme.onSurface : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isActive
-                ? colorScheme.onSurface
-                : colorScheme.outline.withValues(alpha: 0.2),
+            color: isActive ? colorScheme.onSurface : colorScheme.outline.withValues(alpha: 0.2),
             width: 0.5,
           ),
         ),
@@ -264,9 +247,7 @@ class _SortChip extends StatelessWidget {
             Icon(
               icon,
               size: 12,
-              color: isActive
-                  ? colorScheme.surface
-                  : colorScheme.onSurface.withValues(alpha: 0.5),
+              color: isActive ? colorScheme.surface : colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             const SizedBox(width: 5),
             Text(
@@ -283,9 +264,7 @@ class _SortChip extends StatelessWidget {
             if (isActive && isAscending != null) ...[
               const SizedBox(width: 4),
               Icon(
-                isAscending!
-                    ? Icons.arrow_upward_rounded
-                    : Icons.arrow_downward_rounded,
+                isAscending! ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                 size: 10,
                 color: colorScheme.surface,
               ),
@@ -328,16 +307,9 @@ class _ActionIconBtn extends StatelessWidget {
                 ? colorScheme.surfaceContainerHighest
                 : colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.15),
-              width: 0.5,
-            ),
+            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15), width: 0.5),
           ),
-          child: Icon(
-            icon,
-            size: 17,
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
+          child: Icon(icon, size: 17, color: colorScheme.onSurface.withValues(alpha: 0.6)),
         ),
       ),
     );
@@ -351,9 +323,5 @@ class HistoryGlobalMetrics {
   final double avgWr;
   final double avgKda;
 
-  const HistoryGlobalMetrics({
-    required this.total,
-    required this.avgWr,
-    required this.avgKda,
-  });
+  const HistoryGlobalMetrics({required this.total, required this.avgWr, required this.avgKda});
 }

@@ -151,10 +151,7 @@ class ValidationResultDialog extends StatelessWidget {
             ),
 
             // Botones mejorados
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildAwesomeActions(context),
-            ),
+            Padding(padding: const EdgeInsets.all(16), child: _buildAwesomeActions(context)),
           ],
         ),
       ),
@@ -216,11 +213,7 @@ class ValidationResultDialog extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
           textAlign: TextAlign.center,
         ),
       ],
@@ -257,11 +250,7 @@ class ValidationResultDialog extends StatelessWidget {
             ),
             Text(
               '${percentage.toStringAsFixed(1)}%',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
             ),
           ],
         ),
@@ -271,9 +260,7 @@ class ValidationResultDialog extends StatelessWidget {
           child: LinearProgressIndicator(
             value: percentage / 100,
             minHeight: 12,
-            backgroundColor: isDark
-                ? colorScheme.surfaceContainerHighest
-                : Colors.grey[200],
+            backgroundColor: isDark ? colorScheme.surfaceContainerHighest : Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
@@ -305,11 +292,7 @@ class ValidationResultDialog extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.close,
-                color: Colors.red[isDark ? 300 : 700],
-                size: 18,
-              ),
+              Icon(Icons.close, color: Colors.red[isDark ? 300 : 700], size: 18),
               const SizedBox(width: 8),
               Text(
                 'Datos Faltantes (${result.missingFields.length})',
@@ -338,10 +321,7 @@ class ValidationResultDialog extends StatelessWidget {
                       Expanded(
                         child: Text(
                           field,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.red[isDark ? 200 : 900],
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.red[isDark ? 200 : 900]),
                         ),
                       ),
                     ],
@@ -381,11 +361,7 @@ class ValidationResultDialog extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: Colors.orange[isDark ? 300 : 700],
-                size: 18,
-              ),
+              Icon(Icons.info_outline, color: Colors.orange[isDark ? 300 : 700], size: 18),
               const SizedBox(width: 8),
               Text(
                 'Campos en 0 (${result.warningFields.length})',
@@ -414,10 +390,7 @@ class ValidationResultDialog extends StatelessWidget {
                       Expanded(
                         child: Text(
                           field,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange[isDark ? 200 : 900],
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.orange[isDark ? 200 : 900]),
                         ),
                       ),
                     ],
@@ -457,11 +430,7 @@ class ValidationResultDialog extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                color: Colors.red[isDark ? 300 : 700],
-                size: 20,
-              ),
+              Icon(Icons.error_outline, color: Colors.red[isDark ? 300 : 700], size: 20),
               const SizedBox(width: 8),
               Text(
                 'Datos Faltantes (${result.missingFields.length})',
@@ -479,19 +448,12 @@ class ValidationResultDialog extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.close,
-                    size: 16,
-                    color: Colors.red[isDark ? 300 : 700],
-                  ),
+                  Icon(Icons.close, size: 16, color: Colors.red[isDark ? 300 : 700]),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       field,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.red[isDark ? 200 : 900],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.red[isDark ? 200 : 900]),
                     ),
                   ),
                 ],
@@ -521,11 +483,7 @@ class ValidationResultDialog extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: Colors.orange[isDark ? 300 : 700],
-                size: 20,
-              ),
+              Icon(Icons.info_outline, color: Colors.orange[isDark ? 300 : 700], size: 20),
               const SizedBox(width: 8),
               Text(
                 'Campos en 0 (${result.warningFields.length})',
@@ -540,10 +498,7 @@ class ValidationResultDialog extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Estos campos pueden ser legítimamente 0:',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.orange[isDark ? 200 : 800],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.orange[isDark ? 200 : 800]),
           ),
           const SizedBox(height: 8),
           ...displayWarnings.map(
@@ -560,10 +515,7 @@ class ValidationResultDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       field,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.orange[isDark ? 200 : 900],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.orange[isDark ? 200 : 900]),
                     ),
                   ),
                 ],
@@ -608,11 +560,7 @@ class ValidationResultDialog extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.lightbulb_outline,
-                color: Colors.blue[isDark ? 300 : 700],
-                size: 20,
-              ),
+              Icon(Icons.lightbulb_outline, color: Colors.blue[isDark ? 300 : 700], size: 20),
               const SizedBox(width: 8),
               Text(
                 'Recomendaciones',
@@ -643,10 +591,7 @@ class ValidationResultDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       rec,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[isDark ? 200 : 900],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.blue[isDark ? 200 : 900]),
                     ),
                   ),
                 ],
@@ -693,10 +638,7 @@ class ValidationResultDialog extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 8),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cerrar'),
-        ),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cerrar')),
       ],
     );
   }

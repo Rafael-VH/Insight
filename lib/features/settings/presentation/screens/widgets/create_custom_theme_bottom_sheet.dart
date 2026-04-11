@@ -22,12 +22,10 @@ class CreateCustomThemeBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<CreateCustomThemeBottomSheet> createState() =>
-      _CreateCustomThemeBottomSheetState();
+  State<CreateCustomThemeBottomSheet> createState() => _CreateCustomThemeBottomSheetState();
 }
 
-class _CreateCustomThemeBottomSheetState
-    extends State<CreateCustomThemeBottomSheet> {
+class _CreateCustomThemeBottomSheetState extends State<CreateCustomThemeBottomSheet> {
   final _nameController = TextEditingController(text: 'Mi Tema Personalizado');
   final _formKey = GlobalKey<FormState>();
 
@@ -62,20 +60,13 @@ class _CreateCustomThemeBottomSheetState
     return AppTheme(
       id: 'custom_preview',
       name: _nameController.text.isEmpty ? 'Mi Tema' : _nameController.text,
-      lightColorScheme: ColorScheme.fromSeed(
-        seedColor: _lightSeed,
-        brightness: Brightness.light,
-      ),
-      darkColorScheme: ColorScheme.fromSeed(
-        seedColor: _darkSeed,
-        brightness: Brightness.dark,
-      ),
+      lightColorScheme: ColorScheme.fromSeed(seedColor: _lightSeed, brightness: Brightness.light),
+      darkColorScheme: ColorScheme.fromSeed(seedColor: _darkSeed, brightness: Brightness.dark),
       isCustom: true,
     );
   }
 
-  String _colorToHex(Color color) =>
-      '#${color.value.toRadixString(16).toUpperCase().substring(2)}';
+  String _colorToHex(Color color) => '#${color.value.toRadixString(16).toUpperCase().substring(2)}';
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
@@ -86,14 +77,8 @@ class _CreateCustomThemeBottomSheetState
     final theme = AppTheme(
       id: id,
       name: name,
-      lightColorScheme: ColorScheme.fromSeed(
-        seedColor: _lightSeed,
-        brightness: Brightness.light,
-      ),
-      darkColorScheme: ColorScheme.fromSeed(
-        seedColor: _darkSeed,
-        brightness: Brightness.dark,
-      ),
+      lightColorScheme: ColorScheme.fromSeed(seedColor: _lightSeed, brightness: Brightness.light),
+      darkColorScheme: ColorScheme.fromSeed(seedColor: _darkSeed, brightness: Brightness.dark),
       isCustom: true,
     );
 
@@ -115,22 +100,15 @@ class _CreateCustomThemeBottomSheetState
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
+          style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
         ),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: isDark
-                ? colorScheme.surfaceContainerHighest
-                : colorScheme.surface,
+            color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.4),
-            ),
+            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.4)),
           ),
           child: Row(
             children: [
@@ -140,9 +118,7 @@ class _CreateCustomThemeBottomSheetState
                 decoration: BoxDecoration(
                   color: currentColor,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
-                  ),
+                  border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -173,9 +149,7 @@ class _CreateCustomThemeBottomSheetState
                   color: color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSelected
-                        ? colorScheme.onSurface
-                        : Colors.transparent,
+                    color: isSelected ? colorScheme.onSurface : Colors.transparent,
                     width: 2.5,
                   ),
                   boxShadow: isSelected
@@ -192,9 +166,7 @@ class _CreateCustomThemeBottomSheetState
                     ? Icon(
                         Icons.check,
                         size: 16,
-                        color:
-                            ThemeData.estimateBrightnessForColor(color) ==
-                                Brightness.dark
+                        color: ThemeData.estimateBrightnessForColor(color) == Brightness.dark
                             ? Colors.white
                             : Colors.black,
                       )
@@ -210,9 +182,7 @@ class _CreateCustomThemeBottomSheetState
   // ── Vista previa ──────────────────────────────────────────────
   Widget _buildPreview() {
     final preview = _buildPreviewTheme();
-    final scheme = _previewLight
-        ? preview.lightColorScheme
-        : preview.darkColorScheme;
+    final scheme = _previewLight ? preview.lightColorScheme : preview.darkColorScheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -247,10 +217,7 @@ class _CreateCustomThemeBottomSheetState
             children: [
               // AppBar simulado
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 color: _previewLight ? scheme.primary : scheme.surface,
                 child: Row(
                   children: [
@@ -264,22 +231,16 @@ class _CreateCustomThemeBottomSheetState
                       child: Icon(
                         Icons.insights,
                         size: 16,
-                        color: _previewLight
-                            ? scheme.onPrimary
-                            : scheme.onSurface,
+                        color: _previewLight ? scheme.onPrimary : scheme.onSurface,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      _nameController.text.isEmpty
-                          ? 'Insight'
-                          : _nameController.text,
+                      _nameController.text.isEmpty ? 'Insight' : _nameController.text,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: _previewLight
-                            ? scheme.onPrimary
-                            : scheme.onSurface,
+                        color: _previewLight ? scheme.onPrimary : scheme.onSurface,
                       ),
                     ),
                   ],
@@ -334,9 +295,7 @@ class _CreateCustomThemeBottomSheetState
               content: const Text('Tema personalizado guardado'),
               backgroundColor: colorScheme.primary,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           );
         }
@@ -347,9 +306,7 @@ class _CreateCustomThemeBottomSheetState
               content: Text(state.message),
               backgroundColor: colorScheme.error,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           );
         }
@@ -394,11 +351,7 @@ class _CreateCustomThemeBottomSheetState
                         color: colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(
-                        Icons.palette_outlined,
-                        color: colorScheme.primary,
-                        size: 22,
-                      ),
+                      child: Icon(Icons.palette_outlined, color: colorScheme.primary, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -441,19 +394,12 @@ class _CreateCustomThemeBottomSheetState
                     counterText: '',
                     hintText: 'Ej: Mi Tema Especial',
                     filled: true,
-                    fillColor: isDark
-                        ? colorScheme.surfaceContainerHighest
-                        : colorScheme.surface,
+                    fillColor: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.4),
-                      ),
+                      borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.4)),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   ),
                   onChanged: (_) => setState(() {}),
                   validator: (value) {
@@ -469,8 +415,7 @@ class _CreateCustomThemeBottomSheetState
                 _buildColorPicker(
                   label: 'Color primario — modo claro',
                   currentColor: _lightSeed,
-                  onColorSelected: (color) =>
-                      setState(() => _lightSeed = color),
+                  onColorSelected: (color) => setState(() => _lightSeed = color),
                 ),
                 const SizedBox(height: 16),
 
@@ -505,14 +450,10 @@ class _CreateCustomThemeBottomSheetState
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isSaving
-                            ? null
-                            : () => Navigator.of(context).pop(),
+                        onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         child: const Text('Cancelar'),
                       ),
@@ -532,16 +473,12 @@ class _CreateCustomThemeBottomSheetState
                                 ),
                               )
                             : const Icon(Icons.check, size: 18),
-                        label: Text(
-                          _isSaving ? 'Guardando...' : 'Guardar Tema',
-                        ),
+                        label: Text(_isSaving ? 'Guardando...' : 'Guardar Tema'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                       ),
                     ),
@@ -558,11 +495,7 @@ class _CreateCustomThemeBottomSheetState
 
 // ── Widgets auxiliares ────────────────────────────────────────────
 class _PreviewToggleBtn extends StatelessWidget {
-  const _PreviewToggleBtn({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+  const _PreviewToggleBtn({required this.label, required this.isActive, required this.onTap});
 
   final String label;
   final bool isActive;
@@ -579,18 +512,14 @@ class _PreviewToggleBtn extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive ? colorScheme.surface : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
-          border: isActive
-              ? Border.all(color: colorScheme.outline.withValues(alpha: 0.3))
-              : null,
+          border: isActive ? Border.all(color: colorScheme.outline.withValues(alpha: 0.3)) : null,
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 12,
             fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
-            color: isActive
-                ? colorScheme.onSurface
-                : colorScheme.onSurface.withValues(alpha: 0.5),
+            color: isActive ? colorScheme.onSurface : colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -599,11 +528,7 @@ class _PreviewToggleBtn extends StatelessWidget {
 }
 
 class _PreviewChip extends StatelessWidget {
-  const _PreviewChip({
-    required this.label,
-    required this.bgColor,
-    required this.textColor,
-  });
+  const _PreviewChip({required this.label, required this.bgColor, required this.textColor});
 
   final String label;
   final Color bgColor;
@@ -613,17 +538,10 @@ class _PreviewChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(20)),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: textColor,
-        ),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: textColor),
       ),
     );
   }

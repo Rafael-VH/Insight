@@ -76,6 +76,5 @@ class NavigationItem {
       section.hashCode;
 
   @override
-  String toString() =>
-      'NavigationItem(title: $title, id: $id, section: $section)';
+  String toString() => 'NavigationItem(title: $title, id: $id, section: $section)';
 }

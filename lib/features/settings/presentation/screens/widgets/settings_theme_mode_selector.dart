@@ -34,10 +34,7 @@ class SettingsThemeModeSelector extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.brightness_6_outlined,
-                  color: Theme.of(context).primaryColor,
-                ),
+                Icon(Icons.brightness_6_outlined, color: Theme.of(context).primaryColor),
                 const SizedBox(width: 12),
                 const Text(
                   'Modo de Tema',
@@ -68,11 +65,7 @@ class SettingsThemeModeSelector extends StatelessWidget {
 }
 
 class _ThemeModeOption extends StatelessWidget {
-  const _ThemeModeOption({
-    required this.mode,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _ThemeModeOption({required this.mode, required this.isSelected, required this.onTap});
 
   final AppThemeMode mode;
   final bool isSelected;
@@ -88,14 +81,10 @@ class _ThemeModeOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color: isSelected ? colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? colorScheme.primary
-                : colorScheme.outline.withValues(alpha: 0.5),
+            color: isSelected ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.5),
             width: isSelected ? 2 : 1,
           ),
         ),

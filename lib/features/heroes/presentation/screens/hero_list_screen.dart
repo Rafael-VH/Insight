@@ -95,8 +95,7 @@ class _HeroListScreenState extends State<HeroListScreen> {
             expandedHeight: 140,
             floating: false,
             pinned: true,
-            backgroundColor:
-                isDark ? const Color(0xFF0A0C10) : colorScheme.surface,
+            backgroundColor: isDark ? const Color(0xFF0A0C10) : colorScheme.surface,
             surfaceTintColor: Colors.transparent,
             title: Text(
               'HÉROES',
@@ -107,9 +106,7 @@ class _HeroListScreenState extends State<HeroListScreen> {
                 color: colorScheme.onSurface,
               ),
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: _HeroListHeader(),
-            ),
+            flexibleSpace: FlexibleSpaceBar(background: _HeroListHeader()),
           ),
 
           // ── Buscador ──────────────────────────────────────────
@@ -153,24 +150,18 @@ class _HeroListScreenState extends State<HeroListScreen> {
 
           // ── Grid de héroes ────────────────────────────────────
           BlocBuilder<HeroBloc, HeroState>(
-            buildWhen: (_, s) =>
-                s is HeroListLoading ||
-                s is HeroListLoaded ||
-                s is HeroListError,
+            buildWhen: (_, s) => s is HeroListLoading || s is HeroListLoaded || s is HeroListError,
             builder: (context, state) {
               if (state is HeroListLoading) {
-                return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                );
+                return const SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
               }
 
               if (state is HeroListError) {
                 return SliverFillRemaining(
                   child: _ErrorState(
                     message: state.message,
-                    onRetry: () => context
-                        .read<HeroBloc>()
-                        .add(const LoadHeroListEvent(forceRefresh: true)),
+                    onRetry: () =>
+                        context.read<HeroBloc>().add(const LoadHeroListEvent(forceRefresh: true)),
                   ),
                 );
               }
@@ -179,26 +170,20 @@ class _HeroListScreenState extends State<HeroListScreen> {
                 final filtered = _applyRoleFilter(state.filtered);
 
                 if (filtered.isEmpty) {
-                  return const SliverFillRemaining(
-                    child: _EmptyState(),
-                  );
+                  return const SliverFillRemaining(child: _EmptyState());
                 }
 
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final hero = filtered[index];
-                        return HeroCard(
-                          hero: hero,
-                          onTap: () => _navigateToDetail(context, hero.heroId),
-                        );
-                      },
-                      childCount: filtered.length,
-                    ),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final hero = filtered[index];
+                      return HeroCard(
+                        hero: hero,
+                        onTap: () => _navigateToDetail(context, hero.heroId),
+                      );
+                    }, childCount: filtered.length),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
@@ -249,11 +234,7 @@ class _HeroListHeader extends StatelessWidget {
               children: [
                 TextSpan(
                   text: 'HÉ',
-                  style: TextStyle(
-                    color: isDark
-                        ? const Color(0xFFF0F2F7)
-                        : colorScheme.onSurface,
-                  ),
+                  style: TextStyle(color: isDark ? const Color(0xFFF0F2F7) : colorScheme.onSurface),
                 ),
                 TextSpan(
                   text: 'ROES',
@@ -266,8 +247,7 @@ class _HeroListHeader extends StatelessWidget {
           BlocBuilder<HeroBloc, HeroState>(
             buildWhen: (_, s) => s is HeroListLoaded,
             builder: (context, state) {
-              final count =
-                  state is HeroListLoaded ? state.heroes.length : 0;
+              final count = state is HeroListLoaded ? state.heroes.length : 0;
               return Text(
                 '$count personajes disponibles',
                 style: TextStyle(
@@ -287,11 +267,7 @@ class _HeroListHeader extends StatelessWidget {
 // ── Barra de búsqueda ─────────────────────────────────────────────
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({
-    required this.controller,
-    required this.onChanged,
-    required this.onClear,
-  });
+  const _SearchBar({required this.controller, required this.onChanged, required this.onClear});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -308,10 +284,7 @@ class _SearchBar extends StatelessWidget {
       style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: 'Buscar héroe...',
-        hintStyle: TextStyle(
-          color: colorScheme.onSurface.withValues(alpha: 0.35),
-          fontSize: 14,
-        ),
+        hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.35), fontSize: 14),
         prefixIcon: Icon(
           Icons.search_rounded,
           size: 18,
@@ -328,32 +301,20 @@ class _SearchBar extends StatelessWidget {
               )
             : null,
         filled: true,
-        fillColor: isDark
-            ? const Color(0xFF181C24)
-            : colorScheme.surfaceContainerHighest,
+        fillColor: isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.15),
-            width: 0.5,
-          ),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.15), width: 0.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.15),
-            width: 0.5,
-          ),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.15), width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.primary.withValues(alpha: 0.5),
-            width: 1,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary.withValues(alpha: 0.5), width: 1),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       ),
     );
   }
@@ -362,11 +323,7 @@ class _SearchBar extends StatelessWidget {
 // ── Chip de filtro por rol ────────────────────────────────────────
 
 class _RoleFilterChip extends StatelessWidget {
-  const _RoleFilterChip({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+  const _RoleFilterChip({required this.label, required this.isActive, required this.onTap});
 
   final String label;
   final bool isActive;
@@ -376,9 +333,7 @@ class _RoleFilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final roleColor = label == 'Todos'
-        ? colorScheme.primary
-        : HeroRoleUtils.colorForRole(label);
+    final roleColor = label == 'Todos' ? colorScheme.primary : HeroRoleUtils.colorForRole(label);
 
     return GestureDetector(
       onTap: onTap,
@@ -389,12 +344,10 @@ class _RoleFilterChip extends StatelessWidget {
           color: isActive
               ? roleColor
               : isDark
-                  ? const Color(0xFF181C24)
-                  : colorScheme.surfaceContainerHighest,
+              ? const Color(0xFF181C24)
+              : colorScheme.surfaceContainerHighest,
           border: Border.all(
-            color: isActive
-                ? roleColor
-                : colorScheme.outline.withValues(alpha: 0.18),
+            color: isActive ? roleColor : colorScheme.outline.withValues(alpha: 0.18),
             width: 0.5,
           ),
           borderRadius: BorderRadius.circular(20),
@@ -405,9 +358,7 @@ class _RoleFilterChip extends StatelessWidget {
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
-            color: isActive
-                ? Colors.white
-                : colorScheme.onSurface.withValues(alpha: 0.6),
+            color: isActive ? Colors.white : colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -440,11 +391,7 @@ class _ErrorState extends StatelessWidget {
                 color: colorScheme.errorContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.wifi_off_rounded,
-                size: 28,
-                color: colorScheme.error,
-              ),
+              child: Icon(Icons.wifi_off_rounded, size: 28, color: colorScheme.error),
             ),
             const SizedBox(height: 20),
             Text(
@@ -471,13 +418,8 @@ class _ErrorState extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: const Text('Reintentar'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -517,10 +459,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'Prueba con otro nombre',
-            style: TextStyle(
-              fontSize: 13,
-              color: colorScheme.onSurface.withValues(alpha: 0.3),
-            ),
+            style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.3)),
           ),
         ],
       ),

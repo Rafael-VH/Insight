@@ -24,12 +24,7 @@ class HeroDetailModel extends HeroDetail {
 
   static const int _maxBuilds = 3;
 
-  static const List<String> _statLabels = [
-    'Durabilidad',
-    'Ofensa',
-    'Habilidad',
-    'Dificultad',
-  ];
+  static const List<String> _statLabels = ['Durabilidad', 'Ofensa', 'Habilidad', 'Dificultad'];
 
   // ── Factory principal ─────────────────────────────────────────
 
@@ -67,9 +62,7 @@ class HeroDetailModel extends HeroDetail {
 
   /// Navega la estructura `data.records[0].data.hero.data` y retorna
   /// el mapa del héroe, o `null` si algún nivel está ausente.
-  static Map<String, dynamic>? _extractHeroData(
-    Map<String, dynamic> detailJson,
-  ) {
+  static Map<String, dynamic>? _extractHeroData(Map<String, dynamic> detailJson) {
     final records = detailJson['data']?['records'];
     if (records is! List || records.isEmpty) return null;
 
@@ -87,27 +80,19 @@ class HeroDetailModel extends HeroDetail {
 
   // ── Parsers de campos simples ─────────────────────────────────
 
-  static String _parseString(dynamic value) =>
-      value is String ? value : '';
+  static String _parseString(dynamic value) => value is String ? value : '';
 
   /// Convierte una lista dinámica a `List<String>` descartando
   /// entradas nulas o vacías. Seguro con cualquier tipo de entrada.
   static List<String> _parseStringList(dynamic value) {
     if (value is! List) return const [];
-    return value
-        .whereType<String>()
-        .where((e) => e.isNotEmpty)
-        .toList();
+    return value.whereType<String>().where((e) => e.isNotEmpty).toList();
   }
 
   /// Extrae el primer valor no vacío de `roadsortlabel`.
   static String _parseLane(dynamic value) {
     if (value is! List) return '';
-    return value
-            .whereType<String>()
-            .where((e) => e.isNotEmpty)
-            .firstOrNull ??
-        '';
+    return value.whereType<String>().where((e) => e.isNotEmpty).firstOrNull ?? '';
   }
 
   /// Convierte un valor dinámico a `double` de forma segura.
@@ -238,10 +223,7 @@ class HeroDetailModel extends HeroDetail {
   /// inválidos (0 o negativos).
   static List<int> _parseEquipIds(dynamic raw) {
     if (raw is! List) return const [];
-    return raw
-        .map<int>(_toInt)
-        .where((id) => id > 0)
-        .toList();
+    return raw.map<int>(_toInt).where((id) => id > 0).toList();
   }
 
   /// Resuelve los IDs de equipo contra el mapa de equipamiento descargado.
@@ -265,15 +247,11 @@ class HeroDetailModel extends HeroDetail {
 
   /// Navega `battleskill.data.__data.skillname` de forma segura.
   static String _parseSpellName(dynamic battleskill) =>
-      _parseString(
-        _safeMap(battleskill)?['data']?['__data']?['skillname'],
-      );
+      _parseString(_safeMap(battleskill)?['data']?['__data']?['skillname']);
 
   /// Navega `battleskill.data.__data.skillicon` de forma segura.
   static String _parseSpellIcon(dynamic battleskill) =>
-      _parseString(
-        _safeMap(battleskill)?['data']?['__data']?['skillicon'],
-      );
+      _parseString(_safeMap(battleskill)?['data']?['__data']?['skillicon']);
 
   /// Extrae un campo simple del nodo `emblem.data`.
   static String _parseEmblemField(dynamic emblem, String key) =>

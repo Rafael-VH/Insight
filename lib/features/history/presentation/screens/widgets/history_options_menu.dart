@@ -37,10 +37,7 @@ class HistoryOptionsMenu {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.more_horiz,
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
+                  Icon(Icons.more_horiz, color: colorScheme.onSurface.withValues(alpha: 0.7)),
                   const SizedBox(width: 12),
                   Text(
                     'Opciones',
@@ -61,10 +58,7 @@ class HistoryOptionsMenu {
                 Navigator.pop(bottomSheetContext);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        ChartsScreen(collection: collection),
-                  ),
+                  MaterialPageRoute(builder: (_) => ChartsScreen(collection: collection)),
                 );
               },
             ),
@@ -132,11 +126,7 @@ class _OptionTile extends StatelessWidget {
         ),
         child: Icon(icon, color: color),
       ),
-      title: Text(
-        label,
-        style:
-            TextStyle(color: labelColor ?? colorScheme.onSurface),
-      ),
+      title: Text(label, style: TextStyle(color: labelColor ?? colorScheme.onSurface)),
       onTap: onTap,
     );
   }

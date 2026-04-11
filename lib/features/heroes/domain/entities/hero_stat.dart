@@ -3,9 +3,5 @@ class HeroStat {
   final String value;
   final double normalizedValue;
 
-  const HeroStat({
-    required this.label,
-    required this.value,
-    required this.normalizedValue,
-  });
+  const HeroStat({required this.label, required this.value, required this.normalizedValue});
 }

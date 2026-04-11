@@ -7,6 +7,5 @@ class GetHeroDetail {
   final HeroRepository repository;
   GetHeroDetail(this.repository);
 
-  Future<Either<Failure, HeroDetail>> call(int heroId) =>
-      repository.getHeroDetail(heroId);
+  Future<Either<Failure, HeroDetail>> call(int heroId) => repository.getHeroDetail(heroId);
 }

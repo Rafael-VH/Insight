@@ -56,8 +56,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 collection: widget.collection,
                 stats: _stats,
                 activeStat: _activeStat,
-                formattedDate:
-                    dateFormat.format(widget.collection.createdAt),
+                formattedDate: dateFormat.format(widget.collection.createdAt),
                 isDark: isDark,
                 colorScheme: colorScheme,
               ),
@@ -83,11 +82,7 @@ class _DetailScreenState extends State<DetailScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _CompletenessBar(
-                stats: _activeStat,
-                isDark: isDark,
-                colorScheme: colorScheme,
-              ),
+              child: _CompletenessBar(stats: _activeStat, isDark: isDark, colorScheme: colorScheme),
             ),
           ),
 
@@ -143,84 +138,67 @@ class _DetailScreenState extends State<DetailScreen> {
   // ── Grupos de campos ──────────────────────────────────────────
 
   List<_StatField> _getPrimaryFields(PlayerStats s) => [
-        _StatField('Partidas totales', '${s.totalGames}', s.totalGames > 0),
-        _StatField(
-          'Win Rate',
-          s.winRate > 0 ? '${s.winRate.toStringAsFixed(2)}%' : '—',
-          s.winRate > 0,
-          accentColor: s.winRate >= 50 ? const Color(0xFF059669) : null,
-        ),
-        _StatField('MVP', '${s.mvpCount}', s.mvpCount > 0),
-        _StatField(
-          'KDA',
-          s.kda > 0 ? s.kda.toStringAsFixed(2) : '—',
-          s.kda > 0,
-          accentColor: s.kda >= 3 ? const Color(0xFF059669) : null,
-        ),
-      ];
+    _StatField('Partidas totales', '${s.totalGames}', s.totalGames > 0),
+    _StatField(
+      'Win Rate',
+      s.winRate > 0 ? '${s.winRate.toStringAsFixed(2)}%' : '—',
+      s.winRate > 0,
+      accentColor: s.winRate >= 50 ? const Color(0xFF059669) : null,
+    ),
+    _StatField('MVP', '${s.mvpCount}', s.mvpCount > 0),
+    _StatField(
+      'KDA',
+      s.kda > 0 ? s.kda.toStringAsFixed(2) : '—',
+      s.kda > 0,
+      accentColor: s.kda >= 3 ? const Color(0xFF059669) : null,
+    ),
+  ];
 
   List<_StatField> _getPerformanceFields(PlayerStats s) => [
-        _StatField(
-          'Participación equipo',
-          s.teamFightParticipation > 0
-              ? '${s.teamFightParticipation.toStringAsFixed(1)}%'
-              : '—',
-          s.teamFightParticipation > 0,
-          accentColor: s.teamFightParticipation >= 70
-              ? const Color(0xFF059669)
-              : null,
-        ),
-        _StatField(
-          'Oro / Min',
-          s.goldPerMin > 0 ? '${s.goldPerMin}' : '—',
-          s.goldPerMin > 0,
-        ),
-        _StatField(
-          'Daño héroe / Min',
-          s.heroDamagePerMin > 0 ? '${s.heroDamagePerMin}' : '—',
-          s.heroDamagePerMin > 0,
-        ),
-        _StatField(
-          'Muertes / Partida',
-          s.deathsPerGame > 0 ? s.deathsPerGame.toStringAsFixed(1) : '—',
-          true,
-          accentColor: s.deathsPerGame > 0 && s.deathsPerGame <= 3
-              ? null
-              : s.deathsPerGame > 3
-                  ? const Color(0xFFD97706)
-                  : null,
-        ),
-        _StatField(
-          'Daño torre / Partida',
-          s.towerDamagePerGame > 0 ? '${s.towerDamagePerGame}' : '—',
-          s.towerDamagePerGame > 0,
-        ),
-        _StatField(
-          'MVP Perdedor',
-          s.mvpLoss > 0 ? '${s.mvpLoss}' : '—',
-          true,
-        ),
-      ];
+    _StatField(
+      'Participación equipo',
+      s.teamFightParticipation > 0 ? '${s.teamFightParticipation.toStringAsFixed(1)}%' : '—',
+      s.teamFightParticipation > 0,
+      accentColor: s.teamFightParticipation >= 70 ? const Color(0xFF059669) : null,
+    ),
+    _StatField('Oro / Min', s.goldPerMin > 0 ? '${s.goldPerMin}' : '—', s.goldPerMin > 0),
+    _StatField(
+      'Daño héroe / Min',
+      s.heroDamagePerMin > 0 ? '${s.heroDamagePerMin}' : '—',
+      s.heroDamagePerMin > 0,
+    ),
+    _StatField(
+      'Muertes / Partida',
+      s.deathsPerGame > 0 ? s.deathsPerGame.toStringAsFixed(1) : '—',
+      true,
+      accentColor: s.deathsPerGame > 0 && s.deathsPerGame <= 3
+          ? null
+          : s.deathsPerGame > 3
+          ? const Color(0xFFD97706)
+          : null,
+    ),
+    _StatField(
+      'Daño torre / Partida',
+      s.towerDamagePerGame > 0 ? '${s.towerDamagePerGame}' : '—',
+      s.towerDamagePerGame > 0,
+    ),
+    _StatField('MVP Perdedor', s.mvpLoss > 0 ? '${s.mvpLoss}' : '—', true),
+  ];
 
   List<_StatField> _getAchievementFields(PlayerStats s) => [
-        _StatField('Legendario', '${s.legendary}', s.legendary > 0),
-        _StatField('Savage', '${s.savage}', s.savage > 0),
-        _StatField('Maniac', '${s.maniac}', s.maniac > 0),
-        _StatField('Triple Kill', '${s.tripleKill}', s.tripleKill > 0),
-        _StatField('Doble Kill', '${s.doubleKill}', s.doubleKill > 0),
-        _StatField('Primera Sangre', '${s.firstBlood}', s.firstBlood > 0),
-        _StatField('Asesinatos Máx.', '${s.maxKills}', s.maxKills > 0),
-        _StatField(
-            'Asistencias Máx.', '${s.maxAssists}', s.maxAssists > 0),
-        _StatField('Racha victorias Máx.', '${s.maxWinningStreak}',
-            s.maxWinningStreak > 0),
-        _StatField('Daño causado Máx./min', '${s.maxDamageDealt}',
-            s.maxDamageDealt > 0),
-        _StatField('Daño tomado Máx./min', '${s.maxDamageTaken}',
-            s.maxDamageTaken > 0),
-        _StatField(
-            'Oro Máx./min', '${s.maxGold}', s.maxGold > 0),
-      ];
+    _StatField('Legendario', '${s.legendary}', s.legendary > 0),
+    _StatField('Savage', '${s.savage}', s.savage > 0),
+    _StatField('Maniac', '${s.maniac}', s.maniac > 0),
+    _StatField('Triple Kill', '${s.tripleKill}', s.tripleKill > 0),
+    _StatField('Doble Kill', '${s.doubleKill}', s.doubleKill > 0),
+    _StatField('Primera Sangre', '${s.firstBlood}', s.firstBlood > 0),
+    _StatField('Asesinatos Máx.', '${s.maxKills}', s.maxKills > 0),
+    _StatField('Asistencias Máx.', '${s.maxAssists}', s.maxAssists > 0),
+    _StatField('Racha victorias Máx.', '${s.maxWinningStreak}', s.maxWinningStreak > 0),
+    _StatField('Daño causado Máx./min', '${s.maxDamageDealt}', s.maxDamageDealt > 0),
+    _StatField('Daño tomado Máx./min', '${s.maxDamageTaken}', s.maxDamageTaken > 0),
+    _StatField('Oro Máx./min', '${s.maxGold}', s.maxGold > 0),
+  ];
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -240,14 +218,9 @@ class _BackButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isDark
-              ? colorScheme.surfaceContainerHighest
-              : colorScheme.surfaceContainerLowest,
+          color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.12),
-            width: 0.5,
-          ),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.12), width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -340,10 +313,7 @@ class _SessionBand extends StatelessWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: stats.map((s) {
-                    return _ModeChip(
-                      label: s.mode.shortName,
-                      color: s.mode.color,
-                    );
+                    return _ModeChip(label: s.mode.shortName, color: s.mode.color);
                   }).toList(),
                 ),
                 // Quick stats de la stat activa
@@ -364,30 +334,20 @@ class _SessionBand extends StatelessWidget {
                         ),
                       if (activeStat.kda > 0)
                         Expanded(
-                          child: _QuickStat(
-                            value: activeStat.kda.toStringAsFixed(2),
-                            label: 'KDA',
-                          ),
+                          child: _QuickStat(value: activeStat.kda.toStringAsFixed(2), label: 'KDA'),
                         ),
                       if (activeStat.totalGames > 0)
                         Expanded(
-                          child: _QuickStat(
-                            value: '${activeStat.totalGames}',
-                            label: 'PARTIDAS',
-                          ),
+                          child: _QuickStat(value: '${activeStat.totalGames}', label: 'PARTIDAS'),
                         ),
                       if (activeStat.goldPerMin > 0)
                         Expanded(
-                          child: _QuickStat(
-                            value: '${activeStat.goldPerMin}',
-                            label: 'ORO/MIN',
-                          ),
+                          child: _QuickStat(value: '${activeStat.goldPerMin}', label: 'ORO/MIN'),
                         ),
                       if (activeStat.teamFightParticipation > 0)
                         Expanded(
                           child: _QuickStat(
-                            value:
-                                '${activeStat.teamFightParticipation.toStringAsFixed(0)}%',
+                            value: '${activeStat.teamFightParticipation.toStringAsFixed(0)}%',
                             label: 'PART.',
                           ),
                         ),
@@ -449,10 +409,7 @@ class _ModeChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 0.5,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -481,11 +438,7 @@ class _ModeChip extends StatelessWidget {
 // ── Tabs de modo ──────────────────────────────────────────────────
 
 class _ModeTabs extends StatelessWidget {
-  const _ModeTabs({
-    required this.stats,
-    required this.activeIndex,
-    required this.onChanged,
-  });
+  const _ModeTabs({required this.stats, required this.activeIndex, required this.onChanged});
 
   final List<PlayerStats> stats;
   final int activeIndex;
@@ -499,10 +452,7 @@ class _ModeTabs extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.12),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.12), width: 0.5),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(11.5),
@@ -521,13 +471,12 @@ class _ModeTabs extends StatelessWidget {
                     color: isActive
                         ? modeColor
                         : isDark
-                            ? colorScheme.surfaceContainerHighest
-                            : colorScheme.surface,
+                        ? colorScheme.surfaceContainerHighest
+                        : colorScheme.surface,
                     border: e.key < stats.length - 1
                         ? Border(
                             right: BorderSide(
-                              color: colorScheme.outline
-                                  .withValues(alpha: 0.12),
+                              color: colorScheme.outline.withValues(alpha: 0.12),
                               width: 0.5,
                             ),
                           )
@@ -570,11 +519,7 @@ class _ModeTabs extends StatelessWidget {
 // ── Barra de completitud ──────────────────────────────────────────
 
 class _CompletenessBar extends StatelessWidget {
-  const _CompletenessBar({
-    required this.stats,
-    required this.isDark,
-    required this.colorScheme,
-  });
+  const _CompletenessBar({required this.stats, required this.isDark, required this.colorScheme});
 
   final PlayerStats stats;
   final bool isDark;
@@ -584,7 +529,10 @@ class _CompletenessBar extends StatelessWidget {
   double get _completeness {
     int total = 0;
     int found = 0;
-    void check(num v) { total++; if (v != 0) found++; }
+    void check(num v) {
+      total++;
+      if (v != 0) found++;
+    }
 
     check(stats.totalGames);
     check(stats.winRate);
@@ -620,14 +568,9 @@ class _CompletenessBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.1),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.1), width: 0.5),
       ),
       child: Column(
         children: [
@@ -660,8 +603,7 @@ class _CompletenessBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: pct,
               minHeight: 4,
-              backgroundColor:
-                  colorScheme.onSurface.withValues(alpha: 0.08),
+              backgroundColor: colorScheme.onSurface.withValues(alpha: 0.08),
               valueColor: AlwaysStoppedAnimation<Color>(barColor),
             ),
           ),
@@ -690,9 +632,7 @@ class _StatsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surface,
+        color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
@@ -718,10 +658,7 @@ class _StatsSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Container(
-                    height: 0.5,
-                    color: colorScheme.outline.withValues(alpha: 0.15),
-                  ),
+                  child: Container(height: 0.5, color: colorScheme.outline.withValues(alpha: 0.15)),
                 ),
               ],
             ),
@@ -730,10 +667,7 @@ class _StatsSection extends StatelessWidget {
           // Grid 2 columnas
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-            child: _StatGrid(
-              fields: fields,
-              colorScheme: colorScheme,
-            ),
+            child: _StatGrid(fields: fields, colorScheme: colorScheme),
           ),
         ],
       ),
@@ -742,10 +676,7 @@ class _StatsSection extends StatelessWidget {
 }
 
 class _StatGrid extends StatelessWidget {
-  const _StatGrid({
-    required this.fields,
-    required this.colorScheme,
-  });
+  const _StatGrid({required this.fields, required this.colorScheme});
 
   final List<_StatField> fields;
   final ColorScheme colorScheme;
@@ -784,11 +715,7 @@ class _StatGrid extends StatelessWidget {
               // Columna derecha (si existe)
               if (right != null)
                 Expanded(
-                  child: _StatCell(
-                    field: right,
-                    colorScheme: colorScheme,
-                    hasBorderRight: false,
-                  ),
+                  child: _StatCell(field: right, colorScheme: colorScheme, hasBorderRight: false),
                 )
               else
                 const Expanded(child: SizedBox()),
@@ -803,11 +730,7 @@ class _StatGrid extends StatelessWidget {
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({
-    required this.field,
-    required this.colorScheme,
-    required this.hasBorderRight,
-  });
+  const _StatCell({required this.field, required this.colorScheme, required this.hasBorderRight});
 
   final _StatField field;
   final ColorScheme colorScheme;
@@ -820,10 +743,7 @@ class _StatCell extends StatelessWidget {
       decoration: BoxDecoration(
         border: hasBorderRight
             ? Border(
-                right: BorderSide(
-                  color: colorScheme.outline.withValues(alpha: 0.08),
-                  width: 0.5,
-                ),
+                right: BorderSide(color: colorScheme.outline.withValues(alpha: 0.08), width: 0.5),
               )
             : null,
       ),
@@ -835,9 +755,7 @@ class _StatCell extends StatelessWidget {
               field.label,
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurface.withValues(
-                  alpha: field.isPresent ? 0.65 : 0.3,
-                ),
+                color: colorScheme.onSurface.withValues(alpha: field.isPresent ? 0.65 : 0.3),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -850,7 +768,8 @@ class _StatCell extends StatelessWidget {
               fontFamily: 'monospace',
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: field.accentColor ??
+              color:
+                  field.accentColor ??
                   (field.isPresent
                       ? colorScheme.onSurface
                       : colorScheme.onSurface.withValues(alpha: 0.25)),
@@ -870,12 +789,7 @@ class _StatField {
   final bool isPresent;
   final Color? accentColor;
 
-  const _StatField(
-    this.label,
-    this.value,
-    this.isPresent, {
-    this.accentColor,
-  });
+  const _StatField(this.label, this.value, this.isPresent, {this.accentColor});
 }
 
 // ── Pintor de patrón diagonal ─────────────────────────────────────
@@ -889,11 +803,7 @@ class _DiagonalPatternPainter extends CustomPainter {
 
     const spacing = 8.0;
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paint,
-      );
+      canvas.drawLine(Offset(i, 0), Offset(i + size.height, size.height), paint);
     }
   }
 

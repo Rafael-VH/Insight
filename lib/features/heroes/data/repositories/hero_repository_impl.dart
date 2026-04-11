@@ -173,9 +173,7 @@ class HeroRepositoryImpl implements HeroRepository {
   }
 
   // ── Helpers ───────────────────────────────────────────────
-  Map<int, Map<String, dynamic>> _buildRelationsMap(
-    Map<String, dynamic> listJson,
-  ) {
+  Map<int, Map<String, dynamic>> _buildRelationsMap(Map<String, dynamic> listJson) {
     final result = <int, Map<String, dynamic>>{};
     final records = listJson['data']?['records'] as List?;
     if (records == null) return result;
@@ -199,10 +197,7 @@ class HeroRepositoryImpl implements HeroRepository {
       for (final item in raw) {
         final m = item as Map<String, dynamic>?;
         if (m == null) continue;
-        final id =
-            m['equipment_id'] as int? ??
-            int.tryParse(m['id']?.toString() ?? '') ??
-            0;
+        final id = m['equipment_id'] as int? ?? int.tryParse(m['id']?.toString() ?? '') ?? 0;
         if (id > 0) result[id] = m;
       }
     } else if (raw is Map) {

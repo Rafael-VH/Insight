@@ -46,12 +46,8 @@ class AppTheme {
     return AppTheme(
       id: json['id'] as String,
       name: json['name'] as String,
-      lightColorScheme: _colorSchemeFromJson(
-        json['lightColorScheme'] as Map<String, dynamic>,
-      ),
-      darkColorScheme: _colorSchemeFromJson(
-        json['darkColorScheme'] as Map<String, dynamic>,
-      ),
+      lightColorScheme: _colorSchemeFromJson(json['lightColorScheme'] as Map<String, dynamic>),
+      darkColorScheme: _colorSchemeFromJson(json['darkColorScheme'] as Map<String, dynamic>),
       isCustom: json['isCustom'] as bool? ?? false,
     );
   }
@@ -80,9 +76,7 @@ class AppTheme {
       onError: Color(json['onError'] as int),
       surface: Color(json['surface'] as int),
       onSurface: Color(json['onSurface'] as int),
-      brightness: json['brightness'] == 'dark'
-          ? Brightness.dark
-          : Brightness.light,
+      brightness: json['brightness'] == 'dark' ? Brightness.dark : Brightness.light,
     );
   }
 }
@@ -176,14 +170,7 @@ class AppThemes {
   );
 
   // Lista de todos los temas disponibles
-  static final List<AppTheme> all = [
-    emerald,
-    violet,
-    blue,
-    crimson,
-    amber,
-    rose,
-  ];
+  static final List<AppTheme> all = [emerald, violet, blue, crimson, amber, rose];
 
   // Obtener tema por ID
   static AppTheme? getById(String id) {

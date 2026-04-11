@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 /// Widget que proporciona diálogos reutilizables para guardar estadísticas
 class SaveStatsDialog {
   /// Muestra un diálogo de éxito
-  static void showSuccess(
-    BuildContext context, {
-    required String message,
-    VoidCallback? onClose,
-  }) {
+  static void showSuccess(BuildContext context, {required String message, VoidCallback? onClose}) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -27,11 +23,7 @@ class SaveStatsDialog {
                 color: Colors.green[isDark ? 900 : 100],
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.check_circle,
-                size: 50,
-                color: Colors.green[isDark ? 300 : 700],
-              ),
+              child: Icon(Icons.check_circle, size: 50, color: Colors.green[isDark ? 300 : 700]),
             ),
             const SizedBox(height: 16),
             Text(
@@ -46,11 +38,7 @@ class SaveStatsDialog {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: colorScheme.onSurface,
-                height: 1.5,
-              ),
+              style: TextStyle(fontSize: 16, color: colorScheme.onSurface, height: 1.5),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -61,18 +49,10 @@ class SaveStatsDialog {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text(
-                'Aceptar',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              child: const Text('Aceptar', style: TextStyle(fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -109,11 +89,7 @@ class SaveStatsDialog {
                   color: Colors.red[isDark ? 900 : 100],
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.error_outline,
-                  size: 50,
-                  color: Colors.red[isDark ? 300 : 700],
-                ),
+                child: Icon(Icons.error_outline, size: 50, color: Colors.red[isDark ? 300 : 700]),
               ),
               const SizedBox(height: 16),
               Text(
@@ -129,11 +105,7 @@ class SaveStatsDialog {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colorScheme.onSurface,
-                  height: 1.5,
-                ),
+                style: TextStyle(fontSize: 16, color: colorScheme.onSurface, height: 1.5),
               ),
               if (errorDetails != null && errorDetails.isNotEmpty) ...[
                 const SizedBox(height: 16),
@@ -143,8 +115,7 @@ class SaveStatsDialog {
                   decoration: BoxDecoration(
                     color: Colors.red[isDark ? 900 : 50],
                     borderRadius: BorderRadius.circular(8),
-                    border:
-                        Border.all(color: Colors.red[isDark ? 700 : 200]!),
+                    border: Border.all(color: Colors.red[isDark ? 700 : 200]!),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,10 +152,7 @@ class SaveStatsDialog {
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: const Text(
-                        'Cerrar',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      child: const Text('Cerrar', style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ),
                   if (onRetry != null) ...[
@@ -199,9 +167,7 @@ class SaveStatsDialog {
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text(
                           'Reintentar',
@@ -248,10 +214,7 @@ class SaveStatsDialog {
             const SizedBox(height: 8),
             Text(
               'Por favor espera',
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -278,11 +241,7 @@ class SaveStatsDialog {
         backgroundColor: colorScheme.surface,
         title: Text(
           title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
         ),
         content: Text(
           message,
@@ -295,24 +254,16 @@ class SaveStatsDialog {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              cancelButtonText,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: Text(cancelButtonText, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF059669),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text(
-              confirmButtonText,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: Text(confirmButtonText, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -335,11 +286,7 @@ class SaveStatsDialog {
         backgroundColor: colorScheme.surface,
         title: Text(
           title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
         ),
         content: Text(
           message,
@@ -355,14 +302,9 @@ class SaveStatsDialog {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text(
-              buttonText,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: Text(buttonText, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),

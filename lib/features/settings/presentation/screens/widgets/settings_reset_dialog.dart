@@ -19,10 +19,7 @@ class SettingsResetDialog {
           'a los valores predeterminados?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               context.read<SettingsBloc>().add(ResetSettings());

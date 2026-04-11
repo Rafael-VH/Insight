@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:insight/core/utils/stats_validator.dart';
 
 class UploadValidationBadge extends StatelessWidget {
-  const UploadValidationBadge({
-    super.key,
-    required this.validation,
-    required this.onTap,
-  });
+  const UploadValidationBadge({super.key, required this.validation, required this.onTap});
 
   final ValidationResult validation;
   final VoidCallback onTap;

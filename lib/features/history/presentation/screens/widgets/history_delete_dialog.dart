@@ -38,13 +38,9 @@ class HistoryDeleteDialog {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.red[900]!.withValues(alpha: 0.3)
-                    : Colors.red[50],
+                color: isDark ? Colors.red[900]!.withValues(alpha: 0.3) : Colors.red[50],
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isDark ? Colors.red[700]! : Colors.red[200]!,
-                ),
+                border: Border.all(color: isDark ? Colors.red[700]! : Colors.red[200]!),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

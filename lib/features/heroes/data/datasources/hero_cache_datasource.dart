@@ -80,19 +80,13 @@ class HeroCacheDataSourceImpl implements HeroCacheDataSource {
   @override
   Future<void> saveBuildsCache(String buildsJson) async {
     await prefs.setString(_keyBuilds, buildsJson);
-    await prefs.setInt(
-      _keyBuildsTimestamp,
-      DateTime.now().millisecondsSinceEpoch,
-    );
+    await prefs.setInt(_keyBuildsTimestamp, DateTime.now().millisecondsSinceEpoch);
   }
 
   @override
   Future<void> saveEquipmentCache(String equipmentJson) async {
     await prefs.setString(_keyEquipment, equipmentJson);
-    await prefs.setInt(
-      _keyEquipmentTimestamp,
-      DateTime.now().millisecondsSinceEpoch,
-    );
+    await prefs.setInt(_keyEquipmentTimestamp, DateTime.now().millisecondsSinceEpoch);
   }
 
   @override

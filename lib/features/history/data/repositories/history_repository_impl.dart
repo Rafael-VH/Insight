@@ -18,17 +18,12 @@ class HistoryRepositoryImpl implements HistoryRepository {
   final LocalStorageDataSource localDataSource;
   final JsonExportDataSource jsonExportDataSource;
 
-  HistoryRepositoryImpl({
-    required this.localDataSource,
-    required this.jsonExportDataSource,
-  });
+  HistoryRepositoryImpl({required this.localDataSource, required this.jsonExportDataSource});
 
   // ── CRUD ──────────────────────────────────────────────────────
 
   @override
-  Future<Either<Failure, void>> saveStatsCollection(
-    StatsCollection collection,
-  ) async {
+  Future<Either<Failure, void>> saveStatsCollection(StatsCollection collection) async {
     try {
       await localDataSource.saveStatsCollection(collection);
       return const Right(null);
@@ -40,8 +35,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<Either<Failure, List<StatsCollection>>>
-      getAllStatsCollections() async {
+  Future<Either<Failure, List<StatsCollection>>> getAllStatsCollections() async {
     try {
       final collections = await localDataSource.getAllStatsCollections();
       return Right(collections);
@@ -53,8 +47,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<Either<Failure, StatsCollection?>>
-      getLatestStatsCollection() async {
+  Future<Either<Failure, StatsCollection?>> getLatestStatsCollection() async {
     try {
       final collection = await localDataSource.getLatestStatsCollection();
       return Right(collection);
@@ -66,12 +59,9 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(
-    DateTime createdAt,
-  ) async {
+  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(DateTime createdAt) async {
     try {
-      final collection =
-          await localDataSource.getStatsCollectionByDate(createdAt);
+      final collection = await localDataSource.getStatsCollectionByDate(createdAt);
       return Right(collection);
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
@@ -96,9 +86,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteStatsCollection(
-    DateTime createdAt,
-  ) async {
+  Future<Either<Failure, void>> deleteStatsCollection(DateTime createdAt) async {
     try {
       await localDataSource.deleteStatsCollection(createdAt);
       return const Right(null);
@@ -124,14 +112,10 @@ class HistoryRepositoryImpl implements HistoryRepository {
   // ── Export / Import ──────────────────────────────────────────
 
   @override
-  Future<Either<Failure, String>> exportStatsToJson(
-    List<StatsCollection> collections,
-  ) async {
+  Future<Either<Failure, String>> exportStatsToJson(List<StatsCollection> collections) async {
     try {
       if (collections.isEmpty) {
-        return const Left(
-          FileSystemFailure('No hay colecciones para exportar'),
-        );
+        return const Left(FileSystemFailure('No hay colecciones para exportar'));
       }
 
       final exportMap = <String, dynamic>{
@@ -139,21 +123,17 @@ class HistoryRepositoryImpl implements HistoryRepository {
         'app': 'Insight',
         'exportedAt': DateTime.now().toUtc().toIso8601String(),
         'totalCollections': collections.length,
-        'collections': collections
-            .map((c) => StatsCollectionModel.fromEntity(c).toJson())
-            .toList(),
+        'collections': collections.map((c) => StatsCollectionModel.fromEntity(c).toJson()).toList(),
       };
 
-      final jsonString =
-          const JsonEncoder.withIndent('  ').convert(exportMap);
+      final jsonString = const JsonEncoder.withIndent('  ').convert(exportMap);
 
       final now = DateTime.now();
       final fileName =
           'ml_stats_${now.year}${_pad(now.month)}${_pad(now.day)}'
           '_${_pad(now.hour)}${_pad(now.minute)}${_pad(now.second)}.json';
 
-      final filePath =
-          await jsonExportDataSource.writeJsonFile(fileName, jsonString);
+      final filePath = await jsonExportDataSource.writeJsonFile(fileName, jsonString);
 
       return Right(filePath);
     } on FileSystemException catch (e) {
@@ -164,18 +144,13 @@ class HistoryRepositoryImpl implements HistoryRepository {
   }
 
   @override
-  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(
-    String filePath,
-  ) async {
+  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(String filePath) async {
     try {
-      final jsonString =
-          await jsonExportDataSource.readJsonFile(filePath);
+      final jsonString = await jsonExportDataSource.readJsonFile(filePath);
 
       final dynamic decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) {
-        return const Left(
-          ParseFailure('El archivo no tiene el formato esperado'),
-        );
+        return const Left(ParseFailure('El archivo no tiene el formato esperado'));
       }
 
       final version = decoded['version'] as String?;
@@ -189,16 +164,10 @@ class HistoryRepositoryImpl implements HistoryRepository {
 
       final rawList = decoded['collections'];
       if (rawList == null || rawList is! List) {
-        return const Left(
-          ParseFailure(
-            'El campo "collections" falta o tiene formato incorrecto',
-          ),
-        );
+        return const Left(ParseFailure('El campo "collections" falta o tiene formato incorrecto'));
       }
       if (rawList.isEmpty) {
-        return const Left(
-          ParseFailure('El archivo no contiene colecciones'),
-        );
+        return const Left(ParseFailure('El archivo no contiene colecciones'));
       }
 
       final collections = <StatsCollection>[];
@@ -212,22 +181,16 @@ class HistoryRepositoryImpl implements HistoryRepository {
       }
 
       if (collections.isEmpty) {
-        return const Left(
-          ParseFailure('No se pudo parsear ninguna colección válida'),
-        );
+        return const Left(ParseFailure('No se pudo parsear ninguna colección válida'));
       }
 
       return Right(collections);
     } on FormatException catch (e) {
       return Left(ParseFailure('JSON malformado: ${e.message}'));
     } on FileSystemException catch (e) {
-      return Left(
-        FileSystemFailure('Error al leer archivo: ${e.message}'),
-      );
+      return Left(FileSystemFailure('Error al leer archivo: ${e.message}'));
     } catch (e) {
-      return Left(
-        FileSystemFailure('Error al importar: ${e.toString()}'),
-      );
+      return Left(FileSystemFailure('Error al importar: ${e.toString()}'));
     }
   }
 
@@ -260,9 +223,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(
-        FileSystemFailure('Error en guardado batch: ${e.toString()}'),
-      );
+      return Left(FileSystemFailure('Error en guardado batch: ${e.toString()}'));
     }
   }
 

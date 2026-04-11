@@ -25,12 +25,10 @@ class SettingsDeleteAllBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<SettingsDeleteAllBottomSheet> createState() =>
-      _SettingsDeleteAllBottomSheetState();
+  State<SettingsDeleteAllBottomSheet> createState() => _SettingsDeleteAllBottomSheetState();
 }
 
-class _SettingsDeleteAllBottomSheetState
-    extends State<SettingsDeleteAllBottomSheet> {
+class _SettingsDeleteAllBottomSheetState extends State<SettingsDeleteAllBottomSheet> {
   int _step = 0;
   bool _isDeleting = false;
   int _totalCollections = 0;
@@ -73,9 +71,7 @@ class _SettingsDeleteAllBottomSheetState
           Navigator.of(context, rootNavigator: true).pop();
         }
       },
-      child: _step == 0
-          ? _buildWarningStep(context)
-          : _buildConfirmStep(context),
+      child: _step == 0 ? _buildWarningStep(context) : _buildConfirmStep(context),
     );
   }
 
@@ -88,8 +84,7 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -109,11 +104,7 @@ class _SettingsDeleteAllBottomSheetState
               color: Colors.red.withValues(alpha: isDark ? 0.2 : 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.delete_sweep_rounded,
-              size: 32,
-              color: Colors.red,
-            ),
+            child: const Icon(Icons.delete_sweep_rounded, size: 32, color: Colors.red),
           ),
           const SizedBox(height: 12),
           const Text(
@@ -124,10 +115,7 @@ class _SettingsDeleteAllBottomSheetState
           Text(
             'Esta acción es permanente y no se puede deshacer.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+            style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.6)),
           ),
           const SizedBox(height: 24),
           _buildImpactCard(colorScheme, isDark),
@@ -145,16 +133,10 @@ class _SettingsDeleteAllBottomSheetState
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor:
-                    colorScheme.onSurface.withValues(alpha: 0.12),
+                disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -163,9 +145,7 @@ class _SettingsDeleteAllBottomSheetState
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
-              style: TextStyle(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+              style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
             ),
           ),
         ],
@@ -180,9 +160,7 @@ class _SettingsDeleteAllBottomSheetState
       decoration: BoxDecoration(
         color: Colors.red.withValues(alpha: isDark ? 0.12 : 0.06),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: isDark ? 0.4 : 0.25),
-        ),
+        border: Border.all(color: Colors.red.withValues(alpha: isDark ? 0.4 : 0.25)),
       ),
       child: _loadingCount
           ? const Center(
@@ -200,11 +178,7 @@ class _SettingsDeleteAllBottomSheetState
                     color: Colors.red.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.library_books_outlined,
-                    color: Colors.red,
-                    size: 22,
-                  ),
+                  child: const Icon(Icons.library_books_outlined, color: Colors.red, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -215,8 +189,7 @@ class _SettingsDeleteAllBottomSheetState
                         'Se eliminarán permanentemente',
                         style: TextStyle(
                           fontSize: 12,
-                          color: colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -241,21 +214,13 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF059669)
-            .withValues(alpha: isDark ? 0.12 : 0.07),
+        color: const Color(0xFF059669).withValues(alpha: isDark ? 0.12 : 0.07),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF059669)
-              .withValues(alpha: isDark ? 0.35 : 0.25),
-        ),
+        border: Border.all(color: const Color(0xFF059669).withValues(alpha: isDark ? 0.35 : 0.25)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.lightbulb_outline_rounded,
-            color: Color(0xFF059669),
-            size: 18,
-          ),
+          const Icon(Icons.lightbulb_outline_rounded, color: Color(0xFF059669), size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -282,8 +247,7 @@ class _SettingsDeleteAllBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -302,16 +266,9 @@ class _SettingsDeleteAllBottomSheetState
             decoration: BoxDecoration(
               color: Colors.red.withValues(alpha: isDark ? 0.25 : 0.12),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.red.withValues(alpha: 0.5),
-                width: 2,
-              ),
+              border: Border.all(color: Colors.red.withValues(alpha: 0.5), width: 2),
             ),
-            child: const Icon(
-              Icons.warning_amber_rounded,
-              size: 36,
-              color: Colors.red,
-            ),
+            child: const Icon(Icons.warning_amber_rounded, size: 36, color: Colors.red),
           ),
           const SizedBox(height: 14),
           const Text(
@@ -340,40 +297,27 @@ class _SettingsDeleteAllBottomSheetState
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
                   : const Icon(Icons.delete_forever_rounded),
-              label: Text(
-                _isDeleting ? 'Eliminando...' : 'Sí, eliminar todo',
-              ),
+              label: Text(_isDeleting ? 'Eliminando...' : 'Sí, eliminar todo'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor:
-                    colorScheme.onSurface.withValues(alpha: 0.12),
+                disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
           ),
           const SizedBox(height: 12),
           TextButton.icon(
-            onPressed:
-                _isDeleting ? null : () => setState(() => _step = 0),
+            onPressed: _isDeleting ? null : () => setState(() => _step = 0),
             icon: const Icon(Icons.arrow_back_rounded, size: 18),
             label: const Text('Volver'),
             style: TextButton.styleFrom(
-              foregroundColor:
-                  colorScheme.onSurface.withValues(alpha: 0.6),
+              foregroundColor: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],

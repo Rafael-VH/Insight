@@ -29,12 +29,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _navigateToUpload(BuildContext context, StatsUploadType type) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => UploadScreen(uploadType: type),
-      ),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => UploadScreen(uploadType: type)));
   }
 }
 
@@ -56,27 +51,13 @@ class _HeroHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: colorScheme.primary,
-      ),
+      decoration: BoxDecoration(color: colorScheme.primary),
       child: Stack(
         children: [
           // Círculos decorativos de fondo
-          Positioned(
-            top: -50,
-            right: -50,
-            child: _DecorativeCircle(size: 200, opacity: 0.06),
-          ),
-          Positioned(
-            bottom: -30,
-            right: 20,
-            child: _DecorativeCircle(size: 130, opacity: 0.05),
-          ),
-          Positioned(
-            top: 30,
-            left: -60,
-            child: _DecorativeCircle(size: 160, opacity: 0.04),
-          ),
+          Positioned(top: -50, right: -50, child: _DecorativeCircle(size: 200, opacity: 0.06)),
+          Positioned(bottom: -30, right: 20, child: _DecorativeCircle(size: 130, opacity: 0.05)),
+          Positioned(top: 30, left: -60, child: _DecorativeCircle(size: 160, opacity: 0.04)),
           // Contenido
           SafeArea(
             bottom: false,
@@ -131,10 +112,7 @@ class _DecorativeCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: colorScheme.onPrimary.withValues(alpha: opacity),
-          width: 1,
-        ),
+        border: Border.all(color: colorScheme.onPrimary.withValues(alpha: opacity), width: 1),
       ),
     );
   }
@@ -151,9 +129,7 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -161,10 +137,7 @@ class _StatusBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
-              color: Color(0xFF34D399),
-              shape: BoxShape.circle,
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF34D399), shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
           Text(
@@ -187,11 +160,7 @@ class _HeroStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      ('28', 'Campos OCR'),
-      ('4', 'Modos'),
-      ('100%', 'Automático'),
-    ];
+    final items = [('28', 'Campos OCR'), ('4', 'Modos'), ('100%', 'Automático')];
 
     return Row(
       children: items.asMap().entries.map((entry) {
@@ -222,11 +191,7 @@ class _HeroStatsRow extends StatelessWidget {
 }
 
 class _HeroStatItem extends StatelessWidget {
-  const _HeroStatItem({
-    required this.value,
-    required this.label,
-    required this.onPrimaryColor,
-  });
+  const _HeroStatItem({required this.value, required this.label, required this.onPrimaryColor});
 
   final String value;
   final String label;
@@ -239,28 +204,16 @@ class _HeroStatItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: onPrimaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: onPrimaryColor.withValues(alpha: 0.12),
-        ),
+        border: Border.all(color: onPrimaryColor.withValues(alpha: 0.12)),
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: onPrimaryColor,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: onPrimaryColor),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              color: onPrimaryColor.withValues(alpha: 0.6),
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 10, color: onPrimaryColor.withValues(alpha: 0.6))),
         ],
       ),
     );
@@ -344,9 +297,7 @@ class _UploadCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.15),
-            ),
+            border: Border.all(color: colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.15)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,16 +313,10 @@ class _UploadCard extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? accentColor.withValues(alpha: 0.15)
-                            : iconBackground,
+                        color: isDark ? accentColor.withValues(alpha: 0.15) : iconBackground,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        icon,
-                        color: isDark ? accentColor : iconColor,
-                        size: 24,
-                      ),
+                      child: Icon(icon, color: isDark ? accentColor : iconColor, size: 24),
                     ),
                     const SizedBox(width: 14),
                     // Texto
@@ -392,8 +337,7 @@ class _UploadCard extends StatelessWidget {
                             description,
                             style: TextStyle(
                               fontSize: 12,
-                              color: colorScheme.onSurface
-                                  .withValues(alpha: 0.55),
+                              color: colorScheme.onSurface.withValues(alpha: 0.55),
                               height: 1.4,
                             ),
                           ),
@@ -411,20 +355,16 @@ class _UploadCard extends StatelessWidget {
               ),
               // ── Pie de la tarjeta ────────────────────────────
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.5),
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(16),
                     bottomRight: Radius.circular(16),
                   ),
                   border: Border(
                     top: BorderSide(
-                      color: colorScheme.outline.withValues(
-                        alpha: isDark ? 0.15 : 0.1,
-                      ),
+                      color: colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.1),
                     ),
                   ),
                 ),
@@ -433,10 +373,7 @@ class _UploadCard extends StatelessWidget {
                     Container(
                       width: 7,
                       height: 7,
-                      decoration: BoxDecoration(
-                        color: accentColor,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 7),
                     Text(
@@ -452,10 +389,7 @@ class _UploadCard extends StatelessWidget {
                     if (uploadType == StatsUploadType.byModes)
                       _ModesChipRow(accentColor: accentColor)
                     else
-                      _ModeChip(
-                        label: 'Total',
-                        color: accentColor,
-                      ),
+                      _ModeChip(label: 'Total', color: accentColor),
                   ],
                 ),
               ),
@@ -556,10 +490,7 @@ class _TipsSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: colorScheme.outline
-                  .withValues(alpha: isDark ? 0.2 : 0.15),
-            ),
+            border: Border.all(color: colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.15)),
           ),
           child: Column(
             children: tips.asMap().entries.map((entry) {
@@ -580,9 +511,7 @@ class _TipsSection extends StatelessWidget {
                       height: 1,
                       indent: 16,
                       endIndent: 16,
-                      color: colorScheme.outline.withValues(
-                        alpha: isDark ? 0.12 : 0.08,
-                      ),
+                      color: colorScheme.outline.withValues(alpha: isDark ? 0.12 : 0.08),
                     ),
                 ],
               );
@@ -643,11 +572,7 @@ class _TipRow extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  icon,
-                  size: 18,
-                  color: colorScheme.onSurface.withValues(alpha: 0.45),
-                ),
+                Icon(icon, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.45)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -666,8 +591,7 @@ class _TipRow extends StatelessWidget {
                         description,
                         style: TextStyle(
                           fontSize: 12,
-                          color:
-                              colorScheme.onSurface.withValues(alpha: 0.55),
+                          color: colorScheme.onSurface.withValues(alpha: 0.55),
                           height: 1.4,
                         ),
                       ),
@@ -688,10 +612,7 @@ class _TipRow extends StatelessWidget {
 // ════════════════════════════════════════════════════════════════
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.label,
-    required this.subtitle,
-  });
+  const _SectionHeader({required this.label, required this.subtitle});
 
   final String label;
   final String subtitle;
@@ -704,19 +625,12 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
         ),
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: TextStyle(
-            fontSize: 12,
-            color: colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
+          style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.5)),
         ),
       ],
     );

@@ -80,8 +80,7 @@ class UploadImageCardWithOverlay extends StatelessWidget {
     );
   }
 
-  bool get _hasFinalState =>
-      validation != null || (imagePath != null && !isProcessing);
+  bool get _hasFinalState => validation != null || (imagePath != null && !isProcessing);
 
   Color _borderColor(ColorScheme cs, bool isDark, Color modeColor) {
     if (isProcessing) return modeColor.withValues(alpha: 0.5);
@@ -211,19 +210,12 @@ class _StatusBadge extends StatelessWidget {
             SizedBox(
               width: 10,
               height: 10,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.5,
-                color: modeColor,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 1.5, color: modeColor),
             ),
             const SizedBox(width: 6),
             Text(
               'Procesando',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: modeColor,
-              ),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: modeColor),
             ),
           ],
         ),
@@ -239,11 +231,7 @@ class _StatusBadge extends StatelessWidget {
         ),
         child: Text(
           'Pendiente',
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: Colors.grey[600]),
         ),
       );
     }
@@ -269,11 +257,7 @@ class _StatusBadge extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color),
             ),
           ],
         ),
@@ -363,11 +347,7 @@ class _EmptyImageZone extends StatelessWidget {
                 color: modeColor.withValues(alpha: isDark ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                Icons.add_photo_alternate_rounded,
-                color: modeColor,
-                size: 22,
-              ),
+              child: Icon(Icons.add_photo_alternate_rounded, color: modeColor, size: 22),
             ),
             const SizedBox(height: 10),
             Text(
@@ -381,10 +361,7 @@ class _EmptyImageZone extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Cámara o galería',
-              style: TextStyle(
-                fontSize: 11,
-                color: colorScheme.onSurface.withValues(alpha: 0.38),
-              ),
+              style: TextStyle(fontSize: 11, color: colorScheme.onSurface.withValues(alpha: 0.38)),
             ),
           ],
         ),
@@ -419,10 +396,7 @@ class _FilledImageZone extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.35),
-                ],
+                colors: [Colors.transparent, Colors.black.withValues(alpha: 0.35)],
               ),
             ),
           ),
@@ -433,10 +407,7 @@ class _FilledImageZone extends StatelessWidget {
             child: GestureDetector(
               onTap: onTap,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.55),
                   borderRadius: BorderRadius.circular(8),
@@ -469,11 +440,7 @@ class _FilledImageZone extends StatelessWidget {
                 color: Colors.green.withValues(alpha: 0.85),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.check_rounded,
-                size: 12,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.check_rounded, size: 12, color: Colors.white),
             ),
           ),
         ],
@@ -506,10 +473,7 @@ class _ProcessingZone extends StatelessWidget {
           SizedBox(
             width: 32,
             height: 32,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.5,
-              color: modeColor,
-            ),
+            child: CircularProgressIndicator(strokeWidth: 2.5, color: modeColor),
           ),
           const SizedBox(height: 12),
           Text(
@@ -523,11 +487,7 @@ class _ProcessingZone extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             mode.fullDisplayName,
-            style: TextStyle(
-              fontSize: 11,
-              color: modeColor,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 11, color: modeColor, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -605,18 +565,12 @@ class _SourceButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.1),
-          ),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.1)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 15,
-              color: colorScheme.onSurface.withValues(alpha: 0.55),
-            ),
+            Icon(icon, size: 15, color: colorScheme.onSurface.withValues(alpha: 0.55)),
             const SizedBox(width: 6),
             Text(
               label,
@@ -636,10 +590,7 @@ class _SourceButton extends StatelessWidget {
 // ── Sheet de selección de fuente ──────────────────────────────────
 
 class _SourceBottomSheet {
-  static void show(
-    BuildContext context,
-    void Function(ImageSourceType) onSelected,
-  ) {
+  static void show(BuildContext context, void Function(ImageSourceType) onSelected) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -747,9 +698,7 @@ class _BigSourceButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: color.withValues(alpha: isDark ? 0.15 : 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: color.withValues(alpha: isDark ? 0.3 : 0.2),
-          ),
+          border: Border.all(color: color.withValues(alpha: isDark ? 0.3 : 0.2)),
         ),
         child: Column(
           children: [
@@ -766,10 +715,7 @@ class _BigSourceButton extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
+              style: TextStyle(fontSize: 11, color: colorScheme.onSurface.withValues(alpha: 0.5)),
             ),
           ],
         ),

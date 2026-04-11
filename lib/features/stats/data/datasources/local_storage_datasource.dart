@@ -34,9 +34,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       }
 
       final exactDuplicateIndex = collections.indexWhere(
-        (c) =>
-            c.createdAt.millisecondsSinceEpoch ==
-            collection.createdAt.millisecondsSinceEpoch,
+        (c) => c.createdAt.millisecondsSinceEpoch == collection.createdAt.millisecondsSinceEpoch,
       );
 
       if (exactDuplicateIndex != -1) {
@@ -61,10 +59,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
 
       final jsonString = json.encode(jsonList);
 
-      final success = await sharedPreferences.setString(
-        _collectionsKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_collectionsKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to save stats collection');
@@ -145,9 +140,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
 
       final originalLength = collections.length;
       collections.removeWhere(
-        (c) =>
-            c.createdAt.millisecondsSinceEpoch ==
-            createdAt.millisecondsSinceEpoch,
+        (c) => c.createdAt.millisecondsSinceEpoch == createdAt.millisecondsSinceEpoch,
       );
 
       if (collections.length == originalLength) {
@@ -167,10 +160,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       }).toList();
 
       final jsonString = json.encode(jsonList);
-      final success = await sharedPreferences.setString(
-        _collectionsKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_collectionsKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to delete stats collection');
@@ -197,16 +187,11 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
   }
 
   @override
-  Future<void> updateStatsCollectionName(
-    DateTime createdAt,
-    String newName,
-  ) async {
+  Future<void> updateStatsCollectionName(DateTime createdAt, String newName) async {
     try {
       final collections = await getAllStatsCollections();
       final index = collections.indexWhere(
-        (c) =>
-            c.createdAt.millisecondsSinceEpoch ==
-            createdAt.millisecondsSinceEpoch,
+        (c) => c.createdAt.millisecondsSinceEpoch == createdAt.millisecondsSinceEpoch,
       );
 
       if (index == -1) {
@@ -228,10 +213,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       }).toList();
 
       final jsonString = json.encode(jsonList);
-      final success = await sharedPreferences.setString(
-        _collectionsKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_collectionsKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to update stats collection name');
@@ -240,9 +222,7 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
       if (e is FileSystemFailure) {
         rethrow;
       }
-      throw FileSystemFailure(
-        'Error updating collection name: ${e.toString()}',
-      );
+      throw FileSystemFailure('Error updating collection name: ${e.toString()}');
     }
   }
 
@@ -253,18 +233,14 @@ class LocalStorageDataSourceImpl implements LocalStorageDataSource {
 
       try {
         final collection = collections.firstWhere(
-          (c) =>
-              c.createdAt.millisecondsSinceEpoch ==
-              createdAt.millisecondsSinceEpoch,
+          (c) => c.createdAt.millisecondsSinceEpoch == createdAt.millisecondsSinceEpoch,
         );
         return collection;
       } catch (e) {
         return null;
       }
     } catch (e) {
-      throw FileSystemFailure(
-        'Error loading collection by date: ${e.toString()}',
-      );
+      throw FileSystemFailure('Error loading collection by date: ${e.toString()}');
     }
   }
 }

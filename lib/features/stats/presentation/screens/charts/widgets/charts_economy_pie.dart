@@ -18,21 +18,9 @@ class _ChartsEconomyPieState extends State<ChartsEconomyPie> {
   int _touchedIndex = -1;
 
   List<PieEntry> get _entries => [
-    PieEntry(
-      'Oro/Min',
-      widget.stats.goldPerMin.toDouble(),
-      const Color(0xFFF59E0B),
-    ),
-    PieEntry(
-      'Daño Héroe/Min',
-      widget.stats.heroDamagePerMin.toDouble(),
-      const Color(0xFFDC2626),
-    ),
-    PieEntry(
-      'Daño Torre/P',
-      widget.stats.towerDamagePerGame.toDouble(),
-      const Color(0xFF7C3AED),
-    ),
+    PieEntry('Oro/Min', widget.stats.goldPerMin.toDouble(), const Color(0xFFF59E0B)),
+    PieEntry('Daño Héroe/Min', widget.stats.heroDamagePerMin.toDouble(), const Color(0xFFDC2626)),
+    PieEntry('Daño Torre/P', widget.stats.towerDamagePerGame.toDouble(), const Color(0xFF7C3AED)),
   ];
 
   @override
@@ -48,9 +36,7 @@ class _ChartsEconomyPieState extends State<ChartsEconomyPie> {
           child: Center(
             child: Text(
               'Sin datos de economía',
-              style: TextStyle(
-                color: colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
+              style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
             ),
           ),
         ),
@@ -116,10 +102,7 @@ class _ChartsEconomyPieState extends State<ChartsEconomyPie> {
                   Container(
                     width: 12,
                     height: 12,
-                    decoration: BoxDecoration(
-                      color: e.color,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: e.color, shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 8),
                   Column(
@@ -135,11 +118,7 @@ class _ChartsEconomyPieState extends State<ChartsEconomyPie> {
                       ),
                       Text(
                         NumberFormat.compact().format(e.value),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: e.color,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(fontSize: 14, color: e.color, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

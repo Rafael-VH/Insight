@@ -65,13 +65,7 @@ class DialogService {
     bool useAwesome = true,
   }) async {
     if (useAwesome) {
-      return _showAwesomeConfirmation(
-        context,
-        title,
-        message,
-        confirmButtonText,
-        cancelButtonText,
-      );
+      return _showAwesomeConfirmation(context, title, message, confirmButtonText, cancelButtonText);
     } else {
       return SaveStatsDialog.showConfirmation(
         context,
@@ -83,11 +77,7 @@ class DialogService {
     }
   }
 
-  static void _showAwesomeSuccess(
-    BuildContext context,
-    String message,
-    Duration duration,
-  ) {
+  static void _showAwesomeSuccess(BuildContext context, String message, Duration duration) {
     final snackBar = SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,
@@ -173,9 +163,7 @@ class DialogService {
       builder: (dialogContext) {
         final colorScheme = Theme.of(dialogContext).colorScheme;
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           backgroundColor: colorScheme.surface,
           title: Text(
             title,
@@ -196,24 +184,16 @@ class DialogService {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(
-                cancelButtonText,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
+              child: Text(cancelButtonText, style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(
-                confirmButtonText,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
+              child: Text(confirmButtonText, style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
           ],
         );

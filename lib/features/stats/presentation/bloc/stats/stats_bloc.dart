@@ -17,10 +17,8 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
   final SaveStatsCollection saveStatsCollection;
   final HistoryBloc historyBloc;
 
-  StatsBloc({
-    required this.saveStatsCollection,
-    required this.historyBloc,
-  }) : super(StatsInitial()) {
+  StatsBloc({required this.saveStatsCollection, required this.historyBloc})
+    : super(StatsInitial()) {
     on<SaveStatsCollectionEvent>(_onSaveStatsCollection);
   }
 
@@ -33,8 +31,7 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         emit(
           const StatsError(
             'No hay estadísticas para guardar',
-            errorDetails:
-                'Debes cargar al menos una estadística antes de guardar.',
+            errorDetails: 'Debes cargar al menos una estadística antes de guardar.',
           ),
         );
         return;
@@ -46,12 +43,7 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
       await result.fold(
         (failure) async {
-          emit(
-            StatsError(
-              'Error al guardar estadísticas',
-              errorDetails: failure.message,
-            ),
-          );
+          emit(StatsError('Error al guardar estadísticas', errorDetails: failure.message));
         },
         (_) async {
           emit(const StatsSaved('Estadísticas guardadas correctamente'));

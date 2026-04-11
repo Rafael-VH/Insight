@@ -40,10 +40,7 @@ class HistoryFilterBar extends StatelessWidget {
           ),
           if (searchQuery.isNotEmpty)
             Chip(
-              label: Text(
-                'Búsqueda: "$searchQuery"',
-                style: const TextStyle(fontSize: 12),
-              ),
+              label: Text('Búsqueda: "$searchQuery"', style: const TextStyle(fontSize: 12)),
               deleteIcon: const Icon(Icons.close, size: 16),
               onDeleted: onClearSearch,
               backgroundColor: colorScheme.primary.withValues(alpha: 0.1),

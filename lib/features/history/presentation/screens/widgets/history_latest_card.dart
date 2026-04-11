@@ -111,10 +111,7 @@ class HistoryLatestCard extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: collection.availableStats.map((s) {
-                      return _ModeChip(
-                        label: s.mode.shortName,
-                        color: s.mode.color,
-                      );
+                      return _ModeChip(label: s.mode.shortName, color: s.mode.color);
                     }).toList(),
                   ),
 
@@ -131,31 +128,21 @@ class HistoryLatestCard extends StatelessWidget {
                         if (stats.winRate > 0)
                           Expanded(
                             child: _StatInline(
-                              value:
-                                  '${stats.winRate.toStringAsFixed(1)}%',
+                              value: '${stats.winRate.toStringAsFixed(1)}%',
                               label: 'WIN RATE',
                             ),
                           ),
                         if (stats.kda > 0)
                           Expanded(
-                            child: _StatInline(
-                              value: stats.kda.toStringAsFixed(2),
-                              label: 'KDA',
-                            ),
+                            child: _StatInline(value: stats.kda.toStringAsFixed(2), label: 'KDA'),
                           ),
                         if (stats.totalGames > 0)
                           Expanded(
-                            child: _StatInline(
-                              value: '${stats.totalGames}',
-                              label: 'PARTIDAS',
-                            ),
+                            child: _StatInline(value: '${stats.totalGames}', label: 'PARTIDAS'),
                           ),
                         if (stats.mvpCount > 0)
                           Expanded(
-                            child: _StatInline(
-                              value: '${stats.mvpCount}',
-                              label: 'MVP',
-                            ),
+                            child: _StatInline(value: '${stats.mvpCount}', label: 'MVP'),
                           ),
                       ],
                     ),
@@ -180,10 +167,7 @@ class _LatestBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
-          width: 0.5,
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -191,10 +175,7 @@ class _LatestBadge extends StatelessWidget {
           Container(
             width: 5,
             height: 5,
-            decoration: const BoxDecoration(
-              color: Color(0xFF34D399),
-              shape: BoxShape.circle,
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF34D399), shape: BoxShape.circle),
           ),
           const SizedBox(width: 5),
           const Text(
@@ -213,11 +194,7 @@ class _LatestBadge extends StatelessWidget {
 }
 
 class _IconButton extends StatelessWidget {
-  const _IconButton({
-    required this.icon,
-    required this.onTap,
-    required this.tooltip,
-  });
+  const _IconButton({required this.icon, required this.onTap, required this.tooltip});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -235,10 +212,7 @@ class _IconButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
-              width: 0.5,
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 0.5),
           ),
           child: Icon(icon, size: 15, color: Colors.white70),
         ),
@@ -259,10 +233,7 @@ class _ModeChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 0.5,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -333,11 +304,7 @@ class _DiagonalPatternPainter extends CustomPainter {
 
     const spacing = 8.0;
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paint,
-      );
+      canvas.drawLine(Offset(i, 0), Offset(i + size.height, size.height), paint);
     }
   }
 

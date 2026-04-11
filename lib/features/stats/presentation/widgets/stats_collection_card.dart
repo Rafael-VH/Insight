@@ -5,12 +5,7 @@ import 'package:insight/features/stats/presentation/utils/game_mode_extensions.d
 import 'package:intl/intl.dart';
 
 class StatsCollectionCard extends StatelessWidget {
-  const StatsCollectionCard({
-    super.key,
-    required this.collection,
-    required this.onTap,
-    this.badge,
-  });
+  const StatsCollectionCard({super.key, required this.collection, required this.onTap, this.badge});
 
   final StatsCollection collection;
   final VoidCallback onTap;
@@ -77,11 +72,7 @@ class StatsCollectionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    DateFormat dateFormat,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildHeader(BuildContext context, DateFormat dateFormat, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -100,10 +91,7 @@ class StatsCollectionCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 _getRelativeTime(collection.createdAt),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
+                style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
               ),
             ],
           ),

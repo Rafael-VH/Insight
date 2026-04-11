@@ -22,9 +22,7 @@ class StatsUploadButton extends StatelessWidget {
     // Adaptar colores según tema
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? color.withValues(alpha: 0.2) : color;
-    final gradientColor = isDark
-        ? color.withValues(alpha: 0.3)
-        : color.withValues(alpha: 0.8);
+    final gradientColor = isDark ? color.withValues(alpha: 0.3) : color.withValues(alpha: 0.8);
     return Material(
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
@@ -44,11 +42,7 @@ class StatsUploadButton extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 16),
-              _buildDescription(),
-            ],
+            children: [_buildHeader(context), const SizedBox(height: 16), _buildDescription()],
           ),
         ),
       ),
@@ -57,9 +51,7 @@ class StatsUploadButton extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     // Texto adaptado al tema
-    final textColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.white;
+    final textColor = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.white;
     return Row(
       children: [
         Container(
@@ -77,28 +69,17 @@ class StatsUploadButton extends StatelessWidget {
             children: [
               Text(
                 uploadType.displayName,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
                 '${uploadType.imageCount} imagen${uploadType.imageCount > 1 ? 'es' : ''}',
-                style: TextStyle(
-                  color: textColor.withValues(alpha: 0.9),
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: textColor.withValues(alpha: 0.9), fontSize: 14),
               ),
             ],
           ),
         ),
-        Icon(
-          Icons.arrow_forward_ios,
-          color: textColor.withValues(alpha: 0.8),
-          size: 16,
-        ),
+        Icon(Icons.arrow_forward_ios, color: textColor.withValues(alpha: 0.8), size: 16),
       ],
     );
   }

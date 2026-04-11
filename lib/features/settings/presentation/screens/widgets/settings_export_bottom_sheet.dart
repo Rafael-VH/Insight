@@ -30,12 +30,10 @@ class SettingsExportBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<SettingsExportBottomSheet> createState() =>
-      _SettingsExportBottomSheetState();
+  State<SettingsExportBottomSheet> createState() => _SettingsExportBottomSheetState();
 }
 
-class _SettingsExportBottomSheetState
-    extends State<SettingsExportBottomSheet> {
+class _SettingsExportBottomSheetState extends State<SettingsExportBottomSheet> {
   List<StatsCollection> _collections = [];
   bool _isLoadingPreview = true;
   bool _isExporting = false;
@@ -70,12 +68,9 @@ class _SettingsExportBottomSheetState
         'app': 'Insight',
         'exportedAt': DateTime.now().toUtc().toIso8601String(),
         'totalCollections': collections.length,
-        'collections': collections
-            .map((c) => StatsCollectionModel.fromEntity(c).toJson())
-            .toList(),
+        'collections': collections.map((c) => StatsCollectionModel.fromEntity(c).toJson()).toList(),
       };
-      final jsonString =
-          const JsonEncoder.withIndent('  ').convert(exportMap);
+      final jsonString = const JsonEncoder.withIndent('  ').convert(exportMap);
       return utf8.encode(jsonString).length;
     } catch (_) {
       return 0;
@@ -104,9 +99,7 @@ class _SettingsExportBottomSheetState
 
   void _export() {
     setState(() => _isExporting = true);
-    context.read<HistoryBloc>().add(
-      ExportStatsToJsonEvent(collections: _collections),
-    );
+    context.read<HistoryBloc>().add(ExportStatsToJsonEvent(collections: _collections));
   }
 
   // ── Build ────────────────────────────────────────────────────
@@ -124,8 +117,7 @@ class _SettingsExportBottomSheetState
           SharePlus.instance.share(
             ShareParams(
               files: [XFile(state.filePath)],
-              subject:
-                  'Insight — ${state.totalCollections} colección(es)',
+              subject: 'Insight — ${state.totalCollections} colección(es)',
               text: 'Backup de estadísticas de Mobile Legends',
             ),
           );
@@ -147,8 +139,7 @@ class _SettingsExportBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -174,13 +165,10 @@ class _SettingsExportBottomSheetState
           _buildExportButton(colorScheme),
           const SizedBox(height: 12),
           TextButton(
-            onPressed:
-                _isExporting ? null : () => Navigator.of(context).pop(),
+            onPressed: _isExporting ? null : () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
-              style: TextStyle(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+              style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
             ),
           ),
         ],
@@ -206,15 +194,10 @@ class _SettingsExportBottomSheetState
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(0xFF059669)
-                .withValues(alpha: isDark ? 0.2 : 0.1),
+            color: const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.upload_file_rounded,
-            size: 32,
-            color: Color(0xFF059669),
-          ),
+          child: const Icon(Icons.upload_file_rounded, size: 32, color: Color(0xFF059669)),
         ),
         const SizedBox(height: 12),
         const Text(
@@ -227,34 +210,23 @@ class _SettingsExportBottomSheetState
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSummaryCard(
-    BuildContext context,
-    ColorScheme colorScheme,
-    bool isDark,
-  ) {
+  Widget _buildSummaryCard(BuildContext context, ColorScheme colorScheme, bool isDark) {
     final isEmpty = _collections.isEmpty;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
       ),
       child: isEmpty
           ? Row(
@@ -304,10 +276,7 @@ class _SettingsExportBottomSheetState
   Widget _buildDivider(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Divider(
-        height: 1,
-        color: colorScheme.outline.withValues(alpha: 0.2),
-      ),
+      child: Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.2)),
     );
   }
 
@@ -322,28 +291,17 @@ class _SettingsExportBottomSheetState
             ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
             : const Icon(Icons.ios_share_rounded),
-        label: Text(
-          _isExporting ? 'Exportando...' : 'Exportar y compartir',
-        ),
+        label: Text(_isExporting ? 'Exportando...' : 'Exportar y compartir'),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF059669),
           foregroundColor: Colors.white,
-          disabledBackgroundColor:
-              colorScheme.onSurface.withValues(alpha: 0.12),
+          disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -384,19 +342,12 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
-              color: colorScheme.onSurface.withValues(alpha: 0.65),
-            ),
+            style: TextStyle(fontSize: 13, color: colorScheme.onSurface.withValues(alpha: 0.65)),
           ),
         ),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: valueColor,
-          ),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: valueColor),
         ),
       ],
     );

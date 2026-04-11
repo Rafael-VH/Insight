@@ -93,10 +93,7 @@ class HistoryExported extends HistoryState {
   final String filePath;
   final int totalCollections;
 
-  const HistoryExported({
-    required this.filePath,
-    required this.totalCollections,
-  });
+  const HistoryExported({required this.filePath, required this.totalCollections});
 
   @override
   List<Object> get props => [filePath, totalCollections];
@@ -111,11 +108,7 @@ class HistoryImported extends HistoryState {
   final int skippedCount;
   final bool merged;
 
-  const HistoryImported({
-    required this.importedCount,
-    this.skippedCount = 0,
-    required this.merged,
-  });
+  const HistoryImported({required this.importedCount, this.skippedCount = 0, required this.merged});
 
   @override
   List<Object> get props => [importedCount, skippedCount, merged];

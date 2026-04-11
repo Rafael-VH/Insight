@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HistorySearchBar extends StatelessWidget {
-  const HistorySearchBar({
-    super.key,
-    required this.controller,
-    required this.onChanged,
-  });
+  const HistorySearchBar({super.key, required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final void Function(String query) onChanged;

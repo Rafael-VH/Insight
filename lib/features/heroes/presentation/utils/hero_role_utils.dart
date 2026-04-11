@@ -10,11 +10,11 @@ class HeroRoleUtils {
 
   static const Map<String, Color> _roleColors = {
     'Marksman': Color(0xFF3B82F6),
-    'Mage':     Color(0xFF8B5CF6),
-    'Fighter':  Color(0xFFF59E0B),
-    'Tank':     Color(0xFF10B981),
+    'Mage': Color(0xFF8B5CF6),
+    'Fighter': Color(0xFFF59E0B),
+    'Tank': Color(0xFF10B981),
     'Assassin': Color(0xFFEF4444),
-    'Support':  Color(0xFF14B8A6),
+    'Support': Color(0xFF14B8A6),
   };
 
   static const List<Color> _avatarPalette = [
@@ -31,12 +31,10 @@ class HeroRoleUtils {
   ];
 
   /// Color del dot/chip para un rol dado.
-  static Color colorForRole(String role) =>
-      _roleColors[role] ?? const Color(0xFF6B7280);
+  static Color colorForRole(String role) => _roleColors[role] ?? const Color(0xFF6B7280);
 
   /// Color de fondo del avatar para un héroe dado (por ID).
-  static Color avatarColorForId(int heroId) =>
-      _avatarPalette[heroId % _avatarPalette.length];
+  static Color avatarColorForId(int heroId) => _avatarPalette[heroId % _avatarPalette.length];
 
   /// Construye un chip de rol con colores semánticos.
   static Widget buildRoleChip(String role, {bool small = false}) {
@@ -58,11 +56,7 @@ class HeroRoleUtils {
 // ── Widget de chip de rol ─────────────────────────────────────────
 
 class _RoleChip extends StatelessWidget {
-  const _RoleChip({
-    required this.role,
-    required this.color,
-    required this.small,
-  });
+  const _RoleChip({required this.role, required this.color, required this.small});
 
   final String role;
   final Color color;

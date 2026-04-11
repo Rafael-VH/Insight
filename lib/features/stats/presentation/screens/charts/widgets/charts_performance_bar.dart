@@ -38,8 +38,7 @@ class ChartsPerformanceBar extends StatelessWidget {
                 maxY: 100,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) =>
-                        Colors.black.withValues(alpha: 0.75),
+                    getTooltipColor: (_) => Colors.black.withValues(alpha: 0.75),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final e = entries[groupIndex];
                       return BarTooltipItem(
@@ -69,40 +68,29 @@ class ChartsPerformanceBar extends StatelessWidget {
                             entries[idx].label,
                             style: TextStyle(
                               fontSize: 10,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.7,
-                              ),
+                              color: colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: FlGridData(
                   drawVerticalLine: false,
                   horizontalInterval: 25,
-                  getDrawingHorizontalLine: (_) => FlLine(
-                    color: colorScheme.outline.withValues(alpha: 0.2),
-                    strokeWidth: 1,
-                  ),
+                  getDrawingHorizontalLine: (_) =>
+                      FlLine(color: colorScheme.outline.withValues(alpha: 0.2), strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: entries.asMap().entries.map((e) {
-                  final normalized =
-                      ((e.value.rawValue / e.value.maxValue) * 100).clamp(
-                        0.0,
-                        100.0,
-                      );
+                  final normalized = ((e.value.rawValue / e.value.maxValue) * 100).clamp(
+                    0.0,
+                    100.0,
+                  );
                   return BarChartGroupData(
                     x: e.key,
                     barRods: [

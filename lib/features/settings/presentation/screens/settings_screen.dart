@@ -29,24 +29,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, state) {
               if (state is SettingsLoading) {
-                return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                );
+                return const SliverFillRemaining(child: Center(child: CircularProgressIndicator()));
               }
 
               if (state is SettingsError) {
-                return SliverFillRemaining(
-                  child: _ErrorView(message: state.message),
-                );
+                return SliverFillRemaining(child: _ErrorView(message: state.message));
               }
 
               if (state is SettingsLoaded) {
                 return SettingsContent(settings: state.settings);
               }
 
-              return const SliverFillRemaining(
-                child: Center(child: Text('Cargando...')),
-              );
+              return const SliverFillRemaining(child: Center(child: Text('Cargando...')));
             },
           ),
         ],
@@ -71,11 +65,7 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Error al cargar configuración',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.red[700],
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red[700]),
           ),
           const SizedBox(height: 8),
           Text(message),
@@ -99,10 +89,7 @@ class _SettingsHeroCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
-          colors: [
-            colorScheme.primary,
-            colorScheme.primary.withValues(alpha: 8.0),
-          ],
+          colors: [colorScheme.primary, colorScheme.primary.withValues(alpha: 8.0)],
         ),
       ),
       child: Column(
@@ -132,10 +119,7 @@ class _SettingsHeroCard extends StatelessWidget {
                   ),
                   Text(
                     'Personaliza tu experiencia',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.65),
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.65)),
                   ),
                 ],
               ),
@@ -147,15 +131,10 @@ class _SettingsHeroCard extends StatelessWidget {
             children: ['Apariencia', 'General', 'Datos', 'Acerca de']
                 .map(
                   (label) => Container(
-                    padding: const EdgeInsetsGeometry.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsetsGeometry.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.25),
-                      ),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(

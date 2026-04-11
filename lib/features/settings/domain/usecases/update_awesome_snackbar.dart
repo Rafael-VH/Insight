@@ -15,13 +15,9 @@ class UpdateAwesomeSnackbar {
     // Obtener configuración actual
     final settingsResult = await repository.getSettings();
 
-    return settingsResult.fold((failure) => Left(failure), (
-      currentSettings,
-    ) async {
+    return settingsResult.fold((failure) => Left(failure), (currentSettings) async {
       // Actualizar solo el estilo de snackbar
-      final updatedSettings = currentSettings.copyWith(
-        useAwesomeSnackbar: params.enabled,
-      );
+      final updatedSettings = currentSettings.copyWith(useAwesomeSnackbar: params.enabled);
 
       // Guardar la configuración actualizada
       return await repository.saveSettings(updatedSettings);

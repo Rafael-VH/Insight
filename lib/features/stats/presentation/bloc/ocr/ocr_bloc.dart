@@ -9,24 +9,17 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
   final PickImageAndRecognizeText pickImageAndRecognizeText;
   final CopyTextToClipboard copyTextToClipboard;
 
-  OcrBloc({
-    required this.pickImageAndRecognizeText,
-    required this.copyTextToClipboard,
-  }) : super(OcrInitial()) {
+  OcrBloc({required this.pickImageAndRecognizeText, required this.copyTextToClipboard})
+    : super(OcrInitial()) {
     on<ProcessImageEvent>(_onProcessImage);
     on<CopyTextEvent>(_onCopyText);
     on<ResetStateEvent>(_onResetState);
   }
 
-  Future<void> _onProcessImage(
-    ProcessImageEvent event,
-    Emitter<OcrState> emit,
-  ) async {
+  Future<void> _onProcessImage(ProcessImageEvent event, Emitter<OcrState> emit) async {
     emit(OcrLoading());
 
-    final result = await pickImageAndRecognizeText(
-      ImageSourceParams(source: event.source),
-    );
+    final result = await pickImageAndRecognizeText(ImageSourceParams(source: event.source));
 
     result.fold(
       (failure) => emit(OcrError(failure.message)),

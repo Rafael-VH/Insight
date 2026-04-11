@@ -12,11 +12,7 @@ class MainBackHandler extends StatelessWidget {
 
   final Widget child;
 
-  Future<void> _onPopInvokedWithResult(
-    BuildContext context,
-    bool didPop,
-    dynamic result,
-  ) async {
+  Future<void> _onPopInvokedWithResult(BuildContext context, bool didPop, dynamic result) async {
     if (didPop) return;
 
     final navigationBloc = context.read<NavigationBloc>();
@@ -44,19 +40,13 @@ class MainBackHandler extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: colorScheme.surface,
-        title: Text(
-          'Salir de la aplicación',
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
+        title: Text('Salir de la aplicación', style: TextStyle(color: colorScheme.onSurface)),
         content: Text(
           '¿Estás seguro de que quieres salir?',
           style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8)),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
@@ -74,8 +64,7 @@ class MainBackHandler extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) =>
-          _onPopInvokedWithResult(context, didPop, result),
+      onPopInvokedWithResult: (didPop, result) => _onPopInvokedWithResult(context, didPop, result),
       child: child,
     );
   }

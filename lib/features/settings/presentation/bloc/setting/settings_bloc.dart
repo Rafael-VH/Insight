@@ -19,10 +19,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ResetSettings>(_onResetSettings);
   }
 
-  Future<void> _onLoadSettings(
-    LoadSettings event,
-    Emitter<SettingsState> emit,
-  ) async {
+  Future<void> _onLoadSettings(LoadSettings event, Emitter<SettingsState> emit) async {
     emit(SettingsLoading());
 
     final result = await repository.getSettings();
@@ -33,13 +30,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     });
   }
 
-  Future<void> _onUpdateThemeMode(
-    UpdateThemeMode event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      themeMode: event.themeMode,
-    );
+  Future<void> _onUpdateThemeMode(UpdateThemeMode event, Emitter<SettingsState> emit) async {
+    final updatedSettings = _currentSettings.copyWith(themeMode: event.themeMode);
     await _saveAndEmit(updatedSettings, emit);
   }
 
@@ -47,9 +39,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     UpdateSelectedTheme event,
     Emitter<SettingsState> emit,
   ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      selectedThemeId: event.themeId,
-    );
+    final updatedSettings = _currentSettings.copyWith(selectedThemeId: event.themeId);
     await _saveAndEmit(updatedSettings, emit);
   }
 
@@ -57,9 +47,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     UpdateNotifications event,
     Emitter<SettingsState> emit,
   ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      enableNotifications: event.enabled,
-    );
+    final updatedSettings = _currentSettings.copyWith(enableNotifications: event.enabled);
     await _saveAndEmit(updatedSettings, emit);
   }
 
@@ -67,19 +55,12 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     UpdateHapticFeedback event,
     Emitter<SettingsState> emit,
   ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      enableHapticFeedback: event.enabled,
-    );
+    final updatedSettings = _currentSettings.copyWith(enableHapticFeedback: event.enabled);
     await _saveAndEmit(updatedSettings, emit);
   }
 
-  Future<void> _onUpdateAutoSave(
-    UpdateAutoSave event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      autoSaveStats: event.enabled,
-    );
+  Future<void> _onUpdateAutoSave(UpdateAutoSave event, Emitter<SettingsState> emit) async {
+    final updatedSettings = _currentSettings.copyWith(autoSaveStats: event.enabled);
     await _saveAndEmit(updatedSettings, emit);
   }
 
@@ -88,16 +69,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     UpdateAwesomeSnackbar event,
     Emitter<SettingsState> emit,
   ) async {
-    final updatedSettings = _currentSettings.copyWith(
-      useAwesomeSnackbar: event.enabled,
-    );
+    final updatedSettings = _currentSettings.copyWith(useAwesomeSnackbar: event.enabled);
     await _saveAndEmit(updatedSettings, emit);
   }
 
-  Future<void> _onResetSettings(
-    ResetSettings event,
-    Emitter<SettingsState> emit,
-  ) async {
+  Future<void> _onResetSettings(ResetSettings event, Emitter<SettingsState> emit) async {
     final result = await repository.resetSettings();
 
     result.fold((failure) => emit(SettingsError(failure.message)), (_) {
@@ -106,10 +82,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     });
   }
 
-  Future<void> _saveAndEmit(
-    AppSettings settings,
-    Emitter<SettingsState> emit,
-  ) async {
+  Future<void> _saveAndEmit(AppSettings settings, Emitter<SettingsState> emit) async {
     final result = await repository.saveSettings(settings);
 
     result.fold((failure) => emit(SettingsError(failure.message)), (_) {

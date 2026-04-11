@@ -42,10 +42,7 @@ class InfoBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
-                color: textColor ?? defaultBlueText,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: textColor ?? defaultBlueText, fontSize: 13),
             ),
           ),
         ],

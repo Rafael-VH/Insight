@@ -23,10 +23,7 @@ class SettingsStylePreview {
         duration: const Duration(seconds: 4),
         content: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(12)),
           child: Row(
             children: [
               const Icon(Icons.check_circle, color: Colors.white, size: 28),
@@ -47,10 +44,7 @@ class SettingsStylePreview {
                     const SizedBox(height: 4),
                     Text(
                       'Disfrutarás de notificaciones más modernas',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13),
                     ),
                   ],
                 ),

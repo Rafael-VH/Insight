@@ -28,18 +28,17 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     if (_cachedTheme != null && _cachedAvailableThemes != null) {
       final settingsResult = await settingsRepository.getSettings();
 
-      await settingsResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (settings) async {
-          emit(
-            ThemeLoaded(
-              currentTheme: _cachedTheme!,
-              themeMode: settings.themeMode,
-              availableThemes: _cachedAvailableThemes!,
-            ),
-          );
-        },
-      );
+      await settingsResult.fold((failure) async => emit(ThemeError(failure.message)), (
+        settings,
+      ) async {
+        emit(
+          ThemeLoaded(
+            currentTheme: _cachedTheme!,
+            themeMode: settings.themeMode,
+            availableThemes: _cachedAvailableThemes!,
+          ),
+        );
+      });
       return;
     }
 
@@ -50,45 +49,36 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       // Cargar configuración
       final settingsResult = await settingsRepository.getSettings();
 
-      await settingsResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (settings) async {
-          // Cargar tema actual
-          final themeResult = await themeRepository.getThemeById(
-            settings.selectedThemeId,
+      await settingsResult.fold((failure) async => emit(ThemeError(failure.message)), (
+        settings,
+      ) async {
+        // Cargar tema actual
+        final themeResult = await themeRepository.getThemeById(settings.selectedThemeId);
+
+        await themeResult.fold((failure) async => emit(ThemeError(failure.message)), (theme) async {
+          final currentTheme = theme ?? AppThemes.defaultTheme;
+
+          // Cargar todos los temas disponibles
+          final allThemesResult = await themeRepository.getAllThemes();
+
+          allThemesResult.fold(
+            (failure) => emit(ThemeError(failure.message)),
+            (themes) => emit(
+              ThemeLoaded(
+                currentTheme: currentTheme,
+                themeMode: settings.themeMode,
+                availableThemes: themes,
+              ),
+            ),
           );
-
-          await themeResult.fold(
-            (failure) async => emit(ThemeError(failure.message)),
-            (theme) async {
-              final currentTheme = theme ?? AppThemes.defaultTheme;
-
-              // Cargar todos los temas disponibles
-              final allThemesResult = await themeRepository.getAllThemes();
-
-              allThemesResult.fold(
-                (failure) => emit(ThemeError(failure.message)),
-                (themes) => emit(
-                  ThemeLoaded(
-                    currentTheme: currentTheme,
-                    themeMode: settings.themeMode,
-                    availableThemes: themes,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      );
+        });
+      });
     } catch (e) {
       emit(ThemeError('Error inesperado: ${e.toString()}'));
     }
   }
 
-  Future<void> _onChangeTheme(
-    ChangeTheme event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onChangeTheme(ChangeTheme event, Emitter<ThemeState> emit) async {
     if (state is! ThemeLoaded) return;
 
     final currentState = state as ThemeLoaded;
@@ -97,45 +87,34 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       // Cargar el nuevo tema
       final themeResult = await themeRepository.getThemeById(event.themeId);
 
-      await themeResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (theme) async {
-          if (theme == null) {
-            emit(const ThemeError('Tema no encontrado'));
-            return;
-          }
+      await themeResult.fold((failure) async => emit(ThemeError(failure.message)), (theme) async {
+        if (theme == null) {
+          emit(const ThemeError('Tema no encontrado'));
+          return;
+        }
 
-          // Actualizar configuración
-          final settingsResult = await settingsRepository.getSettings();
+        // Actualizar configuración
+        final settingsResult = await settingsRepository.getSettings();
 
-          await settingsResult.fold(
-            (failure) async => emit(ThemeError(failure.message)),
-            (settings) async {
-              final updatedSettings = settings.copyWith(
-                selectedThemeId: event.themeId,
-              );
+        await settingsResult.fold((failure) async => emit(ThemeError(failure.message)), (
+          settings,
+        ) async {
+          final updatedSettings = settings.copyWith(selectedThemeId: event.themeId);
 
-              final saveResult = await settingsRepository.saveSettings(
-                updatedSettings,
-              );
+          final saveResult = await settingsRepository.saveSettings(updatedSettings);
 
-              saveResult.fold(
-                (failure) => emit(ThemeError(failure.message)),
-                (_) => emit(currentState.copyWith(currentTheme: theme)),
-              );
-            },
+          saveResult.fold(
+            (failure) => emit(ThemeError(failure.message)),
+            (_) => emit(currentState.copyWith(currentTheme: theme)),
           );
-        },
-      );
+        });
+      });
     } catch (e) {
       emit(ThemeError('Error cambiando tema: ${e.toString()}'));
     }
   }
 
-  Future<void> _onChangeThemeMode(
-    ChangeThemeMode event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onChangeThemeMode(ChangeThemeMode event, Emitter<ThemeState> emit) async {
     if (state is! ThemeLoaded) return;
 
     final currentState = state as ThemeLoaded;
@@ -143,30 +122,24 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     try {
       final settingsResult = await settingsRepository.getSettings();
 
-      await settingsResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (settings) async {
-          final updatedSettings = settings.copyWith(themeMode: event.mode);
+      await settingsResult.fold((failure) async => emit(ThemeError(failure.message)), (
+        settings,
+      ) async {
+        final updatedSettings = settings.copyWith(themeMode: event.mode);
 
-          final saveResult = await settingsRepository.saveSettings(
-            updatedSettings,
-          );
+        final saveResult = await settingsRepository.saveSettings(updatedSettings);
 
-          saveResult.fold(
-            (failure) => emit(ThemeError(failure.message)),
-            (_) => emit(currentState.copyWith(themeMode: event.mode)),
-          );
-        },
-      );
+        saveResult.fold(
+          (failure) => emit(ThemeError(failure.message)),
+          (_) => emit(currentState.copyWith(themeMode: event.mode)),
+        );
+      });
     } catch (e) {
       emit(ThemeError('Error cambiando modo: ${e.toString()}'));
     }
   }
 
-  Future<void> _onLoadAllThemes(
-    LoadAllThemes event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onLoadAllThemes(LoadAllThemes event, Emitter<ThemeState> emit) async {
     if (state is! ThemeLoaded) return;
 
     final currentState = state as ThemeLoaded;
@@ -183,53 +156,39 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     }
   }
 
-  Future<void> _onSaveCustomTheme(
-    SaveCustomTheme event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onSaveCustomTheme(SaveCustomTheme event, Emitter<ThemeState> emit) async {
     try {
       final saveResult = await themeRepository.saveCustomTheme(event.theme);
 
-      await saveResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (_) async {
-          // Recargar temas
-          add(LoadAllThemes());
+      await saveResult.fold((failure) async => emit(ThemeError(failure.message)), (_) async {
+        // Recargar temas
+        add(LoadAllThemes());
 
-          // Cambiar al nuevo tema
-          add(ChangeTheme(event.theme.id));
-        },
-      );
+        // Cambiar al nuevo tema
+        add(ChangeTheme(event.theme.id));
+      });
     } catch (e) {
       emit(ThemeError('Error guardando tema: ${e.toString()}'));
     }
   }
 
-  Future<void> _onDeleteCustomTheme(
-    DeleteCustomTheme event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onDeleteCustomTheme(DeleteCustomTheme event, Emitter<ThemeState> emit) async {
     if (state is! ThemeLoaded) return;
 
     final currentState = state as ThemeLoaded;
 
     try {
-      final deleteResult = await themeRepository.deleteCustomTheme(
-        event.themeId,
-      );
+      final deleteResult = await themeRepository.deleteCustomTheme(event.themeId);
 
-      await deleteResult.fold(
-        (failure) async => emit(ThemeError(failure.message)),
-        (_) async {
-          // Si el tema eliminado es el actual, cambiar al tema por defecto
-          if (currentState.currentTheme.id == event.themeId) {
-            add(ChangeTheme(AppThemes.defaultTheme.id));
-          }
+      await deleteResult.fold((failure) async => emit(ThemeError(failure.message)), (_) async {
+        // Si el tema eliminado es el actual, cambiar al tema por defecto
+        if (currentState.currentTheme.id == event.themeId) {
+          add(ChangeTheme(AppThemes.defaultTheme.id));
+        }
 
-          // Recargar lista de temas
-          add(LoadAllThemes());
-        },
-      );
+        // Recargar lista de temas
+        add(LoadAllThemes());
+      });
     } catch (e) {
       emit(ThemeError('Error eliminando tema: ${e.toString()}'));
     }

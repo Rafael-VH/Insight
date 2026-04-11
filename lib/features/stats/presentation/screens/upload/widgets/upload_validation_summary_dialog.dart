@@ -18,9 +18,7 @@ class UploadValidationSummaryDialog {
       if (validation != null) {
         buffer.writeln('${mode.shortName}:');
         buffer.writeln('  ${validation.summary}');
-        buffer.writeln(
-          '  Completitud: ${validation.completionPercentage.toStringAsFixed(1)}%',
-        );
+        buffer.writeln('  Completitud: ${validation.completionPercentage.toStringAsFixed(1)}%');
         buffer.writeln();
       }
     }
@@ -31,22 +29,11 @@ class UploadValidationSummaryDialog {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: colorScheme.surface,
-        title: Text(
-          'Resumen de Validación',
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
+        title: Text('Resumen de Validación', style: TextStyle(color: colorScheme.onSurface)),
         content: SingleChildScrollView(
-          child: Text(
-            buffer.toString(),
-            style: TextStyle(color: colorScheme.onSurface),
-          ),
+          child: Text(buffer.toString(), style: TextStyle(color: colorScheme.onSurface)),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar'))],
       ),
     );
   }

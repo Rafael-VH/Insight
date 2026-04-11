@@ -47,11 +47,7 @@ class ImageUploadCard extends StatelessWidget {
                     color: _getGameModeColor(),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    _getGameModeIcon(),
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  child: Icon(_getGameModeIcon(), color: Colors.white, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -86,16 +82,12 @@ class ImageUploadCard extends StatelessWidget {
                   : colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: colorScheme.outline.withValues(
-                  alpha: isDark ? 0.4 : 0.5,
-                ),
+                color: colorScheme.outline.withValues(alpha: isDark ? 0.4 : 0.5),
                 style: BorderStyle.solid,
                 width: 2,
               ),
             ),
-            child: imagePath == null
-                ? _buildUploadArea(context)
-                : _buildImagePreview(context),
+            child: imagePath == null ? _buildUploadArea(context) : _buildImagePreview(context),
           ),
         ],
       ),
@@ -144,10 +136,7 @@ class ImageUploadCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Captura de ${_getDisplayName()}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
+                style: TextStyle(fontSize: 14, color: colorScheme.onSurface.withValues(alpha: 0.5)),
               ),
             ],
           ],
@@ -178,9 +167,7 @@ class ImageUploadCard extends StatelessWidget {
             ),
             child: IconButton(
               icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
-              onPressed: isProcessing
-                  ? null
-                  : () => _showImageSourceDialog(context),
+              onPressed: isProcessing ? null : () => _showImageSourceDialog(context),
               tooltip: 'Cambiar imagen',
             ),
           ),
@@ -222,20 +209,12 @@ class ImageUploadCard extends StatelessWidget {
                       color: Colors.blue[isDark ? 900 : 50],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: Colors.blue[isDark ? 300 : 700],
-                    ),
+                    child: Icon(Icons.camera_alt, color: Colors.blue[isDark ? 300 : 700]),
                   ),
-                  title: Text(
-                    'Cámara',
-                    style: TextStyle(color: colorScheme.onSurface),
-                  ),
+                  title: Text('Cámara', style: TextStyle(color: colorScheme.onSurface)),
                   subtitle: Text(
                     'Tomar una foto nueva',
-                    style: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -249,20 +228,12 @@ class ImageUploadCard extends StatelessWidget {
                       color: Colors.green[isDark ? 900 : 50],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      Icons.photo_library,
-                      color: Colors.green[isDark ? 300 : 700],
-                    ),
+                    child: Icon(Icons.photo_library, color: Colors.green[isDark ? 300 : 700]),
                   ),
-                  title: Text(
-                    'Galería',
-                    style: TextStyle(color: colorScheme.onSurface),
-                  ),
+                  title: Text('Galería', style: TextStyle(color: colorScheme.onSurface)),
                   subtitle: Text(
                     'Elegir de la galería',
-                    style: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+                    style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
                   ),
                   onTap: () {
                     Navigator.pop(context);

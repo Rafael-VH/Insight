@@ -23,8 +23,7 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
   final GetHeroes getHeroes;
   final GetHeroDetail getHeroDetail;
 
-  HeroBloc({required this.getHeroes, required this.getHeroDetail})
-      : super(HeroInitial()) {
+  HeroBloc({required this.getHeroes, required this.getHeroDetail}) : super(HeroInitial()) {
     on<LoadHeroListEvent>(_onLoadList);
     on<SearchHeroListEvent>(_onSearch);
     on<LoadHeroDetailEvent>(_onLoadDetail);
@@ -32,10 +31,7 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
 
   // ── Lista ───────────────────────────────────────────────────────
 
-  Future<void> _onLoadList(
-    LoadHeroListEvent event,
-    Emitter<HeroState> emit,
-  ) async {
+  Future<void> _onLoadList(LoadHeroListEvent event, Emitter<HeroState> emit) async {
     // Evitar recargas innecesarias salvo que se pida explícitamente.
     if (state is HeroListLoaded && !event.forceRefresh) return;
 
@@ -43,20 +39,13 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
 
     final result = await getHeroes();
 
-    result.fold(
-      (failure) => emit(HeroListError(failure.message)),
-      (heroes) {
-        if (heroes.isEmpty) {
-          emit(
-            const HeroListError(
-              'No se encontraron héroes. Verifica tu conexión.',
-            ),
-          );
-          return;
-        }
-        emit(HeroListLoaded(heroes: heroes, filtered: heroes));
-      },
-    );
+    result.fold((failure) => emit(HeroListError(failure.message)), (heroes) {
+      if (heroes.isEmpty) {
+        emit(const HeroListError('No se encontraron héroes. Verifica tu conexión.'));
+        return;
+      }
+      emit(HeroListLoaded(heroes: heroes, filtered: heroes));
+    });
   }
 
   void _onSearch(SearchHeroListEvent event, Emitter<HeroState> emit) {
@@ -68,19 +57,14 @@ class HeroBloc extends Bloc<HeroEvent, HeroState> {
 
     final filtered = query.isEmpty
         ? current.heroes
-        : current.heroes
-            .where((h) => h.name.toLowerCase().contains(query))
-            .toList();
+        : current.heroes.where((h) => h.name.toLowerCase().contains(query)).toList();
 
     emit(current.copyWith(filtered: filtered, searchQuery: event.query));
   }
 
   // ── Detalle ─────────────────────────────────────────────────────
 
-  Future<void> _onLoadDetail(
-    LoadHeroDetailEvent event,
-    Emitter<HeroState> emit,
-  ) async {
+  Future<void> _onLoadDetail(LoadHeroDetailEvent event, Emitter<HeroState> emit) async {
     emit(HeroDetailLoading());
 
     final result = await getHeroDetail(event.heroId);

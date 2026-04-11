@@ -27,10 +27,7 @@ class OcrDataSourceImpl implements OcrDataSource {
           ? ImageSource.camera
           : ImageSource.gallery;
 
-      final XFile? pickedFile = await imagePicker.pickImage(
-        source: imageSource,
-        imageQuality: 100,
-      );
+      final XFile? pickedFile = await imagePicker.pickImage(source: imageSource, imageQuality: 100);
 
       if (pickedFile == null) {
         return '';
@@ -46,9 +43,7 @@ class OcrDataSourceImpl implements OcrDataSource {
   Future<OcrResult> recognizeText(String imagePath) async {
     try {
       final inputImage = InputImage.fromFile(File(imagePath));
-      final RecognizedText recognizedText = await textRecognizer.processImage(
-        inputImage,
-      );
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
       if (recognizedText.text.isEmpty) {
         throw const TextRecognitionFailure('No text found in image');
@@ -68,9 +63,7 @@ class OcrDataSourceImpl implements OcrDataSource {
     try {
       await Clipboard.setData(ClipboardData(text: text));
     } catch (e) {
-      throw TextRecognitionFailure(
-        'Failed to copy text to clipboard: ${e.toString()}',
-      );
+      throw TextRecognitionFailure('Failed to copy text to clipboard: ${e.toString()}');
     }
   }
 }

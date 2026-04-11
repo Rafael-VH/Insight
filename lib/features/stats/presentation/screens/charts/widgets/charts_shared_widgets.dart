@@ -38,9 +38,7 @@ class ChartSectionTitle extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -59,10 +57,7 @@ class ChartCard extends StatelessWidget {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: padding ?? const EdgeInsets.all(16),
-        child: child,
-      ),
+      child: Padding(padding: padding ?? const EdgeInsets.all(16), child: child),
     );
   }
 }
@@ -83,19 +78,12 @@ class StatPill extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
+          style: TextStyle(fontSize: 11, color: colorScheme.onSurface.withValues(alpha: 0.6)),
         ),
       ],
     );
@@ -104,12 +92,7 @@ class StatPill extends StatelessWidget {
 
 /// Chip de leyenda para el radar de logros
 class LegendChip extends StatelessWidget {
-  const LegendChip({
-    super.key,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const LegendChip({super.key, required this.label, required this.value, required this.color});
 
   final String label;
   final String value;
@@ -126,11 +109,7 @@ class LegendChip extends StatelessWidget {
       ),
       child: Text(
         '$label: $value',
-        style: TextStyle(
-          fontSize: 11,
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
       ),
     );
   }

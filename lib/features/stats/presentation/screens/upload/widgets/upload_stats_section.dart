@@ -10,11 +10,7 @@ import 'package:insight/features/stats/presentation/widgets/stats_verification_w
 /// Muestra un resumen compacto de completitud + tabla de campos
 /// por cada modo procesado, seguido del widget de verificación completo.
 class UploadStatsSection extends StatelessWidget {
-  const UploadStatsSection({
-    super.key,
-    required this.parsedStats,
-    required this.hasInvalidStats,
-  });
+  const UploadStatsSection({super.key, required this.parsedStats, required this.hasInvalidStats});
 
   final Map<GameMode, PlayerStats?> parsedStats;
   final bool hasInvalidStats;
@@ -24,9 +20,7 @@ class UploadStatsSection extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final validEntries = parsedStats.entries
-        .where((e) => e.value != null)
-        .toList();
+    final validEntries = parsedStats.entries.where((e) => e.value != null).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,10 +37,7 @@ class UploadStatsSection extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            if (hasInvalidStats)
-              _IncompleteChip(isDark: isDark)
-            else
-              _CompleteChip(isDark: isDark),
+            if (hasInvalidStats) _IncompleteChip(isDark: isDark) else _CompleteChip(isDark: isDark),
           ],
         ),
         const SizedBox(height: 12),
@@ -86,11 +77,7 @@ class _CompleteChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.check_circle_outline,
-            size: 12,
-            color: Colors.green[isDark ? 300 : 700],
-          ),
+          Icon(Icons.check_circle_outline, size: 12, color: Colors.green[isDark ? 300 : 700]),
           const SizedBox(width: 4),
           Text(
             'Datos completos',
@@ -122,11 +109,7 @@ class _IncompleteChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.warning_amber_rounded,
-            size: 12,
-            color: Colors.orange[isDark ? 300 : 700],
-          ),
+          Icon(Icons.warning_amber_rounded, size: 12, color: Colors.orange[isDark ? 300 : 700]),
           const SizedBox(width: 4),
           Text(
             'Datos incompletos',
@@ -175,9 +158,7 @@ class _ModeResultCardState extends State<_ModeResultCard> {
         color: widget.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: widget.colorScheme.outline.withValues(
-            alpha: widget.isDark ? 0.2 : 0.12,
-          ),
+          color: widget.colorScheme.outline.withValues(alpha: widget.isDark ? 0.2 : 0.12),
         ),
       ),
       child: Column(
@@ -194,9 +175,7 @@ class _ModeResultCardState extends State<_ModeResultCard> {
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: modeColor.withValues(
-                        alpha: widget.isDark ? 0.2 : 0.1,
-                      ),
+                      color: modeColor.withValues(alpha: widget.isDark ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(widget.mode.icon, color: modeColor, size: 15),
@@ -243,9 +222,7 @@ class _ModeResultCardState extends State<_ModeResultCard> {
                     child: Icon(
                       Icons.expand_more_rounded,
                       size: 18,
-                      color: widget.colorScheme.onSurface.withValues(
-                        alpha: 0.4,
-                      ),
+                      color: widget.colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                 ],
@@ -262,9 +239,7 @@ class _ModeResultCardState extends State<_ModeResultCard> {
                   height: 1,
                   indent: 14,
                   endIndent: 14,
-                  color: widget.colorScheme.outline.withValues(
-                    alpha: widget.isDark ? 0.15 : 0.1,
-                  ),
+                  color: widget.colorScheme.outline.withValues(alpha: widget.isDark ? 0.15 : 0.1),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
@@ -278,23 +253,16 @@ class _ModeResultCardState extends State<_ModeResultCard> {
                   height: 1,
                   indent: 14,
                   endIndent: 14,
-                  color: widget.colorScheme.outline.withValues(
-                    alpha: widget.isDark ? 0.15 : 0.1,
-                  ),
+                  color: widget.colorScheme.outline.withValues(alpha: widget.isDark ? 0.15 : 0.1),
                 ),
                 // Widget de verificación completo
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  child: StatsVerificationWidget(
-                    gameMode: widget.mode,
-                    stats: widget.stats,
-                  ),
+                  child: StatsVerificationWidget(gameMode: widget.mode, stats: widget.stats),
                 ),
               ],
             ),
-            crossFadeState: _expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 250),
           ),
         ],
@@ -360,10 +328,7 @@ class _QuickFieldsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Mostrar los campos críticos primero (los que faltan arriba)
-    final missingEntries = validation.missingFields
-        .take(3)
-        .map((f) => (f, null, false))
-        .toList();
+    final missingEntries = validation.missingFields.take(3).map((f) => (f, null, false)).toList();
 
     final okEntries = validation.extractedValues.entries
         .where((e) => !e.key.contains('sugerencia'))
@@ -398,9 +363,7 @@ class _QuickFieldsTable extends StatelessWidget {
                 child: Icon(
                   isOk ? Icons.check_rounded : Icons.close_rounded,
                   size: 10,
-                  color: isOk
-                      ? Colors.green[isDark ? 300 : 700]
-                      : Colors.red[isDark ? 300 : 700],
+                  color: isOk ? Colors.green[isDark ? 300 : 700] : Colors.red[isDark ? 300 : 700],
                 ),
               ),
               const SizedBox(width: 10),
@@ -422,9 +385,7 @@ class _QuickFieldsTable extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isOk
-                      ? colorScheme.onSurface
-                      : Colors.red[isDark ? 300 : 700],
+                  color: isOk ? colorScheme.onSurface : Colors.red[isDark ? 300 : 700],
                 ),
               ),
             ],

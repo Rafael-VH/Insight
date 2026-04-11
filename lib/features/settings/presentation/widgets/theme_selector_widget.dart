@@ -49,11 +49,7 @@ class ThemeSelectorWidget extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF059669),
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
     );
   }
 
@@ -82,9 +78,7 @@ class ThemeSelectorWidget extends StatelessWidget {
           isSelected: isSelected,
           showDelete: showDelete,
           onTap: () => context.read<ThemeBloc>().add(ChangeTheme(theme.id)),
-          onDelete: showDelete
-              ? () => _showDeleteConfirmation(context, theme)
-              : null,
+          onDelete: showDelete ? () => _showDeleteConfirmation(context, theme) : null,
         );
       },
     );
@@ -100,9 +94,7 @@ class ThemeSelectorWidget extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
           side: BorderSide(color: Theme.of(context).colorScheme.primary),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -115,10 +107,7 @@ class ThemeSelectorWidget extends StatelessWidget {
         title: const Text('Eliminar Tema'),
         content: Text('¿Estás seguro de eliminar el tema "${theme.name}"?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
               context.read<ThemeBloc>().add(DeleteCustomTheme(theme.id));
@@ -198,9 +187,7 @@ class _ThemeCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       color: isSelected
                           ? theme.lightColorScheme.primary
                           : colorScheme.onSurface.withValues(alpha: 0.7),
@@ -221,11 +208,7 @@ class _ThemeCard extends StatelessWidget {
                 color: theme.lightColorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.check,
-                size: 16,
-                color: theme.lightColorScheme.onPrimary,
-              ),
+              child: Icon(Icons.check, size: 16, color: theme.lightColorScheme.onPrimary),
             ),
           ),
         if (showDelete && onDelete != null)
@@ -236,10 +219,7 @@ class _ThemeCard extends StatelessWidget {
               onTap: onDelete,
               child: Container(
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
+                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                 child: const Icon(Icons.close, size: 16, color: Colors.white),
               ),
             ),

@@ -15,8 +15,7 @@ class ChartsScreen extends StatefulWidget {
   State<ChartsScreen> createState() => _ChartsScreenState();
 }
 
-class _ChartsScreenState extends State<ChartsScreen>
-    with SingleTickerProviderStateMixin {
+class _ChartsScreenState extends State<ChartsScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final List<PlayerStats> _availableStats;
 
@@ -48,9 +47,7 @@ class _ChartsScreenState extends State<ChartsScreen>
           ? ChartsModeChartsPage(stats: _availableStats.first)
           : TabBarView(
               controller: _tabController,
-              children: _availableStats
-                  .map((s) => ChartsModeChartsPage(stats: s))
-                  .toList(),
+              children: _availableStats.map((s) => ChartsModeChartsPage(stats: s)).toList(),
             ),
     );
   }
@@ -68,9 +65,7 @@ class _ChartsScreenState extends State<ChartsScreen>
             widget.collection.displayName,
             style: TextStyle(
               fontSize: 11,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -80,12 +75,7 @@ class _ChartsScreenState extends State<ChartsScreen>
               controller: _tabController,
               isScrollable: true,
               tabs: _availableStats
-                  .map(
-                    (s) => Tab(
-                      icon: Icon(s.mode.icon, size: 16),
-                      text: s.mode.shortName,
-                    ),
-                  )
+                  .map((s) => Tab(icon: Icon(s.mode.icon, size: 16), text: s.mode.shortName))
                   .toList(),
             )
           : null,

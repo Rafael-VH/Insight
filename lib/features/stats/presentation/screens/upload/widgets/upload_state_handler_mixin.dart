@@ -278,9 +278,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     if (validation.isValid) {
       _showSuccess('✓ Estadísticas de $modeName listas para guardar.');
     } else {
-      _showWarning(
-        'Estadísticas de $modeName guardadas con datos incompletos.',
-      );
+      _showWarning('Estadísticas de $modeName guardadas con datos incompletos.');
     }
 
     // Auto-guardado en segundo plano: guarda pero NO navega.
@@ -329,11 +327,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
   void _showWarning(String message) {
     if (!mounted) return;
     if (_useAwesome) {
-      DialogService.showWarning(
-        context,
-        message: message,
-        title: '⚠️ Advertencia',
-      );
+      DialogService.showWarning(context, message: message, title: '⚠️ Advertencia');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

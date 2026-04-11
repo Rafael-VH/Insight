@@ -38,9 +38,7 @@ class ThemeRepositoryImpl implements ThemeRepository {
   Future<Either<Failure, void>> saveCustomTheme(AppTheme theme) async {
     try {
       if (!theme.isCustom) {
-        return const Left(
-          FileSystemFailure('Cannot save predefined theme as custom'),
-        );
+        return const Left(FileSystemFailure('Cannot save predefined theme as custom'));
       }
       await dataSource.saveCustomTheme(theme);
       return const Right(null);

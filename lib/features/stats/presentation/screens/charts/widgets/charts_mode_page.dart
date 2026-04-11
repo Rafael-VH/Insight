@@ -22,10 +22,7 @@ class ChartsModeChartsPage extends StatelessWidget {
       children: [
         ChartsSummaryHeader(stats: stats),
         const SizedBox(height: 20),
-        const ChartSectionTitle(
-          title: 'Tasa de Victoria',
-          icon: Icons.emoji_events,
-        ),
+        const ChartSectionTitle(title: 'Tasa de Victoria', icon: Icons.emoji_events),
         const SizedBox(height: 8),
         ChartsWinRateGauge(winRate: stats.winRate),
         const SizedBox(height: 20),
@@ -37,10 +34,7 @@ class ChartsModeChartsPage extends StatelessWidget {
         const SizedBox(height: 8),
         ChartsAchievementsRadar(stats: stats),
         const SizedBox(height: 20),
-        const ChartSectionTitle(
-          title: 'Economía & Daño por Min',
-          icon: Icons.attach_money_rounded,
-        ),
+        const ChartSectionTitle(title: 'Economía & Daño por Min', icon: Icons.attach_money_rounded),
         const SizedBox(height: 8),
         ChartsEconomyPie(stats: stats),
         const SizedBox(height: 32),

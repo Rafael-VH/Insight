@@ -68,14 +68,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         // ── Theme (primero) ──────────────────────────────────
-        BlocProvider<ThemeBloc>(
-          create: (_) => di.sl<ThemeBloc>()..add(LoadTheme()),
-        ),
+        BlocProvider<ThemeBloc>(create: (_) => di.sl<ThemeBloc>()..add(LoadTheme())),
 
         // ── Settings ─────────────────────────────────────────
-        BlocProvider<SettingsBloc>(
-          create: (_) => di.sl<SettingsBloc>()..add(LoadSettings()),
-        ),
+        BlocProvider<SettingsBloc>(create: (_) => di.sl<SettingsBloc>()..add(LoadSettings())),
 
         // ── Navigation ────────────────────────────────────────
         BlocProvider<NavigationBloc>(create: (_) => di.sl<NavigationBloc>()),
@@ -85,8 +81,7 @@ class MyApp extends StatelessWidget {
         // Se precarga la lista al iniciar para que la tab de
         // Historial esté lista sin espera perceptible.
         BlocProvider<HistoryBloc>(
-          create: (_) =>
-              di.sl<HistoryBloc>()..add(LoadAllStatsCollectionsEvent()),
+          create: (_) => di.sl<HistoryBloc>()..add(LoadAllStatsCollectionsEvent()),
         ),
 
         // ── Stats (solo guardado post-OCR) ────────────────────
@@ -151,9 +146,7 @@ class _SplashApp extends StatelessWidget {
             children: [
               Icon(Icons.insights_rounded, size: 64, color: Colors.white),
               SizedBox(height: 24),
-              CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+              CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
             ],
           ),
         ),

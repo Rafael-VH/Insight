@@ -7,9 +7,5 @@ class TextBlock {
   final List<TextLine> lines;
   final Rect boundingBox;
 
-  const TextBlock({
-    required this.text,
-    required this.lines,
-    required this.boundingBox,
-  });
+  const TextBlock({required this.text, required this.lines, required this.boundingBox});
 }

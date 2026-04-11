@@ -25,7 +25,8 @@ class HistoryListCard extends StatelessWidget {
   final VoidCallback onOptionsPressed;
 
   double? get _primaryWr {
-    final stats = collection.totalStats ??
+    final stats =
+        collection.totalStats ??
         collection.rankedStats ??
         collection.classicStats ??
         collection.brawlStats;
@@ -41,9 +42,12 @@ class HistoryListCard extends StatelessWidget {
 
     Color wrColor = colorScheme.onSurface;
     if (wr != null) {
-      if (wr >= 58) wrColor = const Color(0xFF059669);
-      else if (wr >= 52) wrColor = const Color(0xFFD97706);
-      else wrColor = const Color(0xFFDC2626);
+      if (wr >= 58)
+        wrColor = const Color(0xFF059669);
+      else if (wr >= 52)
+        wrColor = const Color(0xFFD97706);
+      else
+        wrColor = const Color(0xFFDC2626);
     }
 
     return GestureDetector(
@@ -52,9 +56,7 @@ class HistoryListCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
-          color: isDark
-              ? colorScheme.surfaceContainerHighest
-              : colorScheme.surface,
+          color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
@@ -182,9 +184,7 @@ class _SessionNumber extends StatelessWidget {
       width: 34,
       height: 34,
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHigh
-            : colorScheme.surfaceContainerHighest,
+        color: isDark ? colorScheme.surfaceContainerHigh : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(9),
       ),
       child: Center(

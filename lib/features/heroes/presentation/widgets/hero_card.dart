@@ -55,7 +55,9 @@ class HeroCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Expanded(child: _HeroImageArea(hero: hero, roleColor: roleColor)),
+              Expanded(
+                child: _HeroImageArea(hero: hero, roleColor: roleColor),
+              ),
               _HeroCardFooter(hero: hero, roleHint: roleHint, colorScheme: colorScheme),
             ],
           ),
@@ -102,10 +104,7 @@ class _HeroImageArea extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.55),
-                  ],
+                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.55)],
                   stops: const [0.45, 1.0],
                 ),
               ),
@@ -122,10 +121,7 @@ class _HeroImageArea extends StatelessWidget {
               decoration: BoxDecoration(
                 color: roleColor,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.3), width: 1),
               ),
             ),
           ),
@@ -138,10 +134,7 @@ class _HeroImageArea extends StatelessWidget {
 // ── Placeholder de avatar ─────────────────────────────────────────
 
 class _AvatarPlaceholder extends StatelessWidget {
-  const _AvatarPlaceholder({
-    required this.hero,
-    required this.colorScheme,
-  });
+  const _AvatarPlaceholder({required this.hero, required this.colorScheme});
 
   final MlbbHero hero;
   final ColorScheme colorScheme;
@@ -170,11 +163,7 @@ class _AvatarPlaceholder extends StatelessWidget {
 // ── Footer: nombre + tag de rol ───────────────────────────────────
 
 class _HeroCardFooter extends StatelessWidget {
-  const _HeroCardFooter({
-    required this.hero,
-    required this.roleHint,
-    required this.colorScheme,
-  });
+  const _HeroCardFooter({required this.hero, required this.roleHint, required this.colorScheme});
 
   final MlbbHero hero;
   final String? roleHint;

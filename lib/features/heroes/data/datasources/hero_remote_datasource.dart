@@ -25,21 +25,17 @@ class HeroRemoteDataSourceImpl implements HeroRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> fetchHeroIndex() =>
-      _get('heroes/hero_index.json');
+  Future<Map<String, dynamic>> fetchHeroIndex() => _get('heroes/hero_index.json');
 
   @override
-  Future<Map<String, dynamic>> fetchHeroDetails() =>
-      _get('heroes/hero_details.json');
+  Future<Map<String, dynamic>> fetchHeroDetails() => _get('heroes/hero_details.json');
 
   @override
   Future<Map<String, dynamic>> fetchHeroList() => _get('heroes/hero_list.json');
 
   @override
-  Future<Map<String, dynamic>> fetchGuideBuilds() =>
-      _get('guides/guide_builds.json');
+  Future<Map<String, dynamic>> fetchGuideBuilds() => _get('guides/guide_builds.json');
 
   @override
-  Future<Map<String, dynamic>> fetchEquipment() =>
-      _get('academy/academy_equipment.json');
+  Future<Map<String, dynamic>> fetchEquipment() => _get('academy/academy_equipment.json');
 }

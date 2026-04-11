@@ -48,10 +48,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
 
   // ── Carga ─────────────────────────────────────────────────────
 
-  Future<void> _onLoadAll(
-    LoadAllStatsCollectionsEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onLoadAll(LoadAllStatsCollectionsEvent event, Emitter<HistoryState> emit) async {
     // Evitar emitir Loading si ya hay datos en pantalla
     if (state is! HistoryCollectionsLoaded) {
       emit(HistoryLoading());
@@ -60,12 +57,8 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     final result = await getAllStatsCollections();
 
     result.fold(
-      (failure) => emit(
-        HistoryError(
-          'Error al cargar estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) =>
+          emit(HistoryError('Error al cargar estadísticas', errorDetails: failure.message)),
       (collections) => emit(HistoryCollectionsLoaded(collections)),
     );
   }
@@ -79,54 +72,33 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     final result = await getLatestStatsCollection();
 
     result.fold(
-      (failure) => emit(
-        HistoryError(
-          'Error al cargar últimas estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) =>
+          emit(HistoryError('Error al cargar últimas estadísticas', errorDetails: failure.message)),
       (collection) => emit(HistoryLatestLoaded(collection)),
     );
   }
 
-  Future<void> _onGetByDate(
-    GetStatsCollectionByDateEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onGetByDate(GetStatsCollectionByDateEvent event, Emitter<HistoryState> emit) async {
     emit(HistoryLoading());
 
-    final result =
-        await historyRepository.getStatsCollectionByDate(event.createdAt);
+    final result = await historyRepository.getStatsCollectionByDate(event.createdAt);
 
     result.fold(
-      (failure) => emit(
-        HistoryError(
-          'Error al buscar estadística',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) => emit(HistoryError('Error al buscar estadística', errorDetails: failure.message)),
       (collection) => emit(HistoryCollectionByDateLoaded(collection)),
     );
   }
 
   // ── Mutación ──────────────────────────────────────────────────
 
-  Future<void> _onDelete(
-    DeleteStatsCollectionEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onDelete(DeleteStatsCollectionEvent event, Emitter<HistoryState> emit) async {
     emit(HistoryLoading());
 
-    final result =
-        await historyRepository.deleteStatsCollection(event.createdAt);
+    final result = await historyRepository.deleteStatsCollection(event.createdAt);
 
     await result.fold(
-      (failure) async => emit(
-        HistoryError(
-          'Error al eliminar estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) async =>
+          emit(HistoryError('Error al eliminar estadísticas', errorDetails: failure.message)),
       (_) async {
         emit(const HistoryDeleted('Estadística eliminada correctamente'));
         await Future.delayed(const Duration(milliseconds: 300));
@@ -135,21 +107,14 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     );
   }
 
-  Future<void> _onClearAll(
-    ClearAllStatsEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onClearAll(ClearAllStatsEvent event, Emitter<HistoryState> emit) async {
     emit(HistoryLoading());
 
     final result = await historyRepository.clearAllStats();
 
     result.fold(
-      (failure) => emit(
-        HistoryError(
-          'Error al limpiar estadísticas',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) =>
+          emit(HistoryError('Error al limpiar estadísticas', errorDetails: failure.message)),
       (_) {
         emit(const HistoryCleared('Todas las estadísticas han sido eliminadas'));
         add(LoadAllStatsCollectionsEvent());
@@ -166,12 +131,8 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     );
 
     await result.fold(
-      (failure) async => emit(
-        HistoryError(
-          'Error al actualizar nombre',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) async =>
+          emit(HistoryError('Error al actualizar nombre', errorDetails: failure.message)),
       (_) async {
         emit(
           HistoryNameUpdated(
@@ -187,10 +148,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
 
   // ── Export / Import ──────────────────────────────────────────
 
-  Future<void> _onExport(
-    ExportStatsToJsonEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onExport(ExportStatsToJsonEvent event, Emitter<HistoryState> emit) async {
     emit(const HistoryExporting());
 
     List<StatsCollection> toExport = event.collections ?? [];
@@ -213,33 +171,19 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
     final result = await exportStatsToJson(toExport);
 
     result.fold(
-      (failure) => emit(
-        HistoryError('Error al exportar', errorDetails: failure.message),
-      ),
-      (filePath) => emit(
-        HistoryExported(
-          filePath: filePath,
-          totalCollections: toExport.length,
-        ),
-      ),
+      (failure) => emit(HistoryError('Error al exportar', errorDetails: failure.message)),
+      (filePath) => emit(HistoryExported(filePath: filePath, totalCollections: toExport.length)),
     );
   }
 
-  Future<void> _onImport(
-    ImportStatsFromJsonEvent event,
-    Emitter<HistoryState> emit,
-  ) async {
+  Future<void> _onImport(ImportStatsFromJsonEvent event, Emitter<HistoryState> emit) async {
     emit(const HistoryImporting());
 
     final parseResult = await importStatsFromJson(event.filePath);
 
     await parseResult.fold(
-      (failure) async => emit(
-        HistoryError(
-          'Error al leer el archivo',
-          errorDetails: failure.message,
-        ),
-      ),
+      (failure) async =>
+          emit(HistoryError('Error al leer el archivo', errorDetails: failure.message)),
       (importedCollections) async {
         final saveResult = await saveCollectionsBatch(
           importedCollections,
@@ -247,9 +191,7 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
         );
 
         saveResult.fold(
-          (failure) => emit(
-            HistoryError('Error al guardar', errorDetails: failure.message),
-          ),
+          (failure) => emit(HistoryError('Error al guardar', errorDetails: failure.message)),
           (savedCount) {
             final skipped = importedCollections.length - savedCount;
             emit(

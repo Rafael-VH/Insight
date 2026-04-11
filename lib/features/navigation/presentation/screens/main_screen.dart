@@ -22,8 +22,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen>
-    with SingleTickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   late final List<NavigationItem> _navigationItems;
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
@@ -65,10 +64,7 @@ class _MainScreenState extends State<MainScreen>
         // HistoryBloc ya está en el árbol de widgets desde main.dart.
         // BlocProvider.value lo hace disponible para HistoryScreen y
         // todos sus hijos (bottom sheets, diálogos, etc.).
-        page: BlocProvider.value(
-          value: sl<HistoryBloc>(),
-          child: const HistoryScreen(),
-        ),
+        page: BlocProvider.value(value: sl<HistoryBloc>(), child: const HistoryScreen()),
         section: 'General',
       ),
 
@@ -78,10 +74,7 @@ class _MainScreenState extends State<MainScreen>
         title: 'Héroes',
         icon: Icons.sports_esports_rounded,
         color: const Color(0xFFDC2626),
-        page: BlocProvider.value(
-          value: sl<HeroBloc>(),
-          child: const HeroListScreen(),
-        ),
+        page: BlocProvider.value(value: sl<HeroBloc>(), child: const HeroListScreen()),
         section: 'Enciclopedia',
       ),
       // Próximas secciones — páginas placeholder hasta implementarlas
@@ -90,10 +83,7 @@ class _MainScreenState extends State<MainScreen>
         title: 'Ítems',
         icon: Icons.shield_rounded,
         color: const Color(0xFF7C3AED),
-        page: const _PlaceholderPage(
-          title: 'Ítems',
-          icon: Icons.shield_rounded,
-        ),
+        page: const _PlaceholderPage(title: 'Ítems', icon: Icons.shield_rounded),
         section: 'Enciclopedia',
         badge: 'Pronto',
       ),
@@ -102,10 +92,7 @@ class _MainScreenState extends State<MainScreen>
         title: 'Academia',
         icon: Icons.school_rounded,
         color: const Color(0xFFF59E0B),
-        page: const _PlaceholderPage(
-          title: 'Academia',
-          icon: Icons.school_rounded,
-        ),
+        page: const _PlaceholderPage(title: 'Academia', icon: Icons.school_rounded),
         section: 'Enciclopedia',
         badge: 'Pronto',
       ),
@@ -114,10 +101,7 @@ class _MainScreenState extends State<MainScreen>
         title: 'Rankings',
         icon: Icons.leaderboard_rounded,
         color: const Color(0xFFEC4899),
-        page: const _PlaceholderPage(
-          title: 'Rankings',
-          icon: Icons.leaderboard_rounded,
-        ),
+        page: const _PlaceholderPage(title: 'Rankings', icon: Icons.leaderboard_rounded),
         section: 'Enciclopedia',
         badge: 'Pronto',
       ),
@@ -131,10 +115,7 @@ class _MainScreenState extends State<MainScreen>
         // SettingsScreen necesita HistoryBloc para los bottom sheets
         // de exportar, importar y eliminar. Se propaga con .value
         // para reutilizar la misma instancia del árbol raíz.
-        page: BlocProvider.value(
-          value: sl<HistoryBloc>(),
-          child: const SettingsScreen(),
-        ),
+        page: BlocProvider.value(value: sl<HistoryBloc>(), child: const SettingsScreen()),
         section: 'App',
       ),
     ];
@@ -145,12 +126,10 @@ class _MainScreenState extends State<MainScreen>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
     _animationController.forward();
   }
 
@@ -163,10 +142,7 @@ class _MainScreenState extends State<MainScreen>
     });
   }
 
-  void _handleNavigationStateChanges(
-    BuildContext context,
-    NavigationState state,
-  ) {
+  void _handleNavigationStateChanges(BuildContext context, NavigationState state) {
     if (state is NavigationError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -204,9 +180,7 @@ class _MainScreenState extends State<MainScreen>
                 opacity: _fadeAnimation,
                 child: IndexedStack(
                   index: currentIndex,
-                  children: _navigationItems
-                      .map((item) => item.page)
-                      .toList(),
+                  children: _navigationItems.map((item) => item.page).toList(),
                 ),
               ),
             ),
@@ -230,13 +204,7 @@ class _MainScreenState extends State<MainScreen>
         children: [
           Icon(item.icon, size: 20, color: item.color),
           const SizedBox(width: 10),
-          Text(
-            item.title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
+          Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
         ],
       ),
       // Indicador de color de la sección activa
@@ -246,10 +214,7 @@ class _MainScreenState extends State<MainScreen>
           height: 2,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                item.color.withValues(alpha: 0.7),
-                item.color.withValues(alpha: 0.0),
-              ],
+              colors: [item.color.withValues(alpha: 0.7), item.color.withValues(alpha: 0.0)],
             ),
           ),
         ),
@@ -284,20 +249,11 @@ class _PlaceholderPage extends StatelessWidget {
             child: Icon(icon, size: 40, color: colorScheme.primary),
           ),
           const SizedBox(height: 20),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
             'Próximamente disponible',
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurface.withValues(alpha: 0.5)),
           ),
         ],
       ),

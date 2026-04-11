@@ -81,8 +81,7 @@ class StatsValidator {
       missingFields.add('Participación en Equipo');
     } else {
       validFields++;
-      extractedValues['Participación en Equipo'] =
-          '${stats.teamFightParticipation}%';
+      extractedValues['Participación en Equipo'] = '${stats.teamFightParticipation}%';
     }
 
     if (stats.goldPerMin == 0) {
@@ -173,9 +172,7 @@ class StatsValidator {
 
         // Agregar sugerencias específicas
         if (field == 'Tasa de Victorias') {
-          buffer.writeln(
-            '    💡 Asegúrate de que el porcentaje (ej: 59.29%) sea visible',
-          );
+          buffer.writeln('    💡 Asegúrate de que el porcentaje (ej: 59.29%) sea visible');
         }
       }
     }
@@ -189,9 +186,7 @@ class StatsValidator {
 
         // Sugerencias específicas para campos importantes
         if (field == 'Daño Causado Máx./min') {
-          buffer.writeln(
-            '    💡 Verifica que el número de 4-5 dígitos sea visible',
-          );
+          buffer.writeln('    💡 Verifica que el número de 4-5 dígitos sea visible');
         }
       }
       if (result.warningFields.length > 5) {
@@ -200,9 +195,7 @@ class StatsValidator {
     }
 
     buffer.writeln();
-    buffer.writeln(
-      '📊 Completitud: ${result.completionPercentage.toStringAsFixed(1)}%',
-    );
+    buffer.writeln('📊 Completitud: ${result.completionPercentage.toStringAsFixed(1)}%');
 
     return buffer.toString();
   }
@@ -215,12 +208,8 @@ class StatsValidator {
       recommendations.add(
         '📸 Asegúrate de que la imagen muestre claramente todas las estadísticas',
       );
-      recommendations.add(
-        '💡 Intenta tomar la captura con buena iluminación y sin reflejos',
-      );
-      recommendations.add(
-        '🔍 Verifica que el texto sea legible y no esté borroso',
-      );
+      recommendations.add('💡 Intenta tomar la captura con buena iluminación y sin reflejos');
+      recommendations.add('🔍 Verifica que el texto sea legible y no esté borroso');
 
       // Recomendaciones específicas
       if (result.missingFields.contains('Tasa de Victorias')) {
@@ -237,9 +226,7 @@ class StatsValidator {
     }
 
     if (result.completionPercentage < 50) {
-      recommendations.add(
-        '⚠️ Se detectaron muy pocos datos. Considera volver a tomar la captura',
-      );
+      recommendations.add('⚠️ Se detectaron muy pocos datos. Considera volver a tomar la captura');
     }
 
     return recommendations;
@@ -251,12 +238,8 @@ class StatsValidator {
 
     buffer.writeln('=== REPORTE DE DEPURACIÓN ===\n');
     buffer.writeln('Validez: ${result.isValid ? "✓ VÁLIDO" : "✗ INVÁLIDO"}');
-    buffer.writeln(
-      'Completitud: ${result.completionPercentage.toStringAsFixed(1)}%',
-    );
-    buffer.writeln(
-      'Campos válidos: ${result.validFields}/${result.totalFields}\n',
-    );
+    buffer.writeln('Completitud: ${result.completionPercentage.toStringAsFixed(1)}%');
+    buffer.writeln('Campos válidos: ${result.validFields}/${result.totalFields}\n');
 
     buffer.writeln('--- VALORES EXTRAÍDOS ---');
     result.extractedValues.forEach((key, value) {

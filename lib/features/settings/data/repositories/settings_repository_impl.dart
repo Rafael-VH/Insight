@@ -22,11 +22,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(
-        FileSystemFailure(
-          'Error inesperado al cargar configuración: ${e.toString()}',
-        ),
-      );
+      return Left(FileSystemFailure('Error inesperado al cargar configuración: ${e.toString()}'));
     }
   }
 
@@ -38,11 +34,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on FileSystemFailure catch (e) {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
-      return Left(
-        FileSystemFailure(
-          'Error inesperado al guardar configuración: ${e.toString()}',
-        ),
-      );
+      return Left(FileSystemFailure('Error inesperado al guardar configuración: ${e.toString()}'));
     }
   }
 
@@ -55,9 +47,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
       return Left(FileSystemFailure(e.message));
     } catch (e) {
       return Left(
-        FileSystemFailure(
-          'Error inesperado al restablecer configuración: ${e.toString()}',
-        ),
+        FileSystemFailure('Error inesperado al restablecer configuración: ${e.toString()}'),
       );
     }
   }

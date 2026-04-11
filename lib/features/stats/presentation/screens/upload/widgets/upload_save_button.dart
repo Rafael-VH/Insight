@@ -33,9 +33,7 @@ class UploadSaveButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.orange.withValues(alpha: isDark ? 0.15 : 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.orange.withValues(alpha: isDark ? 0.35 : 0.25),
-        ),
+        border: Border.all(color: Colors.orange.withValues(alpha: isDark ? 0.35 : 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,10 +76,7 @@ class UploadSaveButton extends StatelessWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(14)),
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(14),

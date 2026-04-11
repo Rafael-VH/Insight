@@ -87,9 +87,7 @@ class _StepProgressBar extends StatelessWidget {
                                 height: 1.5,
                                 color: isDone
                                     ? colorScheme.primary
-                                    : colorScheme.outline.withValues(
-                                        alpha: 0.3,
-                                      ),
+                                    : colorScheme.outline.withValues(alpha: 0.3),
                               ),
                             ),
                         ],
@@ -101,9 +99,7 @@ class _StepProgressBar extends StatelessWidget {
                           label,
                           style: TextStyle(
                             fontSize: 10,
-                            fontWeight: isActive || isDone
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                            fontWeight: isActive || isDone ? FontWeight.w600 : FontWeight.normal,
                             color: isDone
                                 ? colorScheme.primary
                                 : isActive
@@ -150,9 +146,7 @@ class _StepCircle extends StatelessWidget {
             : isActive
             ? colorScheme.primary
             : colorScheme.outline.withValues(alpha: 0.2),
-        border: isActive && !isDone
-            ? Border.all(color: colorScheme.primary, width: 2)
-            : null,
+        border: isActive && !isDone ? Border.all(color: colorScheme.primary, width: 2) : null,
       ),
       child: Center(
         child: isDone

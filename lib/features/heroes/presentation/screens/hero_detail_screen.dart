@@ -14,11 +14,7 @@ import 'package:insight/features/heroes/presentation/utils/hero_role_utils.dart'
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class HeroDetailScreen extends StatefulWidget {
-  const HeroDetailScreen({
-    super.key,
-    required this.heroId,
-    required this.heroMap,
-  });
+  const HeroDetailScreen({super.key, required this.heroId, required this.heroMap});
 
   final int heroId;
   final Map<int, MlbbHero> heroMap;
@@ -45,9 +41,7 @@ class _HeroDetailScreenState extends State<HeroDetailScreen> {
       backgroundColor: isDark ? const Color(0xFF0A0C10) : colorScheme.surface,
       body: BlocBuilder<HeroBloc, HeroState>(
         buildWhen: (_, s) =>
-            s is HeroDetailLoading ||
-            s is HeroDetailLoaded ||
-            s is HeroDetailError,
+            s is HeroDetailLoading || s is HeroDetailLoaded || s is HeroDetailError,
         builder: (context, state) {
           if (state is HeroDetailLoading) {
             return const _LoadingView();
@@ -55,9 +49,7 @@ class _HeroDetailScreenState extends State<HeroDetailScreen> {
           if (state is HeroDetailError) {
             return _ErrorView(
               message: state.message,
-              onRetry: () => context
-                  .read<HeroBloc>()
-                  .add(LoadHeroDetailEvent(widget.heroId)),
+              onRetry: () => context.read<HeroBloc>().add(LoadHeroDetailEvent(widget.heroId)),
             );
           }
           if (state is HeroDetailLoaded) {
@@ -103,8 +95,7 @@ class _DetailContent extends StatelessWidget {
       _InfoTab(hero: detail, isDark: isDark),
       _StatsTab(stats: detail.stats, isDark: isDark),
       _BuildsTab(builds: detail.builds, isDark: isDark),
-      _CountersTab(
-          relation: detail.relation, heroMap: heroMap, isDark: isDark),
+      _CountersTab(relation: detail.relation, heroMap: heroMap, isDark: isDark),
     ];
 
     return Stack(
@@ -119,10 +110,7 @@ class _DetailContent extends StatelessWidget {
             SliverToBoxAdapter(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 220),
-                transitionBuilder: (child, anim) => FadeTransition(
-                  opacity: anim,
-                  child: child,
-                ),
+                transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
                 child: KeyedSubtree(
                   key: ValueKey(currentIndex),
                   child: Padding(
@@ -166,8 +154,7 @@ class _HeroSliverHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final surfaceColor =
-        isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
+    final surfaceColor = isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
 
     return SliverAppBar(
       expandedHeight: 220,
@@ -182,11 +169,7 @@ class _HeroSliverHeader extends StatelessWidget {
             color: colorScheme.onSurface.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(9),
           ),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            size: 18,
-            color: colorScheme.onSurface,
-          ),
+          child: Icon(Icons.arrow_back_rounded, size: 18, color: colorScheme.onSurface),
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
@@ -201,11 +184,7 @@ class _HeroSliverHeader extends StatelessWidget {
       ),
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.pin,
-        background: _HeroHeaderBackground(
-          detail: detail,
-          isDark: isDark,
-          colorScheme: colorScheme,
-        ),
+        background: _HeroHeaderBackground(detail: detail, isDark: isDark, colorScheme: colorScheme),
       ),
     );
   }
@@ -225,8 +204,7 @@ class _HeroHeaderBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final heroColor = HeroRoleUtils.avatarColorForId(detail.heroId);
-    final surfaceColor =
-        isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
+    final surfaceColor = isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerHighest;
 
     return Container(
       color: surfaceColor,
@@ -258,12 +236,10 @@ class _HeroHeaderBackground extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (detail.roles.isNotEmpty)
-                      HeroRoleUtils.buildRoleChips(detail.roles),
+                    if (detail.roles.isNotEmpty) HeroRoleUtils.buildRoleChips(detail.roles),
                     const SizedBox(height: 8),
                     if (detail.lane.isNotEmpty)
-                      _LaneIndicator(
-                          lane: detail.lane, colorScheme: colorScheme),
+                      _LaneIndicator(lane: detail.lane, colorScheme: colorScheme),
                   ],
                 ),
               ),
@@ -277,15 +253,14 @@ class _HeroHeaderBackground extends StatelessWidget {
             Row(
               children: detail.stats
                   .take(4)
-                  .map((s) => Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: _StatPillSmall(
-                              stat: s,
-                              isDark: isDark,
-                              colorScheme: colorScheme),
-                        ),
-                      ))
+                  .map(
+                    (s) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _StatPillSmall(stat: s, isDark: isDark, colorScheme: colorScheme),
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
         ],
@@ -307,10 +282,7 @@ class _HeroAvatarLarge extends StatelessWidget {
       height: 72,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: heroColor.withValues(alpha: 0.4),
-          width: 1.5,
-        ),
+        border: Border.all(color: heroColor.withValues(alpha: 0.4), width: 1.5),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14.5),
@@ -318,8 +290,7 @@ class _HeroAvatarLarge extends StatelessWidget {
             ? Image.network(
                 detail.iconUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    _AvatarFallback(detail: detail, heroColor: heroColor),
+                errorBuilder: (_, __, ___) => _AvatarFallback(detail: detail, heroColor: heroColor),
               )
             : _AvatarFallback(detail: detail, heroColor: heroColor),
       ),
@@ -340,11 +311,7 @@ class _AvatarFallback extends StatelessWidget {
       child: Center(
         child: Text(
           detail.name.isNotEmpty ? detail.name[0].toUpperCase() : '?',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: heroColor,
-          ),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: heroColor),
         ),
       ),
     );
@@ -362,11 +329,7 @@ class _LaneIndicator extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.place_rounded,
-          size: 12,
-          color: colorScheme.onSurface.withValues(alpha: 0.4),
-        ),
+        Icon(Icons.place_rounded, size: 12, color: colorScheme.onSurface.withValues(alpha: 0.4)),
         const SizedBox(width: 4),
         Text(
           lane,
@@ -382,11 +345,7 @@ class _LaneIndicator extends StatelessWidget {
 }
 
 class _StatPillSmall extends StatelessWidget {
-  const _StatPillSmall({
-    required this.stat,
-    required this.isDark,
-    required this.colorScheme,
-  });
+  const _StatPillSmall({required this.stat, required this.isDark, required this.colorScheme});
 
   final HeroStat stat;
   final bool isDark;
@@ -412,14 +371,9 @@ class _StatPillSmall extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF181C24)
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.12),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.12), width: 0.5),
       ),
       child: Column(
         children: [
@@ -470,8 +424,7 @@ class _FloatingTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:
-            isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerHigh,
+        color: isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: colorScheme.outline.withValues(alpha: isDark ? 0.12 : 0.15),
@@ -542,15 +495,10 @@ class _InfoTab extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF111318)
-                    : colorScheme.surfaceContainerLowest,
+                color: isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(12),
                 border: Border(
-                  left: BorderSide(
-                    color: colorScheme.primary.withValues(alpha: 0.5),
-                    width: 2,
-                  ),
+                  left: BorderSide(color: colorScheme.primary.withValues(alpha: 0.5), width: 2),
                 ),
               ),
               child: Text(
@@ -574,8 +522,7 @@ class _InfoTab extends StatelessWidget {
               spacing: 6,
               runSpacing: 6,
               children: hero.specialties
-                  .map((s) => _SpecialtyChip(
-                      label: s, colorScheme: colorScheme, isDark: isDark))
+                  .map((s) => _SpecialtyChip(label: s, colorScheme: colorScheme, isDark: isDark))
                   .toList(),
             ),
             const SizedBox(height: 24),
@@ -585,8 +532,9 @@ class _InfoTab extends StatelessWidget {
           if (hero.skills.isNotEmpty) ...[
             _SectionLabel(label: 'Habilidades', colorScheme: colorScheme),
             const SizedBox(height: 12),
-            ...hero.skills.map((s) => _SkillCard(
-                skill: s, colorScheme: colorScheme, isDark: isDark)),
+            ...hero.skills.map(
+              (s) => _SkillCard(skill: s, colorScheme: colorScheme, isDark: isDark),
+            ),
           ],
         ],
       ),
@@ -595,11 +543,7 @@ class _InfoTab extends StatelessWidget {
 }
 
 class _SpecialtyChip extends StatelessWidget {
-  const _SpecialtyChip({
-    required this.label,
-    required this.colorScheme,
-    required this.isDark,
-  });
+  const _SpecialtyChip({required this.label, required this.colorScheme, required this.isDark});
 
   final String label;
   final ColorScheme colorScheme;
@@ -610,14 +554,9 @@ class _SpecialtyChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF181C24)
-            : colorScheme.surfaceContainerHighest,
+        color: isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2), width: 0.5),
       ),
       child: Text(
         label,
@@ -632,11 +571,7 @@ class _SpecialtyChip extends StatelessWidget {
 }
 
 class _SkillCard extends StatelessWidget {
-  const _SkillCard({
-    required this.skill,
-    required this.colorScheme,
-    required this.isDark,
-  });
+  const _SkillCard({required this.skill, required this.colorScheme, required this.isDark});
 
   final HeroSkill skill;
   final ColorScheme colorScheme;
@@ -655,9 +590,7 @@ class _SkillCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF111318)
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
@@ -750,11 +683,7 @@ class _SkillIconFallback extends StatelessWidget {
       child: Center(
         child: Text(
           label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: color),
         ),
       ),
     );
@@ -841,11 +770,7 @@ class _StatBarRow extends StatelessWidget {
               ),
               Text(
                 stat.value,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: color),
               ),
             ],
           ),
@@ -884,11 +809,10 @@ class _BuildsTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
-        children: builds.asMap().entries
-            .map((e) => _BuildCard(
-                heroBuild: e.value,
-                index: e.key,
-                isDark: isDark))
+        children: builds
+            .asMap()
+            .entries
+            .map((e) => _BuildCard(heroBuild: e.value, index: e.key, isDark: isDark))
             .toList(),
       ),
     );
@@ -896,11 +820,7 @@ class _BuildsTab extends StatelessWidget {
 }
 
 class _BuildCard extends StatelessWidget {
-  const _BuildCard({
-    required this.heroBuild,
-    required this.index,
-    required this.isDark,
-  });
+  const _BuildCard({required this.heroBuild, required this.index, required this.isDark});
 
   final HeroBuild heroBuild;
   final int index;
@@ -919,9 +839,7 @@ class _BuildCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF111318)
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? const Color(0xFF111318) : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: colorScheme.outline.withValues(alpha: isDark ? 0.1 : 0.12),
@@ -944,58 +862,45 @@ class _BuildCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              _BuildRateBadge(
-                label: 'WR $winPct%',
-                color: const Color(0xFF10B981),
-              ),
+              _BuildRateBadge(label: 'WR $winPct%', color: const Color(0xFF10B981)),
               const SizedBox(width: 6),
-              _BuildRateBadge(
-                label: 'Pick $pickPct%',
-                color: colorScheme.primary,
-              ),
+              _BuildRateBadge(label: 'Pick $pickPct%', color: colorScheme.primary),
             ],
           ),
           const SizedBox(height: 12),
 
           // Ítems
-          _SectionLabel(
-            label: 'Ítems',
-            colorScheme: colorScheme,
-            small: true,
-          ),
+          _SectionLabel(label: 'Ítems', colorScheme: colorScheme, small: true),
           const SizedBox(height: 8),
           Row(
             children: heroBuild.items.isNotEmpty
                 ? heroBuild.items
-                    .map((item) => Padding(
+                      .map(
+                        (item) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: _ItemIcon(item: item),
-                        ))
-                    .toList()
+                        ),
+                      )
+                      .toList()
                 : heroBuild.equipIds
-                    .map((id) => Padding(
+                      .map(
+                        (id) => Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: _ItemIconPlaceholder(id: id),
-                        ))
-                    .toList(),
+                        ),
+                      )
+                      .toList(),
           ),
           const SizedBox(height: 14),
 
           // Hechizo y emblema
-          _SectionLabel(
-            label: 'Hechizo y Emblema',
-            colorScheme: colorScheme,
-            small: true,
-          ),
+          _SectionLabel(label: 'Hechizo y Emblema', colorScheme: colorScheme, small: true),
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (heroBuild.spellIconUrl.isNotEmpty)
-                _SpellCard(
-                  iconUrl: heroBuild.spellIconUrl,
-                  name: heroBuild.spellName,
-                ),
+                _SpellCard(iconUrl: heroBuild.spellIconUrl, name: heroBuild.spellName),
               const SizedBox(width: 10),
               if (heroBuild.emblemIconUrl.isNotEmpty)
                 Expanded(
@@ -1030,11 +935,7 @@ class _BuildRateBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: color),
       ),
     );
   }
@@ -1057,10 +958,7 @@ class _ItemIcon extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(9),
-              border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.2),
-                width: 0.5,
-              ),
+              border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2), width: 0.5),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.5),
@@ -1068,8 +966,7 @@ class _ItemIcon extends StatelessWidget {
                   ? Image.network(
                       item.iconUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _ItemIconPlaceholder(id: item.equipId),
+                      errorBuilder: (_, __, ___) => _ItemIconPlaceholder(id: item.equipId),
                     )
                   : _ItemIconPlaceholder(id: item.equipId),
             ),
@@ -1105,19 +1002,12 @@ class _ItemIconPlaceholder extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(9),
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.2), width: 0.5),
       ),
       child: Center(
         child: Text(
           '$id',
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.primary,
-          ),
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: colorScheme.primary),
         ),
       ),
     );
@@ -1138,10 +1028,7 @@ class _SpellCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.15),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15), width: 0.5),
       ),
       child: Column(
         children: [
@@ -1174,11 +1061,7 @@ class _SpellCard extends StatelessWidget {
 }
 
 class _EmblemCard extends StatelessWidget {
-  const _EmblemCard({
-    required this.iconUrl,
-    required this.name,
-    required this.attrs,
-  });
+  const _EmblemCard({required this.iconUrl, required this.name, required this.attrs});
 
   final String iconUrl;
   final String name;
@@ -1189,23 +1072,14 @@ class _EmblemCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cleanAttrs = attrs
-        .split('\n')
-        .map((l) => l.trim())
-        .where((l) => l.isNotEmpty)
-        .join('\n');
+    final cleanAttrs = attrs.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).join('\n');
 
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF181C24)
-            : colorScheme.surfaceContainerLowest,
+        color: isDark ? const Color(0xFF181C24) : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.15),
-          width: 0.5,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.15), width: 0.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1217,8 +1091,7 @@ class _EmblemCard extends StatelessWidget {
               width: 40,
               height: 40,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  Icon(Icons.star_rounded, color: colorScheme.primary),
+              errorBuilder: (_, __, ___) => Icon(Icons.star_rounded, color: colorScheme.primary),
             ),
           ),
           const SizedBox(width: 10),
@@ -1259,11 +1132,7 @@ class _EmblemCard extends StatelessWidget {
 // ══════════════════════════════════════════════════════════════════
 
 class _CountersTab extends StatelessWidget {
-  const _CountersTab({
-    required this.relation,
-    required this.heroMap,
-    required this.isDark,
-  });
+  const _CountersTab({required this.relation, required this.heroMap, required this.isDark});
 
   final HeroRelation? relation;
   final Map<int, MlbbHero> heroMap;
@@ -1349,10 +1218,7 @@ class _CounterSection extends StatelessWidget {
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
             ),
             const SizedBox(width: 8),
             Text(
@@ -1413,10 +1279,7 @@ class _CounterHeroAvatar extends StatelessWidget {
             height: 52,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: borderColor.withValues(alpha: 0.35),
-                width: 1.5,
-              ),
+              border: Border.all(color: borderColor.withValues(alpha: 0.35), width: 1.5),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.5),
@@ -1461,11 +1324,7 @@ class _CounterPlaceholder extends StatelessWidget {
       child: Center(
         child: Text(
           name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: color),
         ),
       ),
     );
@@ -1477,11 +1336,7 @@ class _CounterPlaceholder extends StatelessWidget {
 // ══════════════════════════════════════════════════════════════════
 
 class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({
-    required this.label,
-    required this.colorScheme,
-    this.small = false,
-  });
+  const _SectionLabel({required this.label, required this.colorScheme, this.small = false});
 
   final String label;
   final ColorScheme colorScheme;
@@ -1514,10 +1369,7 @@ class _TabEmptyState extends StatelessWidget {
       child: Center(
         child: Text(
           message,
-          style: TextStyle(
-            fontSize: 14,
-            color: colorScheme.onSurface.withValues(alpha: 0.35),
-          ),
+          style: TextStyle(fontSize: 14, color: colorScheme.onSurface.withValues(alpha: 0.35)),
         ),
       ),
     );

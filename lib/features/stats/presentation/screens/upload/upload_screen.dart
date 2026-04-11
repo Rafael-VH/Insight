@@ -28,8 +28,7 @@ class UploadScreen extends StatefulWidget {
   State<UploadScreen> createState() => _UploadScreenState();
 }
 
-class _UploadScreenState extends State<UploadScreen>
-    with UploadStateHandlerMixin {
+class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixin {
   late final StatsUploadController _controller;
 
   bool _isSaving = false;
@@ -49,16 +48,13 @@ class _UploadScreenState extends State<UploadScreen>
   GameMode? get currentValidatingMode => _currentValidatingMode;
 
   @override
-  set currentValidatingMode(GameMode? value) =>
-      setState(() => _currentValidatingMode = value);
+  set currentValidatingMode(GameMode? value) => setState(() => _currentValidatingMode = value);
 
   // ── Paso actual de la barra de progreso ───────────────────────
   // 0 = sin nada · 1 = imagen(s) cargada(s) · 2 = stats extraídas
   int get _currentStep {
     if (_controller.hasAnyParsedStats) return 2;
-    final anyImage = _controller.availableModes.any(
-      (m) => _controller.uploadedImages[m] != null,
-    );
+    final anyImage = _controller.availableModes.any((m) => _controller.uploadedImages[m] != null);
     if (anyImage) return 1;
     return 0;
   }
@@ -107,14 +103,9 @@ class _UploadScreenState extends State<UploadScreen>
             completedSteps: _currentStep,
             onShowSummary: _showValidationSummary,
           ),
-          body: ListenableBuilder(
-            listenable: _controller,
-            builder: (_, __) => _buildBody(),
-          ),
+          body: ListenableBuilder(listenable: _controller, builder: (_, __) => _buildBody()),
           // ── Botón de guardar fijo en el bottom ────────────
-          bottomNavigationBar: _controller.hasAnyParsedStats
-              ? _buildBottomBar()
-              : null,
+          bottomNavigationBar: _controller.hasAnyParsedStats ? _buildBottomBar() : null,
         ),
       ),
     );
@@ -177,11 +168,7 @@ class _UploadScreenState extends State<UploadScreen>
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           border: Border(
-            top: BorderSide(
-              color: Theme.of(
-                context,
-              ).colorScheme.outline.withValues(alpha: 0.12),
-            ),
+            top: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12)),
           ),
         ),
         child: UploadSaveButton(

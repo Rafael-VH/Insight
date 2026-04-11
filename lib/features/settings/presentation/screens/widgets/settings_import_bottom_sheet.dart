@@ -31,12 +31,10 @@ class SettingsImportBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<SettingsImportBottomSheet> createState() =>
-      _SettingsImportBottomSheetState();
+  State<SettingsImportBottomSheet> createState() => _SettingsImportBottomSheetState();
 }
 
-class _SettingsImportBottomSheetState
-    extends State<SettingsImportBottomSheet> {
+class _SettingsImportBottomSheetState extends State<SettingsImportBottomSheet> {
   bool _mergeMode = true;
   bool _isImporting = false;
 
@@ -55,10 +53,7 @@ class _SettingsImportBottomSheetState
     setState(() => _isImporting = true);
 
     context.read<HistoryBloc>().add(
-      ImportStatsFromJsonEvent(
-        filePath: result.files.single.path!,
-        mergeWithExisting: _mergeMode,
-      ),
+      ImportStatsFromJsonEvent(filePath: result.files.single.path!, mergeWithExisting: _mergeMode),
     );
   }
 
@@ -71,9 +66,7 @@ class _SettingsImportBottomSheetState
         if (state is HistoryImported) {
           Navigator.of(context, rootNavigator: true).pop();
           // Navegar al Historial (índice 1)
-          context
-              .read<NavigationBloc>()
-              .add(const NavigationItemSelected(1));
+          context.read<NavigationBloc>().add(const NavigationItemSelected(1));
         }
 
         if (state is HistoryError && _isImporting) {
@@ -92,8 +85,7 @@ class _SettingsImportBottomSheetState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -113,13 +105,10 @@ class _SettingsImportBottomSheetState
           _buildImportButton(colorScheme),
           const SizedBox(height: 12),
           TextButton(
-            onPressed:
-                _isImporting ? null : () => Navigator.of(context).pop(),
+            onPressed: _isImporting ? null : () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
-              style: TextStyle(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+              style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
             ),
           ),
         ],
@@ -145,15 +134,10 @@ class _SettingsImportBottomSheetState
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(0xFF3B82F6)
-                .withValues(alpha: isDark ? 0.2 : 0.1),
+            color: const Color(0xFF3B82F6).withValues(alpha: isDark ? 0.2 : 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.download_rounded,
-            size: 32,
-            color: Color(0xFF3B82F6),
-          ),
+          child: const Icon(Icons.download_rounded, size: 32, color: Color(0xFF3B82F6)),
         ),
         const SizedBox(height: 12),
         const Text(
@@ -166,10 +150,7 @@ class _SettingsImportBottomSheetState
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -209,10 +190,8 @@ class _SettingsImportBottomSheetState
   }
 
   Widget _buildImportButton(ColorScheme colorScheme) {
-    final color =
-        _mergeMode ? const Color(0xFF3B82F6) : const Color(0xFFDC2626);
-    final label =
-        _mergeMode ? 'Fusionar desde archivo' : 'Reemplazar desde archivo';
+    final color = _mergeMode ? const Color(0xFF3B82F6) : const Color(0xFFDC2626);
+    final label = _mergeMode ? 'Fusionar desde archivo' : 'Reemplazar desde archivo';
 
     return SizedBox(
       width: double.infinity,
@@ -222,26 +201,17 @@ class _SettingsImportBottomSheetState
             ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
             : const Icon(Icons.folder_open_rounded),
         label: Text(_isImporting ? 'Importando...' : label),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
-          disabledBackgroundColor:
-              colorScheme.onSurface.withValues(alpha: 0.12),
+          disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -281,14 +251,10 @@ class _ModeOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? color.withValues(alpha: isDark ? 0.18 : 0.08)
-              : (isDark
-                    ? colorScheme.surfaceContainerHighest
-                    : colorScheme.surfaceContainerLowest),
+              : (isDark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerLowest),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected
-                ? color
-                : colorScheme.outline.withValues(alpha: 0.3),
+            color: selected ? color : colorScheme.outline.withValues(alpha: 0.3),
             width: selected ? 2 : 1,
           ),
         ),
@@ -298,8 +264,7 @@ class _ModeOption extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color:
-                    color.withValues(alpha: selected ? 0.2 : 0.1),
+                color: color.withValues(alpha: selected ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 22, color: color),
@@ -314,8 +279,7 @@ class _ModeOption extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color:
-                          selected ? color : colorScheme.onSurface,
+                      color: selected ? color : colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -324,8 +288,7 @@ class _ModeOption extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.4,
-                      color: colorScheme.onSurface
-                          .withValues(alpha: 0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -338,19 +301,10 @@ class _ModeOption extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: selected ? color : colorScheme.outline,
-                  width: 2,
-                ),
+                border: Border.all(color: selected ? color : colorScheme.outline, width: 2),
                 color: selected ? color : Colors.transparent,
               ),
-              child: selected
-                  ? const Icon(
-                      Icons.check,
-                      size: 12,
-                      color: Colors.white,
-                    )
-                  : null,
+              child: selected ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
             ),
           ],
         ),

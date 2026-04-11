@@ -27,12 +27,10 @@ class HistoryExportImportBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<HistoryExportImportBottomSheet> createState() =>
-      _HistoryExportImportBottomSheetState();
+  State<HistoryExportImportBottomSheet> createState() => _HistoryExportImportBottomSheetState();
 }
 
-class _HistoryExportImportBottomSheetState
-    extends State<HistoryExportImportBottomSheet> {
+class _HistoryExportImportBottomSheetState extends State<HistoryExportImportBottomSheet> {
   bool _isLoading = false;
 
   @override
@@ -41,9 +39,7 @@ class _HistoryExportImportBottomSheetState
       listener: (context, state) {
         if (state is HistoryExporting || state is HistoryImporting) {
           if (mounted) setState(() => _isLoading = true);
-        } else if (state is HistoryExported ||
-            state is HistoryImported ||
-            state is HistoryError) {
+        } else if (state is HistoryExported || state is HistoryImported || state is HistoryError) {
           if (mounted && Navigator.canPop(context)) {
             Navigator.of(context, rootNavigator: true).pop();
           }
@@ -72,10 +68,7 @@ class _HistoryExportImportBottomSheetState
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text(
-              'Procesando archivo...',
-              style: TextStyle(color: colorScheme.onSurface),
-            ),
+            Text('Procesando archivo...', style: TextStyle(color: colorScheme.onSurface)),
           ],
         ),
       ),
@@ -100,17 +93,14 @@ class _HistoryExportImportBottomSheetState
         const SizedBox(height: 20),
         Text(
           'Exportar / Importar',
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
           'Respalda o restaura tus estadísticas en formato JSON',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.6)),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -119,9 +109,7 @@ class _HistoryExportImportBottomSheetState
           color: const Color(0xFF059669),
           title: 'Exportar estadísticas',
           subtitle: 'Genera un archivo .json para compartir o respaldar',
-          onTap: () => context
-              .read<HistoryBloc>()
-              .add(const ExportStatsToJsonEvent()),
+          onTap: () => context.read<HistoryBloc>().add(const ExportStatsToJsonEvent()),
         ),
         const SizedBox(height: 12),
         _ActionTile(
@@ -143,10 +131,7 @@ class _HistoryExportImportBottomSheetState
     );
   }
 
-  Future<void> _pickAndImport(
-    BuildContext context, {
-    required bool merge,
-  }) async {
+  Future<void> _pickAndImport(BuildContext context, {required bool merge}) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -157,10 +142,7 @@ class _HistoryExportImportBottomSheetState
     if (!context.mounted) return;
 
     context.read<HistoryBloc>().add(
-      ImportStatsFromJsonEvent(
-        filePath: result.files.single.path!,
-        mergeWithExisting: merge,
-      ),
+      ImportStatsFromJsonEvent(filePath: result.files.single.path!, mergeWithExisting: merge),
     );
   }
 }
@@ -209,10 +191,7 @@ class _ActionTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: colorScheme.onSurface),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -225,10 +204,7 @@ class _ActionTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurface.withValues(alpha: 0.4),
-              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurface.withValues(alpha: 0.4)),
             ],
           ),
         ),

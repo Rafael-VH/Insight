@@ -36,15 +36,13 @@ class NavigationChanged extends NavigationState {
   /// Timestamp del cambio
   final DateTime timestamp;
 
-  NavigationChanged(this.currentIndex, {this.previousIndex})
-    : timestamp = DateTime.now();
+  NavigationChanged(this.currentIndex, {this.previousIndex}) : timestamp = DateTime.now();
 
   @override
   List<Object?> get props => [currentIndex, previousIndex, timestamp];
 
   @override
-  String toString() =>
-      'NavigationChanged(current: $currentIndex, previous: $previousIndex)';
+  String toString() => 'NavigationChanged(current: $currentIndex, previous: $previousIndex)';
 }
 
 /// Estado: Navegación en transición (útil para animaciones)
@@ -53,17 +51,13 @@ class NavigationTransitioning extends NavigationState {
   final int currentIndex;
   final int targetIndex;
 
-  const NavigationTransitioning({
-    required this.currentIndex,
-    required this.targetIndex,
-  });
+  const NavigationTransitioning({required this.currentIndex, required this.targetIndex});
 
   @override
   List<Object> get props => [currentIndex, targetIndex];
 
   @override
-  String toString() =>
-      'NavigationTransitioning(from: $currentIndex, to: $targetIndex)';
+  String toString() => 'NavigationTransitioning(from: $currentIndex, to: $targetIndex)';
 }
 
 /// Estado: Badge actualizado
@@ -83,8 +77,7 @@ class NavigationBadgeUpdated extends NavigationState {
   List<Object?> get props => [currentIndex, updatedItemIndex, badge];
 
   @override
-  String toString() =>
-      'NavigationBadgeUpdated(item: $updatedItemIndex, badge: $badge)';
+  String toString() => 'NavigationBadgeUpdated(item: $updatedItemIndex, badge: $badge)';
 }
 
 /// Estado: Error de navegación
@@ -94,11 +87,7 @@ class NavigationError extends NavigationState {
   final String message;
   final String? errorDetails;
 
-  const NavigationError({
-    required this.currentIndex,
-    required this.message,
-    this.errorDetails,
-  });
+  const NavigationError({required this.currentIndex, required this.message, this.errorDetails});
 
   @override
   List<Object?> get props => [currentIndex, message, errorDetails];

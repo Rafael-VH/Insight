@@ -8,6 +8,5 @@ class GetLatestStatsCollection {
 
   GetLatestStatsCollection(this.repository);
 
-  Future<Either<Failure, StatsCollection?>> call() =>
-      repository.getLatestStatsCollection();
+  Future<Either<Failure, StatsCollection?>> call() => repository.getLatestStatsCollection();
 }

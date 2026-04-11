@@ -4,11 +4,7 @@ import 'package:insight/features/stats/domain/entities/game_mode.dart';
 import 'package:insight/features/stats/domain/entities/player_stats.dart';
 
 class StatsVerificationWidget extends StatelessWidget {
-  const StatsVerificationWidget({
-    super.key,
-    required this.gameMode,
-    required this.stats,
-  });
+  const StatsVerificationWidget({super.key, required this.gameMode, required this.stats});
 
   final GameMode gameMode;
   final PlayerStats stats;
@@ -49,10 +45,7 @@ class StatsVerificationWidget extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.green[isDark ? 900 : 100],
                     borderRadius: BorderRadius.circular(16),
@@ -124,11 +117,7 @@ class StatsVerificationWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection(
-    BuildContext context,
-    String title,
-    List<StatField> fields,
-  ) {
+  Widget _buildStatsSection(BuildContext context, String title, List<StatField> fields) {
     // Colores adaptados
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -148,21 +137,13 @@ class StatsVerificationWidget extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             // Fondo adaptado
-            color: isDark
-                ? colorScheme.surfaceContainerHighest
-                : Colors.grey[50],
+            color: isDark ? colorScheme.surfaceContainerHighest : Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark
-                  ? colorScheme.outline.withValues(alpha: 0.3)
-                  : Colors.grey[200]!,
+              color: isDark ? colorScheme.outline.withValues(alpha: 0.3) : Colors.grey[200]!,
             ),
           ),
-          child: Column(
-            children: fields
-                .map((field) => _buildStatRow(context, field))
-                .toList(),
-          ),
+          child: Column(children: fields.map((field) => _buildStatRow(context, field)).toList()),
         ),
       ],
     );

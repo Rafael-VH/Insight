@@ -14,21 +14,15 @@ class UpdateSelectedTheme {
   Future<Either<Failure, void>> call(UpdateSelectedThemeParams params) async {
     // Validación del ID del tema
     if (params.themeId.isEmpty) {
-      return const Left(
-        FileSystemFailure('El ID del tema no puede estar vacío'),
-      );
+      return const Left(FileSystemFailure('El ID del tema no puede estar vacío'));
     }
 
     // Obtener configuración actual
     final settingsResult = await repository.getSettings();
 
-    return settingsResult.fold((failure) => Left(failure), (
-      currentSettings,
-    ) async {
+    return settingsResult.fold((failure) => Left(failure), (currentSettings) async {
       // Actualizar solo el tema seleccionado
-      final updatedSettings = currentSettings.copyWith(
-        selectedThemeId: params.themeId,
-      );
+      final updatedSettings = currentSettings.copyWith(selectedThemeId: params.themeId);
 
       // Guardar la configuración actualizada
       return await repository.saveSettings(updatedSettings);

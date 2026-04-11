@@ -32,12 +32,7 @@ class ChartsWinRateGauge extends StatelessWidget {
                 sectionsSpace: 2,
                 centerSpaceRadius: 55,
                 sections: [
-                  PieChartSectionData(
-                    value: pct,
-                    color: color,
-                    title: '',
-                    radius: 28,
-                  ),
+                  PieChartSectionData(value: pct, color: color, title: '', radius: 28),
                   PieChartSectionData(
                     value: 100.0 - pct,
                     color: colorScheme.onSurface.withValues(alpha: 0.1),
@@ -52,11 +47,7 @@ class ChartsWinRateGauge extends StatelessWidget {
               children: [
                 Text(
                   '${pct.toStringAsFixed(1)}%',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: color),
                 ),
                 Text(
                   'Win Rate',

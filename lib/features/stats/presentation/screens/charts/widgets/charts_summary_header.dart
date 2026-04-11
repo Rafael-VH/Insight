@@ -20,10 +20,7 @@ class ChartsSummaryHeader extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
-            colors: [
-              color.withValues(alpha: 0.18),
-              color.withValues(alpha: 0.04),
-            ],
+            colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.04)],
           ),
         ),
         padding: const EdgeInsets.all(20),
@@ -47,10 +44,9 @@ class ChartsSummaryHeader extends StatelessWidget {
         Expanded(
           child: Text(
             stats.mode.fullDisplayName,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: color),
           ),
         ),
       ],

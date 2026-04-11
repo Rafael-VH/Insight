@@ -11,9 +11,5 @@ class SaveCollectionsBatch {
   Future<Either<Failure, int>> call(
     List<StatsCollection> collections, {
     bool replaceExisting = false,
-  }) =>
-      repository.saveCollectionsBatch(
-        collections,
-        replaceExisting: replaceExisting,
-      );
+  }) => repository.saveCollectionsBatch(collections, replaceExisting: replaceExisting);
 }

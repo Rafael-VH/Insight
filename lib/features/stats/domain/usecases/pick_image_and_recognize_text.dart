@@ -4,8 +4,7 @@ import 'package:insight/features/stats/domain/entities/ocr_result.dart';
 import 'package:insight/features/stats/domain/repositories/ocr_repository.dart';
 import 'package:insight/features/stats/domain/usecases/usecase.dart';
 
-class PickImageAndRecognizeText
-    implements UseCase<OcrResult, ImageSourceParams> {
+class PickImageAndRecognizeText implements UseCase<OcrResult, ImageSourceParams> {
   final OcrRepository repository;
 
   PickImageAndRecognizeText(this.repository);

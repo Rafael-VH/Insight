@@ -18,10 +18,7 @@ class StatsCollection {
   }) : name = name ?? '';
 
   bool get hasAnyStats =>
-      totalStats != null ||
-      rankedStats != null ||
-      classicStats != null ||
-      brawlStats != null;
+      totalStats != null || rankedStats != null || classicStats != null || brawlStats != null;
 
   List<PlayerStats> get availableStats {
     final List<PlayerStats> stats = [];

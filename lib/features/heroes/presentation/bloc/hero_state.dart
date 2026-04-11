@@ -26,20 +26,12 @@ class HeroListLoaded extends HeroState {
   final List<MlbbHero> filtered;
   final String searchQuery;
 
-  const HeroListLoaded({
-    required this.heroes,
-    required this.filtered,
-    this.searchQuery = '',
-  });
+  const HeroListLoaded({required this.heroes, required this.filtered, this.searchQuery = ''});
 
   @override
   List<Object> get props => [heroes, filtered, searchQuery];
 
-  HeroListLoaded copyWith({
-    List<MlbbHero>? heroes,
-    List<MlbbHero>? filtered,
-    String? searchQuery,
-  }) {
+  HeroListLoaded copyWith({List<MlbbHero>? heroes, List<MlbbHero>? filtered, String? searchQuery}) {
     return HeroListLoaded(
       heroes: heroes ?? this.heroes,
       filtered: filtered ?? this.filtered,

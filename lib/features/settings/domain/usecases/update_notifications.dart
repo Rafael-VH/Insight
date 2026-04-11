@@ -12,13 +12,9 @@ class UpdateNotifications {
     // Obtener configuración actual
     final settingsResult = await repository.getSettings();
 
-    return settingsResult.fold((failure) => Left(failure), (
-      currentSettings,
-    ) async {
+    return settingsResult.fold((failure) => Left(failure), (currentSettings) async {
       // Actualizar solo las notificaciones
-      final updatedSettings = currentSettings.copyWith(
-        enableNotifications: params.enabled,
-      );
+      final updatedSettings = currentSettings.copyWith(enableNotifications: params.enabled);
 
       // Guardar la configuración actualizada
       return await repository.saveSettings(updatedSettings);

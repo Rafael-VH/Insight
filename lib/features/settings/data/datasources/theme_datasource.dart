@@ -70,10 +70,7 @@ class ThemeDataSourceImpl implements ThemeDataSource {
       final jsonList = customThemes.map((t) => t.toJson()).toList();
       final jsonString = json.encode(jsonList);
 
-      final success = await sharedPreferences.setString(
-        _customThemesKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_customThemesKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to save custom theme');
@@ -98,10 +95,7 @@ class ThemeDataSourceImpl implements ThemeDataSource {
       final jsonList = customThemes.map((t) => t.toJson()).toList();
       final jsonString = json.encode(jsonList);
 
-      final success = await sharedPreferences.setString(
-        _customThemesKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_customThemesKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to delete custom theme');
@@ -125,9 +119,7 @@ class ThemeDataSourceImpl implements ThemeDataSource {
 
       final jsonList = json.decode(jsonString) as List;
 
-      return jsonList
-          .map((jsonMap) => AppTheme.fromJson(jsonMap as Map<String, dynamic>))
-          .toList();
+      return jsonList.map((jsonMap) => AppTheme.fromJson(jsonMap as Map<String, dynamic>)).toList();
     } catch (e) {
       throw FileSystemFailure('Error loading custom themes: ${e.toString()}');
     }

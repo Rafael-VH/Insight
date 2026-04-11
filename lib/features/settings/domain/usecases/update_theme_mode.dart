@@ -9,9 +9,7 @@ class UpdateThemeMode {
 
   Future<Either<Failure, void>> call(AppThemeMode themeMode) async {
     final settingsResult = await repository.getSettings();
-    return settingsResult.fold((failure) => Left(failure), (
-      currentSettings,
-    ) async {
+    return settingsResult.fold((failure) => Left(failure), (currentSettings) async {
       final updated = currentSettings.copyWith(themeMode: themeMode);
       return await repository.saveSettings(updated);
     });

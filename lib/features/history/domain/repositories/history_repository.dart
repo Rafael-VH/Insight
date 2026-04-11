@@ -9,22 +9,15 @@ import 'package:insight/features/history/domain/entities/stats_collection.dart';
 abstract class HistoryRepository {
   // ── CRUD ────────────────────────────────────────────────────────
 
-  Future<Either<Failure, void>> saveStatsCollection(
-    StatsCollection collection,
-  );
+  Future<Either<Failure, void>> saveStatsCollection(StatsCollection collection);
 
   Future<Either<Failure, List<StatsCollection>>> getAllStatsCollections();
 
   Future<Either<Failure, StatsCollection?>> getLatestStatsCollection();
 
-  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(
-    DateTime createdAt,
-  );
+  Future<Either<Failure, StatsCollection?>> getStatsCollectionByDate(DateTime createdAt);
 
-  Future<Either<Failure, void>> updateStatsCollectionName(
-    DateTime createdAt,
-    String newName,
-  );
+  Future<Either<Failure, void>> updateStatsCollectionName(DateTime createdAt, String newName);
 
   Future<Either<Failure, void>> deleteStatsCollection(DateTime createdAt);
 
@@ -34,14 +27,10 @@ abstract class HistoryRepository {
 
   /// Serializa [collections] a JSON, escribe el archivo en disco y
   /// retorna la ruta absoluta del archivo generado.
-  Future<Either<Failure, String>> exportStatsToJson(
-    List<StatsCollection> collections,
-  );
+  Future<Either<Failure, String>> exportStatsToJson(List<StatsCollection> collections);
 
   /// Lee el archivo JSON de [filePath] y retorna las colecciones parseadas.
-  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(
-    String filePath,
-  );
+  Future<Either<Failure, List<StatsCollection>>> importStatsFromJson(String filePath);
 
   /// Guarda múltiples colecciones omitiendo duplicados exactos.
   /// Retorna el número de colecciones efectivamente guardadas.

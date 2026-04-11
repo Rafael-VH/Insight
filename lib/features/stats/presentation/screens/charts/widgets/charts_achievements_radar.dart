@@ -58,9 +58,7 @@ class ChartsAchievementsRadar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 48),
               child: Text(
                 'Sin logros registrados',
-                style: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
+                style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
               ),
             )
           else
@@ -71,9 +69,7 @@ class ChartsAchievementsRadar extends StatelessWidget {
                   radarShape: RadarShape.polygon,
                   dataSets: [
                     RadarDataSet(
-                      dataEntries: normalizedValues
-                          .map((v) => RadarEntry(value: v))
-                          .toList(),
+                      dataEntries: normalizedValues.map((v) => RadarEntry(value: v)).toList(),
                       fillColor: color.withValues(alpha: 0.2),
                       borderColor: color,
                       borderWidth: 2,
@@ -91,16 +87,9 @@ class ChartsAchievementsRadar extends StatelessWidget {
                     width: 1,
                   ),
                   tickCount: 4,
-                  ticksTextStyle: const TextStyle(
-                    fontSize: 0,
-                    color: Colors.transparent,
-                  ),
-                  getTitle: (index, angle) =>
-                      RadarChartTitle(text: labels[index], angle: 0),
-                  titleTextStyle: TextStyle(
-                    fontSize: 10,
-                    color: colorScheme.onSurface,
-                  ),
+                  ticksTextStyle: const TextStyle(fontSize: 0, color: Colors.transparent),
+                  getTitle: (index, angle) => RadarChartTitle(text: labels[index], angle: 0),
+                  titleTextStyle: TextStyle(fontSize: 10, color: colorScheme.onSurface),
                 ),
               ),
             ),
@@ -111,11 +100,7 @@ class ChartsAchievementsRadar extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: List.generate(
               labels.length,
-              (i) => LegendChip(
-                label: labels[i],
-                value: rawValues[i].toString(),
-                color: color,
-              ),
+              (i) => LegendChip(label: labels[i], value: rawValues[i].toString(), color: color),
             ),
           ),
         ],

@@ -35,11 +35,7 @@ class MainNavigationDrawer extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildChildren(
-    BuildContext context,
-    ColorScheme colorScheme,
-    bool isDark,
-  ) {
+  List<Widget> _buildChildren(BuildContext context, ColorScheme colorScheme, bool isDark) {
     final children = <Widget>[];
 
     // ── Encabezado del drawer ────────────────────────────────────
@@ -74,12 +70,7 @@ class MainNavigationDrawer extends StatelessWidget {
     return children;
   }
 
-  Widget _buildIcon(
-    NavigationItem item,
-    int index,
-    ColorScheme colorScheme,
-    bool selected,
-  ) {
+  Widget _buildIcon(NavigationItem item, int index, ColorScheme colorScheme, bool selected) {
     // Obtener badge del BLoC si no está en el item
     return Stack(
       clipBehavior: Clip.none,
@@ -91,10 +82,7 @@ class MainNavigationDrawer extends StatelessWidget {
             right: -8,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(8),
-              ),
+              decoration: BoxDecoration(color: item.color, borderRadius: BorderRadius.circular(8)),
               child: Text(
                 item.badge!,
                 style: const TextStyle(
@@ -126,11 +114,7 @@ class MainNavigationDrawer extends StatelessWidget {
           ),
           child: Text(
             item.badge!,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: item.color,
-            ),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: item.color),
           ),
         ),
       ],
@@ -161,11 +145,7 @@ class _DrawerHeader extends StatelessWidget {
               color: colorScheme.primary,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.insights_rounded,
-              color: colorScheme.onPrimary,
-              size: 24,
-            ),
+            child: Icon(Icons.insights_rounded, color: colorScheme.onPrimary, size: 24),
           ),
           const SizedBox(height: 12),
           Text(
@@ -178,10 +158,7 @@ class _DrawerHeader extends StatelessWidget {
           ),
           Text(
             'ML Stats OCR',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+            style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withValues(alpha: 0.6)),
           ),
           const SizedBox(height: 12),
         ],

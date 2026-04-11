@@ -28,8 +28,7 @@ class SettingsInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final resolvedIconColor =
-        iconColor ?? colorScheme.onSurface.withValues(alpha: 0.7);
+    final resolvedIconColor = iconColor ?? colorScheme.onSurface.withValues(alpha: 0.7);
     final resolvedContainerColor = iconColor != null
         ? iconColor!.withValues(alpha: 0.1)
         : colorScheme.onSurface.withValues(alpha: 0.08);

@@ -30,9 +30,7 @@ class SettingsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<HistoryBloc, HistoryState>(
       listenWhen: (_, state) =>
-          state is HistoryCleared ||
-          state is HistoryImported ||
-          state is HistoryError,
+          state is HistoryCleared || state is HistoryImported || state is HistoryError,
       listener: (context, state) {
         if (state is HistoryError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -40,9 +38,7 @@ class SettingsContent extends StatelessWidget {
               content: Text(state.message),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           );
         }
@@ -66,17 +62,11 @@ class SettingsContent extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.color_lens_outlined,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        Icon(Icons.color_lens_outlined, color: Theme.of(context).primaryColor),
                         const SizedBox(width: 12),
                         const Text(
                           'Tema de Color',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -97,36 +87,28 @@ class SettingsContent extends StatelessWidget {
             title: 'Notificaciones',
             subtitle: 'Recibir alertas y recordatorios',
             value: settings.enableNotifications,
-            onChanged: (value) => context
-                .read<SettingsBloc>()
-                .add(UpdateNotifications(value)),
+            onChanged: (value) => context.read<SettingsBloc>().add(UpdateNotifications(value)),
           ),
           SettingsSwitchTile(
             icon: Icons.vibration,
             title: 'Vibración',
             subtitle: 'Feedback háptico en interacciones',
             value: settings.enableHapticFeedback,
-            onChanged: (value) => context
-                .read<SettingsBloc>()
-                .add(UpdateHapticFeedback(value)),
+            onChanged: (value) => context.read<SettingsBloc>().add(UpdateHapticFeedback(value)),
           ),
           SettingsSwitchTile(
             icon: Icons.save_outlined,
             title: 'Auto-guardar',
             subtitle: 'Guardar estadísticas automáticamente',
             value: settings.autoSaveStats,
-            onChanged: (value) =>
-                context.read<SettingsBloc>().add(UpdateAutoSave(value)),
+            onChanged: (value) => context.read<SettingsBloc>().add(UpdateAutoSave(value)),
           ),
           SettingsSwitchTile(
             icon: Icons.chat_bubble_outline,
             title: 'Diálogos Mejorados',
-            subtitle:
-                'Usar estilo Awesome Snackbar para notificaciones',
+            subtitle: 'Usar estilo Awesome Snackbar para notificaciones',
             value: settings.useAwesomeSnackbar,
-            onChanged: (value) => context
-                .read<SettingsBloc>()
-                .add(UpdateAwesomeSnackbar(value)),
+            onChanged: (value) => context.read<SettingsBloc>().add(UpdateAwesomeSnackbar(value)),
             onPreviewStyle: SettingsStylePreview.show,
           ),
 
@@ -165,18 +147,14 @@ class SettingsContent extends StatelessWidget {
 
           // ── Acerca de ─────────────────────────────────────────
           const SettingsSectionHeader(title: 'Acerca de'),
-          const SettingsInfoTile(
-            icon: Icons.info_outline,
-            title: 'Versión',
-            subtitle: '1.0.0+1',
-          ),
+          const SettingsInfoTile(icon: Icons.info_outline, title: 'Versión', subtitle: '1.0.0+1'),
           SettingsInfoTile(
             icon: Icons.bug_report_outlined,
             title: 'Reportar un problema',
             subtitle: 'Ayúdanos a mejorar la app',
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Función en desarrollo')),
-            ),
+            onTap: () => ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Función en desarrollo'))),
           ),
 
           const Divider(height: 32),

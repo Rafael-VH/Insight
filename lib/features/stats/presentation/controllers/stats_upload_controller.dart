@@ -46,11 +46,9 @@ class StatsUploadController extends ChangeNotifier {
     _initializeState();
   }
 
-  Map<GameMode, String?> get uploadedImages =>
-      Map.unmodifiable(_uploadedImages);
+  Map<GameMode, String?> get uploadedImages => Map.unmodifiable(_uploadedImages);
   Map<GameMode, PlayerStats?> get parsedStats => Map.unmodifiable(_parsedStats);
-  Map<GameMode, ValidationResult?> get validationResults =>
-      Map.unmodifiable(_validationResults);
+  Map<GameMode, ValidationResult?> get validationResults => Map.unmodifiable(_validationResults);
   Map<GameMode, bool> get isProcessing => Map.unmodifiable(_isProcessing);
   GameMode? get currentProcessingMode => _currentProcessingMode;
   GameMode? get lastProcessedMode => _lastProcessedMode;
@@ -103,10 +101,7 @@ class StatsUploadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  OcrProcessingResult handleOcrSuccessWithDiagnostics(
-    String text,
-    String? imagePath,
-  ) {
+  OcrProcessingResult handleOcrSuccessWithDiagnostics(String text, String? imagePath) {
     _assertNotDisposed();
 
     final mode = _currentProcessingMode ?? _lastProcessedMode;
@@ -116,9 +111,7 @@ class StatsUploadController extends ChangeNotifier {
         stats: null,
         validation: null,
         imagePath: null,
-        extractionLog: [
-          'ERROR: No se pudo determinar el modo de procesamiento',
-        ],
+        extractionLog: ['ERROR: No se pudo determinar el modo de procesamiento'],
         processedMode: null,
       );
     }

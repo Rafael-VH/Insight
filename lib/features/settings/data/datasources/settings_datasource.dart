@@ -36,10 +36,7 @@ class SettingsDataSourceImpl implements SettingsDataSource {
   Future<void> saveSettings(AppSettings settings) async {
     try {
       final jsonString = json.encode(settings.toJson());
-      final success = await sharedPreferences.setString(
-        _settingsKey,
-        jsonString,
-      );
+      final success = await sharedPreferences.setString(_settingsKey, jsonString);
 
       if (!success) {
         throw const FileSystemFailure('Failed to save settings');

@@ -98,9 +98,7 @@ Future<void> init() async {
 
   // TextRecognizer — puede fallar si ML Kit no está disponible
   try {
-    sl.registerLazySingleton(
-      () => TextRecognizer(script: TextRecognitionScript.latin),
-    );
+    sl.registerLazySingleton(() => TextRecognizer(script: TextRecognitionScript.latin));
     debugPrint('✓ TextRecognizer registrado');
   } catch (e) {
     debugPrint('✗ TextRecognizer failed: $e');
@@ -112,17 +110,11 @@ Future<void> init() async {
   // ================================================================
 
   // Data
-  sl.registerLazySingleton<ThemeDataSource>(
-    () => ThemeDataSourceImpl(sharedPreferences: sl()),
-  );
-  sl.registerLazySingleton<ThemeRepository>(
-    () => ThemeRepositoryImpl(dataSource: sl()),
-  );
+  sl.registerLazySingleton<ThemeDataSource>(() => ThemeDataSourceImpl(sharedPreferences: sl()));
+  sl.registerLazySingleton<ThemeRepository>(() => ThemeRepositoryImpl(dataSource: sl()));
 
   // Presentation
-  sl.registerFactory(
-    () => ThemeBloc(settingsRepository: sl(), themeRepository: sl()),
-  );
+  sl.registerFactory(() => ThemeBloc(settingsRepository: sl(), themeRepository: sl()));
 
   // ================================================================
   // SETTINGS
@@ -132,9 +124,7 @@ Future<void> init() async {
   sl.registerLazySingleton<SettingsDataSource>(
     () => SettingsDataSourceImpl(sharedPreferences: sl()),
   );
-  sl.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(dataSource: sl()),
-  );
+  sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(dataSource: sl()));
 
   // Domain — Use cases
   sl.registerLazySingleton(() => GetSettings(sl()));
@@ -159,9 +149,7 @@ Future<void> init() async {
   sl.registerLazySingleton<LocalStorageDataSource>(
     () => LocalStorageDataSourceImpl(sharedPreferences: sl()),
   );
-  sl.registerLazySingleton<JsonExportDataSource>(
-    () => JsonExportDataSourceImpl(),
-  );
+  sl.registerLazySingleton<JsonExportDataSource>(() => JsonExportDataSourceImpl());
 
   // ================================================================
   // HISTORY
@@ -169,10 +157,7 @@ Future<void> init() async {
 
   // Data
   sl.registerLazySingleton<HistoryRepository>(
-    () => HistoryRepositoryImpl(
-      localDataSource: sl(),
-      jsonExportDataSource: sl(),
-    ),
+    () => HistoryRepositoryImpl(localDataSource: sl(), jsonExportDataSource: sl()),
   );
 
   // Domain — Use cases
@@ -205,12 +190,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => SaveStatsCollection(sl<HistoryRepository>()));
 
-  sl.registerFactory(
-    () => StatsBloc(
-      saveStatsCollection: sl(),
-      historyBloc: sl(),
-    ),
-  );
+  sl.registerFactory(() => StatsBloc(saveStatsCollection: sl(), historyBloc: sl()));
 
   // ================================================================
   // OCR
@@ -220,37 +200,26 @@ Future<void> init() async {
   sl.registerLazySingleton<OcrDataSource>(
     () => OcrDataSourceImpl(imagePicker: sl(), textRecognizer: sl()),
   );
-  sl.registerLazySingleton<OcrRepository>(
-    () => OcrRepositoryImpl(dataSource: sl()),
-  );
+  sl.registerLazySingleton<OcrRepository>(() => OcrRepositoryImpl(dataSource: sl()));
 
   // Domain — Use cases
   sl.registerLazySingleton(() => PickImageAndRecognizeText(sl()));
   sl.registerLazySingleton(() => CopyTextToClipboard(sl()));
 
   // Presentation
-  sl.registerFactory(
-    () => OcrBloc(
-      pickImageAndRecognizeText: sl(),
-      copyTextToClipboard: sl(),
-    ),
-  );
+  sl.registerFactory(() => OcrBloc(pickImageAndRecognizeText: sl(), copyTextToClipboard: sl()));
 
   // ================================================================
   // HEROES
   // ================================================================
 
   // Data
-  sl.registerLazySingleton<HeroRemoteDataSource>(
-    () => HeroRemoteDataSourceImpl(client: sl()),
-  );
+  sl.registerLazySingleton<HeroRemoteDataSource>(() => HeroRemoteDataSourceImpl(client: sl()));
   sl.registerLazySingleton<HeroCacheDataSource>(
     () => HeroCacheDataSourceImpl(prefs: sl<SharedPreferences>()),
   );
   // Singleton: el caché en memoria persiste entre navegaciones.
-  sl.registerLazySingleton<HeroRepository>(
-    () => HeroRepositoryImpl(remote: sl(), cache: sl()),
-  );
+  sl.registerLazySingleton<HeroRepository>(() => HeroRepositoryImpl(remote: sl(), cache: sl()));
 
   // Domain — Use cases
   sl.registerLazySingleton(() => GetHeroes(sl()));
@@ -265,9 +234,7 @@ Future<void> init() async {
   //
   // Si necesitas un detalle completamente fresco en cada apertura,
   // usa registerFactory() en su lugar.
-  sl.registerLazySingleton(
-    () => HeroBloc(getHeroes: sl(), getHeroDetail: sl()),
-  );
+  sl.registerLazySingleton(() => HeroBloc(getHeroes: sl(), getHeroDetail: sl()));
 
   // ================================================================
   // NAVIGATION
