@@ -218,7 +218,6 @@ class _MainScreenState extends State<MainScreen>
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
     final item = _navigationItems[currentIndex];
-    final colorScheme = Theme.of(context).colorScheme;
 
     return AppBar(
       // El botón hamburguesa abre el drawer

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_event.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
-import 'package:insight/features/stats/presentation/widgets/app_sliver_bar.dart';
 
 // Widgets locales de esta pantalla
 import 'widgets/settings_content.dart';
