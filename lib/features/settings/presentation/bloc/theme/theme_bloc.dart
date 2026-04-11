@@ -3,7 +3,7 @@ import 'package:insight/features/settings/domain/entities/app_theme.dart';
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
-import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
+import 'package:insight/features/settings/domain/repositories/theme_repository.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   final SettingsRepository settingsRepository;

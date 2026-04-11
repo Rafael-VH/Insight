@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 abstract class HistoryState extends Equatable {
   const HistoryState();

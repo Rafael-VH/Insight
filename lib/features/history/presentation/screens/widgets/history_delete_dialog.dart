@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 class HistoryDeleteDialog {
   const HistoryDeleteDialog._();

@@ -14,8 +14,8 @@ import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dar
 import 'package:insight/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:insight/features/settings/presentation/bloc/theme/theme_state.dart';
 import 'package:insight/features/settings/presentation/config/theme_config.dart';
-import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
+import 'package:insight/features/ocr/presentation/bloc/ocr_bloc.dart';
+import 'package:insight/features/upload/presentation/bloc/upload_bloc.dart';
 
 void main() {
   // Captura errores de Flutter (widgets, rendering, etc.)

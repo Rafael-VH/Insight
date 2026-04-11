@@ -1,37 +1,37 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/features/stats/data/model/stats_collection_model.dart';
-import 'package:insight/features/stats/domain/entities/game_mode.dart';
-import 'package:insight/features/stats/domain/entities/player_stats.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/data/model/stats_collection_model.dart';
+import 'package:insight/features/parser/domain/entities/game_mode.dart';
+import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 PlayerStats _buildStats(GameMode mode) => PlayerStats(
-      mode: mode,
-      totalGames: 500,
-      winRate: 58.5,
-      mvpCount: 100,
-      legendary: 50,
-      savage: 3,
-      maniac: 20,
-      tripleKill: 100,
-      doubleKill: 800,
-      mvpLoss: 60,
-      maxKills: 20,
-      maxAssists: 30,
-      maxWinningStreak: 10,
-      firstBlood: 150,
-      maxDamageDealt: 8000,
-      maxDamageTaken: 10000,
-      maxGold: 950,
-      kda: 3.8,
-      teamFightParticipation: 70.0,
-      goldPerMin: 650,
-      heroDamagePerMin: 2800,
-      deathsPerGame: 2.5,
-      towerDamagePerGame: 900,
-      oroMaxMin: 950,
-      danoTomadoMaxMin: 10000,
-      danoCausadoMaxMin: 8000,
-    );
+  mode: mode,
+  totalGames: 500,
+  winRate: 58.5,
+  mvpCount: 100,
+  legendary: 50,
+  savage: 3,
+  maniac: 20,
+  tripleKill: 100,
+  doubleKill: 800,
+  mvpLoss: 60,
+  maxKills: 20,
+  maxAssists: 30,
+  maxWinningStreak: 10,
+  firstBlood: 150,
+  maxDamageDealt: 8000,
+  maxDamageTaken: 10000,
+  maxGold: 950,
+  kda: 3.8,
+  teamFightParticipation: 70.0,
+  goldPerMin: 650,
+  heroDamagePerMin: 2800,
+  deathsPerGame: 2.5,
+  towerDamagePerGame: 900,
+  oroMaxMin: 950,
+  danoTomadoMaxMin: 10000,
+  danoCausadoMaxMin: 8000,
+);
 
 void main() {
   group('StatsCollectionModel', () {
@@ -76,10 +76,7 @@ void main() {
       });
 
       test('serializa totalStats como mapa cuando está presente', () {
-        final model = StatsCollectionModel(
-          createdAt: now,
-          totalStats: total,
-        );
+        final model = StatsCollectionModel(createdAt: now, totalStats: total);
         final json = model.toJson();
         expect(json['totalStats'], isA<Map<String, dynamic>>());
       });
@@ -97,10 +94,7 @@ void main() {
       });
 
       test('incluye todas las claves requeridas', () {
-        final model = StatsCollectionModel(
-          createdAt: now,
-          totalStats: total,
-        );
+        final model = StatsCollectionModel(createdAt: now, totalStats: total);
         final json = model.toJson();
         for (final key in [
           'totalStats',
@@ -172,10 +166,8 @@ void main() {
         final restored = StatsCollectionModel.fromJson(original.toJson());
 
         expect(restored.createdAt, equals(original.createdAt));
-        expect(restored.totalStats?.totalGames,
-            equals(original.totalStats?.totalGames));
-        expect(restored.rankedStats?.winRate,
-            closeTo(original.rankedStats!.winRate, 0.001));
+        expect(restored.totalStats?.totalGames, equals(original.totalStats?.totalGames));
+        expect(restored.rankedStats?.winRate, closeTo(original.rankedStats!.winRate, 0.001));
         expect(restored.name, equals(original.name));
         expect(restored.availableStats.length, equals(4));
       });

@@ -1,0 +1,11 @@
+import 'dart:ui';
+
+import 'package:insight/features/ocr/domain/entities/text_line.dart';
+
+class TextBlock {
+  final String text;
+  final List<TextLine> lines;
+  final Rect boundingBox;
+
+  const TextBlock({required this.text, required this.lines, required this.boundingBox});
+}

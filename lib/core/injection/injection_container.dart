@@ -31,21 +31,21 @@ import 'package:insight/features/settings/presentation/bloc/setting/settings_blo
 import 'package:insight/features/settings/presentation/bloc/theme/theme_bloc.dart';
 
 // ── Stats — Data ──────────────────────────────────────────────────
-import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
-import 'package:insight/features/stats/data/datasources/ocr_datasource.dart';
-import 'package:insight/features/stats/data/datasources/json_export_datasource.dart';
-import 'package:insight/features/stats/data/repositories/ocr_repository_impl.dart';
+import 'package:insight/features/upload/data/datasources/local_storage_datasource.dart';
+import 'package:insight/features/ocr/data/datasources/ocr_datasource.dart';
+import 'package:insight/features/upload/data/datasources/json_export_datasource.dart';
+import 'package:insight/features/ocr/data/repositories/ocr_repository_impl.dart';
 
 // ── Stats — Domain ────────────────────────────────────────────────
-import 'package:insight/features/stats/domain/repositories/ocr_repository.dart';
-import 'package:insight/features/stats/domain/repositories/theme_repository.dart';
-import 'package:insight/features/stats/domain/usecases/copy_text_to_clipboard.dart';
-import 'package:insight/features/stats/domain/usecases/pick_image_and_recognize_text.dart';
-import 'package:insight/features/stats/domain/usecases/save_stats_collection.dart';
+import 'package:insight/features/ocr/domain/repositories/ocr_repository.dart';
+import 'package:insight/features/settings/domain/repositories/theme_repository.dart';
+import 'package:insight/features/ocr/domain/usecases/copy_text_to_clipboard.dart';
+import 'package:insight/features/ocr/domain/usecases/pick_image_and_recognize_text.dart';
+import 'package:insight/features/upload/domain/usecases/save_stats_collection.dart';
 
 // ── Stats — Presentation ──────────────────────────────────────────
-import 'package:insight/features/stats/presentation/bloc/ocr/ocr_bloc.dart';
-import 'package:insight/features/stats/presentation/bloc/stats/stats_bloc.dart';
+import 'package:insight/features/ocr/presentation/bloc/ocr_bloc.dart';
+import 'package:insight/features/upload/presentation/bloc/upload_bloc.dart';
 
 // ── History — Data ────────────────────────────────────────────────
 import 'package:insight/features/history/data/repositories/history_repository_impl.dart';

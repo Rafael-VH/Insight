@@ -7,8 +7,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/history/presentation/bloc/history_state.dart';
-import 'package:insight/features/stats/data/model/stats_collection_model.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/data/model/stats_collection_model.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 /// Bottom sheet de exportación desde el módulo Settings.
 ///

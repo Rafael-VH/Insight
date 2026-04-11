@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/core/utils/stats_parser.dart';
-import 'package:insight/features/stats/domain/entities/game_mode.dart';
+import 'package:insight/features/parser/utils/stats_parser.dart';
+import 'package:insight/features/parser/domain/entities/game_mode.dart';
 
 void main() {
   group('StatsParser', () {
@@ -56,23 +56,20 @@ Daño a Torre/Partida 1200
 
     group('parseStatsWithDiagnostics', () {
       test('retorna ParseResult con stats null si texto vacío', () {
-        final result =
-            StatsParser.parseStatsWithDiagnostics('', GameMode.total);
+        final result = StatsParser.parseStatsWithDiagnostics('', GameMode.total);
         expect(result.stats, isNull);
         expect(result.extractionLog, isNotEmpty);
       });
 
       test('retorna log de extracción no vacío', () {
         const text = '1200 partidas 57.00 % KDA 3.5';
-        final result =
-            StatsParser.parseStatsWithDiagnostics(text, GameMode.total);
+        final result = StatsParser.parseStatsWithDiagnostics(text, GameMode.total);
         expect(result.extractionLog, isNotEmpty);
       });
 
       test('rawMatches tiene claves para campos encontrados', () {
         const text = '59.29 % KDA 4.5';
-        final result =
-            StatsParser.parseStatsWithDiagnostics(text, GameMode.total);
+        final result = StatsParser.parseStatsWithDiagnostics(text, GameMode.total);
         expect(result.rawMatches, isA<Map<String, dynamic>>());
       });
     });

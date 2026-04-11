@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/features/stats/domain/entities/game_mode.dart';
-import 'package:insight/features/stats/domain/entities/stats_upload_type.dart';
-import 'package:insight/features/stats/presentation/controllers/stats_upload_controller.dart';
+import 'package:insight/features/parser/domain/entities/game_mode.dart';
+import 'package:insight/features/upload/domain/entities/stats_upload_type.dart';
+import 'package:insight/features/upload/presentation/controllers/stats_upload_controller.dart';
 
 // ── Texto OCR de muestra ─────────────────────────────────────────
 
@@ -51,8 +51,7 @@ void main() {
       });
 
       test('byModes tiene ranked, classic y brawl', () {
-        final ctrl =
-            StatsUploadController(uploadType: StatsUploadType.byModes);
+        final ctrl = StatsUploadController(uploadType: StatsUploadType.byModes);
         expect(ctrl.availableModes, contains(GameMode.ranked));
         expect(ctrl.availableModes, contains(GameMode.classic));
         expect(ctrl.availableModes, contains(GameMode.brawl));
@@ -101,10 +100,7 @@ void main() {
       });
 
       test('lanza ArgumentError para modo no disponible', () {
-        expect(
-          () => controller.startProcessing(GameMode.ranked),
-          throwsArgumentError,
-        );
+        expect(() => controller.startProcessing(GameMode.ranked), throwsArgumentError);
       });
     });
 
@@ -112,20 +108,14 @@ void main() {
 
     group('handleOcrSuccessWithDiagnostics', () {
       test('retorna resultado sin modo si no hay currentProcessingMode', () {
-        final result = controller.handleOcrSuccessWithDiagnostics(
-          _sampleOcrText,
-          '/fake/path.png',
-        );
+        final result = controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(result.processedMode, isNull);
         expect(result.hasValidStats, isFalse);
       });
 
       test('procesa texto y actualiza estado interno', () {
         controller.startProcessing(GameMode.total);
-        final result = controller.handleOcrSuccessWithDiagnostics(
-          _sampleOcrText,
-          '/fake/path.png',
-        );
+        final result = controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(result.processedMode, equals(GameMode.total));
         expect(result.stats, isNotNull);
         expect(controller.hasAnyParsedStats, isTrue);
@@ -133,30 +123,25 @@ void main() {
 
       test('isProcessing se marca como false tras procesar', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(controller.isProcessing[GameMode.total], isFalse);
       });
 
       test('almacena la ruta de imagen', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/image.jpg');
-        expect(
-            controller.uploadedImages[GameMode.total], equals('/fake/image.jpg'));
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/image.jpg');
+        expect(controller.uploadedImages[GameMode.total], equals('/fake/image.jpg'));
       });
 
       test('almacena validation result', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(controller.getValidationResult(GameMode.total), isNotNull);
       });
 
       test('resultado tiene extractionLog no vacío', () {
         controller.startProcessing(GameMode.total);
-        final result = controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        final result = controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(result.extractionLog, isNotEmpty);
       });
     });
@@ -186,8 +171,7 @@ void main() {
     group('removeStats', () {
       test('elimina stats de un modo', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(controller.hasAnyParsedStats, isTrue);
 
         controller.removeStats(GameMode.total);
@@ -196,16 +180,14 @@ void main() {
 
       test('limpia la ruta de imagen', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         controller.removeStats(GameMode.total);
         expect(controller.uploadedImages[GameMode.total], isNull);
       });
 
       test('limpia el validation result', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         controller.removeStats(GameMode.total);
         expect(controller.getValidationResult(GameMode.total), isNull);
       });
@@ -221,8 +203,7 @@ void main() {
 
       test('retorna StatsCollection con totalStats cuando se procesó', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         final collection = controller.createCollection();
         expect(collection.totalStats, isNotNull);
         expect(collection.totalStats!.mode, equals(GameMode.total));
@@ -258,8 +239,7 @@ void main() {
 
       test('false cuando el texto es válido y tiene todos los campos', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         // El resultado puede variar según la extracción del OCR,
         // pero el método debe retornar un bool sin lanzar excepciones.
         expect(controller.hasInvalidStats(), isA<bool>());
@@ -270,16 +250,12 @@ void main() {
 
     group('getValidationSummary', () {
       test('retorna "No hay estadísticas procesadas" cuando está vacío', () {
-        expect(
-          controller.getValidationSummary(),
-          equals('No hay estadísticas procesadas'),
-        );
+        expect(controller.getValidationSummary(), equals('No hay estadísticas procesadas'));
       });
 
       test('retorna resumen no vacío tras procesar', () {
         controller.startProcessing(GameMode.total);
-        controller.handleOcrSuccessWithDiagnostics(
-            _sampleOcrText, '/fake/path.png');
+        controller.handleOcrSuccessWithDiagnostics(_sampleOcrText, '/fake/path.png');
         expect(controller.getValidationSummary(), isNotEmpty);
       });
     });
@@ -289,10 +265,7 @@ void main() {
     group('dispose', () {
       test('lanza StateError al llamar startProcessing después de dispose', () {
         controller.dispose();
-        expect(
-          () => controller.startProcessing(GameMode.total),
-          throwsStateError,
-        );
+        expect(() => controller.startProcessing(GameMode.total), throwsStateError);
       });
 
       test('dispose múltiples veces no lanza error', () {

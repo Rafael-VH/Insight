@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/core/utils/stats_validator.dart';
-import 'package:insight/features/stats/domain/entities/game_mode.dart';
-import 'package:insight/features/stats/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/domain/entities/game_mode.dart';
+import 'package:insight/features/parser/domain/entities/player_stats.dart';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -70,8 +70,7 @@ void main() {
         result = StatsValidator.validate(_buildStats());
       });
 
-      test('isValid es true cuando todos los campos críticos están presentes',
-          () {
+      test('isValid es true cuando todos los campos críticos están presentes', () {
         expect(result.isValid, isTrue);
       });
 
@@ -156,8 +155,7 @@ void main() {
         expect(result.warningFields, contains('Daño a Torre/Partida'));
       });
 
-      test('mvpCount = 0 genera advertencia, isValid puede seguir siendo true',
-          () {
+      test('mvpCount = 0 genera advertencia, isValid puede seguir siendo true', () {
         final stats = _buildStats(mvpCount: 0);
         final result = StatsValidator.validate(stats);
         expect(result.missingFields, isNot(contains('MVP')));
@@ -230,8 +228,7 @@ void main() {
     // ── getRecommendations ───────────────────────────────────────
 
     group('getRecommendations', () {
-      test('retorna lista vacía cuando no hay errores ni advertencias críticas',
-          () {
+      test('retorna lista vacía cuando no hay errores ni advertencias críticas', () {
         final stats = _buildStats();
         final result = StatsValidator.validate(stats);
         if (result.missingFields.isEmpty) {

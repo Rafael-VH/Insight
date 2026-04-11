@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-import 'package:insight/features/stats/presentation/utils/game_mode_extensions.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 
 /// Card compacta para las entradas del historial (todas menos la más reciente).
 /// Muestra número de sesión, nombre, dots de modos disponibles y win rate.

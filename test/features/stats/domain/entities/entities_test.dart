@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/features/stats/domain/entities/game_mode.dart';
-import 'package:insight/features/stats/domain/entities/player_stats.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/parser/domain/entities/game_mode.dart';
+import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -98,11 +98,7 @@ void main() {
 
     group('fromJson', () {
       test('deserializa correctamente desde un mapa válido', () {
-        final stats = _buildPlayerStats(
-          mode: GameMode.classic,
-          totalGames: 500,
-          winRate: 61.5,
-        );
+        final stats = _buildPlayerStats(mode: GameMode.classic, totalGames: 500, winRate: 61.5);
         final json = stats.toJson();
         final restored = PlayerStats.fromJson(json);
         expect(restored.mode, equals(GameMode.classic));
@@ -150,11 +146,7 @@ void main() {
       });
 
       test('ida y vuelta toJson → fromJson preserva los datos', () {
-        final original = _buildPlayerStats(
-          mode: GameMode.brawl,
-          totalGames: 300,
-          winRate: 62.75,
-        );
+        final original = _buildPlayerStats(mode: GameMode.brawl, totalGames: 300, winRate: 62.75);
         final restored = PlayerStats.fromJson(original.toJson());
         expect(restored.mode, equals(original.mode));
         expect(restored.totalGames, equals(original.totalGames));

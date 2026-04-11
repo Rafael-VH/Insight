@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/stats/domain/entities/player_stats.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-import 'package:insight/features/stats/presentation/utils/game_mode_extensions.dart';
+import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 
 /// Card destacada para la sesión más reciente.
 /// Fondo oscuro (tinta del tema), modos como chips de color,

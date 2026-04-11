@@ -8,7 +8,7 @@ import 'package:insight/features/history/domain/usecases/update_stats_collection
 import 'package:insight/features/history/domain/repositories/history_repository.dart';
 import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/history/presentation/bloc/history_state.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 /// BLoC del módulo History.
 ///

@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:insight/core/errors/failures.dart';
 import 'package:insight/features/history/domain/repositories/history_repository.dart';
-import 'package:insight/features/stats/data/datasources/json_export_datasource.dart';
-import 'package:insight/features/stats/data/datasources/local_storage_datasource.dart';
-import 'package:insight/features/stats/data/model/stats_collection_model.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/data/datasources/json_export_datasource.dart';
+import 'package:insight/features/upload/data/datasources/local_storage_datasource.dart';
+import 'package:insight/features/upload/data/model/stats_collection_model.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
 
 /// Implementación concreta de [HistoryRepository].
 ///

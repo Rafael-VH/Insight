@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:insight/features/history/presentation/screens/widgets/history_export_import_bottom_sheet.dart';
-import 'package:insight/features/stats/domain/entities/stats_collection.dart';
-import 'package:insight/features/stats/presentation/screens/charts/charts_screen.dart';
+import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/insights/presentation/screens/charts/charts_screen.dart';
 
 class HistoryOptionsMenu {
   const HistoryOptionsMenu._();
