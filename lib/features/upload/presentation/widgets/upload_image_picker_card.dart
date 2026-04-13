@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/ocr/domain/entities/image_source_type.dart';
+import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 
 class ImageUploadCard extends StatelessWidget {
   const ImageUploadCard({

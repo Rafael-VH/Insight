@@ -9,8 +9,8 @@ import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/history/presentation/bloc/history_state.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_bloc.dart';
 import 'package:insight/features/settings/presentation/bloc/setting/settings_state.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
-import 'package:insight/features/insights/presentation/screens/details/detail_screen.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
+import 'package:insight/features/insights/presentation/screens/details/session_detail_screen.dart';
 import 'package:insight/core/services/dialog_service.dart';
 
 import 'widgets/history_delete_dialog.dart';

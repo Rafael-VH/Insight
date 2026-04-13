@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/ocr/domain/entities/image_source_type.dart';
-import 'package:insight/features/upload/domain/entities/stats_upload_type.dart';
+import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
+import 'package:insight/features/upload/domain/entities/upload_mode.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_event.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_state.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_bloc.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_state.dart';
-import 'package:insight/features/upload/presentation/controllers/stats_upload_controller.dart';
+import 'package:insight/features/upload/presentation/controllers/upload_controller.dart';
 
 import 'widgets/upload_app_bar.dart';
-import 'widgets/upload_image_card_with_overlay.dart';
+import 'widgets/upload_mode_card.dart';
 import 'widgets/upload_state_handler_mixin.dart';
-import 'widgets/upload_stats_section.dart';
+import 'widgets/upload_parsed_results.dart';
 import 'widgets/upload_validation_summary_dialog.dart';
 
 class UploadScreen extends StatefulWidget {

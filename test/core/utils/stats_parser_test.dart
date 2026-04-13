@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/features/parser/utils/stats_parser.dart';
+import 'package:insight/features/parser/utils/mlbb_parser.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
 
 void main() {

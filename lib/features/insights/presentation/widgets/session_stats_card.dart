@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/utils/stats_parser.dart';
+import 'package:insight/features/parser/utils/mlbb_parser.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
 
 class StatsVerificationWidget extends StatelessWidget {
   const StatsVerificationWidget({super.key, required this.gameMode, required this.stats});

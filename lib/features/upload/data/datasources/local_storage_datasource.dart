@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:insight/core/errors/failures.dart';
-import 'package:insight/features/upload/data/model/stats_collection_model.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/core/errors/app_failures.dart';
+import 'package:insight/features/upload/data/model/game_session_model.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class LocalStorageDataSource {

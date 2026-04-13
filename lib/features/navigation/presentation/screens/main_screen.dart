@@ -10,7 +10,7 @@ import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.da
 import 'package:insight/features/navigation/presentation/bloc/navigation_event.dart';
 import 'package:insight/features/navigation/presentation/bloc/navigation_state.dart';
 import 'package:insight/features/settings/presentation/screens/settings_screen.dart';
-import 'package:insight/features/upload/presentation/screens/home/home_screen.dart';
+import 'package:insight/features/upload/presentation/screens/home/upload_home_screen.dart';
 
 import 'widgets/main_back_handler.dart';
 import 'widgets/main_navigation_drawer.dart';

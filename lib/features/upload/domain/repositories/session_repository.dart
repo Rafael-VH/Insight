@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:insight/core/errors/failures.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/core/errors/app_failures.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
 
 abstract class StatsRepository {
   Future<Either<Failure, void>> saveStatsCollection(StatsCollection collection);

@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 
 import 'charts_shared_widgets.dart';

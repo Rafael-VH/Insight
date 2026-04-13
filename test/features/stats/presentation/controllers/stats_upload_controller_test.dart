@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/upload/domain/entities/stats_upload_type.dart';
-import 'package:insight/features/upload/presentation/controllers/stats_upload_controller.dart';
+import 'package:insight/features/upload/domain/entities/upload_mode.dart';
+import 'package:insight/features/upload/presentation/controllers/upload_controller.dart';
 
 // ── Texto OCR de muestra ─────────────────────────────────────────
 

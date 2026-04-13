@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/heroes/data/datasources/hero_cache_datasource.dart';
 import 'package:insight/features/heroes/data/datasources/hero_remote_datasource.dart';
 import 'package:insight/features/heroes/data/models/hero_detail_model.dart';
 import 'package:insight/features/heroes/data/models/hero_model.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 import 'package:insight/features/heroes/domain/entities/hero_detail.dart';
 import 'package:insight/features/heroes/domain/repositories/hero_repository.dart';
 
@@ -13,7 +13,7 @@ class HeroRepositoryImpl implements HeroRepository {
   final HeroRemoteDataSource remote;
   final HeroCacheDataSource cache;
 
-  List<MlbbHero>? _heroesMemory;
+  List<HeroEntity>? _heroesMemory;
   Map<String, dynamic>? _detailsMemory;
   Map<int, Map<String, dynamic>>? _relationsMemory;
   Map<String, dynamic>? _buildsMemory;
@@ -135,7 +135,7 @@ class HeroRepositoryImpl implements HeroRepository {
   }
 
   @override
-  Future<Either<Failure, List<MlbbHero>>> getHeroes() async {
+  Future<Either<Failure, List<HeroEntity>>> getHeroes() async {
     if (_heroesMemory != null) return Right(_heroesMemory!);
     final preload = await preloadData();
     return preload.fold((f) => Left(f), (_) => Right(_heroesMemory ?? []));
@@ -211,7 +211,7 @@ class HeroRepositoryImpl implements HeroRepository {
     return result;
   }
 
-  List<MlbbHero> _parseHeroIndex(Map<String, dynamic> data) {
+  List<HeroEntity> _parseHeroIndex(Map<String, dynamic> data) {
     return data.entries.map((e) {
       final id = int.tryParse(e.key) ?? 0;
       return HeroModel.fromJson(id, e.value as Map<String, dynamic>);

@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
 
 /// Contrato abstracto del repositorio de configuración

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/upload/domain/entities/stats_upload_type.dart';
+import 'package:insight/features/upload/domain/entities/upload_mode.dart';
 import 'package:insight/features/upload/presentation/screens/upload/upload_screen.dart';
 
 class HomeScreen extends StatelessWidget {

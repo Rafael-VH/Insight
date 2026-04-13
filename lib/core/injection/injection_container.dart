@@ -12,7 +12,7 @@ import 'package:insight/features/navigation/presentation/bloc/navigation_bloc.da
 import 'package:insight/features/settings/data/datasources/settings_datasource.dart';
 import 'package:insight/features/settings/data/datasources/theme_datasource.dart';
 import 'package:insight/features/settings/data/repositories/settings_repository_impl.dart';
-import 'package:insight/features/settings/data/repositories/theme_repository_impl.dart';
+import 'package:insight/features/settings/data/repositories/app_theme_repository_impl.dart';
 
 // ── Settings — Domain ─────────────────────────────────────────────
 import 'package:insight/features/settings/domain/repositories/settings_repository.dart';
@@ -38,10 +38,10 @@ import 'package:insight/features/ocr/data/repositories/ocr_repository_impl.dart'
 
 // ── Stats — Domain ────────────────────────────────────────────────
 import 'package:insight/features/ocr/domain/repositories/ocr_repository.dart';
-import 'package:insight/features/settings/domain/repositories/theme_repository.dart';
-import 'package:insight/features/ocr/domain/usecases/copy_text_to_clipboard.dart';
-import 'package:insight/features/ocr/domain/usecases/pick_image_and_recognize_text.dart';
-import 'package:insight/features/upload/domain/usecases/save_stats_collection.dart';
+import 'package:insight/features/settings/domain/repositories/app_theme_repository.dart';
+import 'package:insight/core/usecases/copy_to_clipboard.dart';
+import 'package:insight/features/ocr/domain/usecases/recognize_image_text.dart';
+import 'package:insight/features/upload/domain/usecases/save_game_session.dart';
 
 // ── Stats — Presentation ──────────────────────────────────────────
 import 'package:insight/features/ocr/presentation/bloc/ocr_bloc.dart';

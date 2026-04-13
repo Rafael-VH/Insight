@@ -1,9 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/heroes/domain/entities/hero_detail.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 import 'package:insight/features/heroes/domain/usecases/get_hero_detail.dart';
 import 'package:insight/features/heroes/domain/usecases/get_heroes.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
@@ -13,11 +13,11 @@ import 'package:insight/features/heroes/presentation/bloc/hero_state.dart';
 // ── Stubs simples (sin mockito para evitar dependencia de build_runner) ──────
 
 class _FakeGetHeroes extends Fake implements GetHeroes {
-  final Either<Failure, List<MlbbHero>> _response;
+  final Either<Failure, List<HeroEntity>> _response;
   _FakeGetHeroes(this._response);
 
   @override
-  Future<Either<Failure, List<MlbbHero>>> call() async => _response;
+  Future<Either<Failure, List<HeroEntity>>> call() async => _response;
 }
 
 class _FakeGetHeroDetail extends Fake implements GetHeroDetail {
@@ -31,9 +31,9 @@ class _FakeGetHeroDetail extends Fake implements GetHeroDetail {
 // ── Datos de prueba ───────────────────────────────────────────────
 
 final _fakeHeroes = [
-  const MlbbHero(heroId: 1, name: 'Layla', iconUrl: 'https://ex.com/1.png'),
-  const MlbbHero(heroId: 2, name: 'Miya', iconUrl: 'https://ex.com/2.png'),
-  const MlbbHero(heroId: 3, name: 'Alpha', iconUrl: 'https://ex.com/3.png'),
+  const HeroEntity(heroId: 1, name: 'Layla', iconUrl: 'https://ex.com/1.png'),
+  const HeroEntity(heroId: 2, name: 'Miya', iconUrl: 'https://ex.com/2.png'),
+  const HeroEntity(heroId: 3, name: 'Alpha', iconUrl: 'https://ex.com/3.png'),
 ];
 
 const _fakeDetail = HeroDetail(

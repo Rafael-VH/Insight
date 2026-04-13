@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 
 class UploadValidationBadge extends StatelessWidget {
   const UploadValidationBadge({super.key, required this.validation, required this.onTap});

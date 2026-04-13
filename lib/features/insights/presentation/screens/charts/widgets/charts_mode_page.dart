@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
 
 import 'charts_achievements_radar.dart';
 import 'charts_economy_pie.dart';

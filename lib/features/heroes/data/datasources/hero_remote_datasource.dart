@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 
 const _base = 'https://raw.githubusercontent.com/Rafael-VH/MLBB-Data/main';
 

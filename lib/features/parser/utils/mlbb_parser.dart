@@ -1,5 +1,5 @@
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
 
 /// Resultado del parseo con información de diagnóstico
 class ParseResult {

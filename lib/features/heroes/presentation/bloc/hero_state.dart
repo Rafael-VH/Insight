@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:insight/features/heroes/domain/entities/hero_detail.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 
 abstract class HeroState extends Equatable {
   const HeroState();
@@ -22,8 +22,8 @@ class HeroListLoading extends HeroState {}
 /// Listado cargado correctamente.
 /// [heroes] es la lista completa; [filtered] es la vista actual tras búsqueda.
 class HeroListLoaded extends HeroState {
-  final List<MlbbHero> heroes;
-  final List<MlbbHero> filtered;
+  final List<HeroEntity> heroes;
+  final List<HeroEntity> filtered;
   final String searchQuery;
 
   const HeroListLoaded({required this.heroes, required this.filtered, this.searchQuery = ''});
@@ -31,7 +31,7 @@ class HeroListLoaded extends HeroState {
   @override
   List<Object> get props => [heroes, filtered, searchQuery];
 
-  HeroListLoaded copyWith({List<MlbbHero>? heroes, List<MlbbHero>? filtered, String? searchQuery}) {
+  HeroListLoaded copyWith({List<HeroEntity>? heroes, List<HeroEntity>? filtered, String? searchQuery}) {
     return HeroListLoaded(
       heroes: heroes ?? this.heroes,
       filtered: filtered ?? this.filtered,

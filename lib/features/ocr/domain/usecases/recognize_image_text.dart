@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 import 'package:insight/features/ocr/domain/repositories/ocr_repository.dart';
-import 'package:insight/features/upload/domain/usecases/usecase.dart';
+import 'package:insight/features/upload/domain/usecases/base_usecase.dart';
 
 class PickImageAndRecognizeText implements UseCase<OcrResult, ImageSourceParams> {
   final OcrRepository repository;

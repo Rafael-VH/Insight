@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 
 /// Diálogo que muestra los resultados de validación de estadísticas
 class ValidationResultDialog extends StatelessWidget {

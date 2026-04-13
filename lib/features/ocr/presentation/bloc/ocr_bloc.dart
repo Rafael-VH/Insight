@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:insight/features/ocr/domain/usecases/copy_text_to_clipboard.dart';
-import 'package:insight/features/ocr/domain/usecases/pick_image_and_recognize_text.dart';
-import 'package:insight/features/upload/domain/usecases/usecase.dart';
+import 'package:insight/core/usecases/copy_to_clipboard.dart';
+import 'package:insight/features/ocr/domain/usecases/recognize_image_text.dart';
+import 'package:insight/features/upload/domain/usecases/base_usecase.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_event.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_state.dart';
 

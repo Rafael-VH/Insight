@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
-import 'package:insight/features/insights/presentation/widgets/stats_verification_widget.dart';
+import 'package:insight/features/insights/presentation/widgets/session_stats_card.dart';
 
 /// Sección de resultados de extracción.
 ///

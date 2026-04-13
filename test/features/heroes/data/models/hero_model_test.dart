@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:insight/features/heroes/data/models/hero_detail_model.dart';
 import 'package:insight/features/heroes/data/models/hero_model.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 
 // ── Helpers: construcción de JSON de prueba ──────────────────────
 
@@ -74,7 +74,7 @@ void main() {
       test('es una instancia de MlbbHero', () {
         final model = HeroModel.fromJson(
             2, {'name': 'Miya', 'icon_url': 'https://example.com/miya.png'});
-        expect(model, isA<MlbbHero>());
+        expect(model, isA<HeroEntity>());
       });
     });
   });

@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/settings/data/datasources/theme_datasource.dart';
 import 'package:insight/features/settings/domain/entities/app_theme.dart';
-import 'package:insight/features/settings/domain/repositories/theme_repository.dart';
+import 'package:insight/features/settings/domain/repositories/app_theme_repository.dart';
 
 class ThemeRepositoryImpl implements ThemeRepository {
   final ThemeDataSource dataSource;

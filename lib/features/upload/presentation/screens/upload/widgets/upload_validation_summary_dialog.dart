@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 
 class UploadValidationSummaryDialog {
   const UploadValidationSummaryDialog._();

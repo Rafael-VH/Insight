@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/history/presentation/bloc/history_event.dart';
 import 'package:insight/features/settings/domain/entities/app_settings.dart';
@@ -12,7 +12,7 @@ import 'package:insight/features/ocr/presentation/bloc/ocr_state.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_bloc.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_event.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_state.dart';
-import 'package:insight/features/upload/presentation/controllers/stats_upload_controller.dart';
+import 'package:insight/features/upload/presentation/controllers/upload_controller.dart';
 import 'package:insight/core/services/dialog_service.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 import 'package:insight/features/upload/presentation/widgets/validation_result_dialog.dart';

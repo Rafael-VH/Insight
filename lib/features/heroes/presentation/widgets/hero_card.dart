@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 import 'package:insight/features/heroes/presentation/utils/hero_role_utils.dart';
 
 class HeroCard extends StatelessWidget {
@@ -11,7 +11,7 @@ class HeroCard extends StatelessWidget {
     this.roleHint,
   });
 
-  final MlbbHero hero;
+  final HeroEntity hero;
   final VoidCallback onTap;
   final bool isSelected;
 
@@ -72,7 +72,7 @@ class HeroCard extends StatelessWidget {
 class _HeroImageArea extends StatelessWidget {
   const _HeroImageArea({required this.hero, required this.roleColor});
 
-  final MlbbHero hero;
+  final HeroEntity hero;
   final Color roleColor;
 
   @override
@@ -136,7 +136,7 @@ class _HeroImageArea extends StatelessWidget {
 class _AvatarPlaceholder extends StatelessWidget {
   const _AvatarPlaceholder({required this.hero, required this.colorScheme});
 
-  final MlbbHero hero;
+  final HeroEntity hero;
   final ColorScheme colorScheme;
 
   @override
@@ -165,7 +165,7 @@ class _AvatarPlaceholder extends StatelessWidget {
 class _HeroCardFooter extends StatelessWidget {
   const _HeroCardFooter({required this.hero, required this.roleHint, required this.colorScheme});
 
-  final MlbbHero hero;
+  final HeroEntity hero;
   final String? roleHint;
   final ColorScheme colorScheme;
 

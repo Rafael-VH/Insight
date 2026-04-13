@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/upload/domain/entities/stats_upload_type.dart';
+import 'package:insight/features/upload/domain/entities/upload_mode.dart';
 
 class StatsUploadButton extends StatelessWidget {
   const StatsUploadButton({

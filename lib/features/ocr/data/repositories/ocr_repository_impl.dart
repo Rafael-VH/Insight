@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/ocr/data/datasources/ocr_datasource.dart';
-import 'package:insight/features/ocr/domain/entities/image_source_type.dart';
+import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 import 'package:insight/features/ocr/domain/repositories/ocr_repository.dart';
 

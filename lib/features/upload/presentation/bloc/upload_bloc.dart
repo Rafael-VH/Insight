@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/history/presentation/bloc/history_event.dart';
-import 'package:insight/features/upload/domain/usecases/save_stats_collection.dart';
+import 'package:insight/features/upload/domain/usecases/save_game_session.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_event.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_state.dart';
 

@@ -6,7 +6,7 @@ import 'package:insight/features/heroes/domain/entities/hero_equipment.dart';
 import 'package:insight/features/heroes/domain/entities/hero_relation.dart';
 import 'package:insight/features/heroes/domain/entities/hero_skill.dart';
 import 'package:insight/features/heroes/domain/entities/hero_stat.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_event.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_state.dart';
@@ -17,7 +17,7 @@ class HeroDetailScreen extends StatefulWidget {
   const HeroDetailScreen({super.key, required this.heroId, required this.heroMap});
 
   final int heroId;
-  final Map<int, MlbbHero> heroMap;
+  final Map<int, HeroEntity> heroMap;
 
   @override
   State<HeroDetailScreen> createState() => _HeroDetailScreenState();
@@ -82,7 +82,7 @@ class _DetailContent extends StatelessWidget {
   });
 
   final HeroDetail detail;
-  final Map<int, MlbbHero> heroMap;
+  final Map<int, HeroEntity> heroMap;
   final int currentIndex;
   final ValueChanged<int> onTabChanged;
   final bool isDark;
@@ -1135,7 +1135,7 @@ class _CountersTab extends StatelessWidget {
   const _CountersTab({required this.relation, required this.heroMap, required this.isDark});
 
   final HeroRelation? relation;
-  final Map<int, MlbbHero> heroMap;
+  final Map<int, HeroEntity> heroMap;
   final bool isDark;
 
   @override
@@ -1205,7 +1205,7 @@ class _CounterSection extends StatelessWidget {
   final Color titleColor;
   final List<int> ids;
   final Color borderColor;
-  final Map<int, MlbbHero> heroMap;
+  final Map<int, HeroEntity> heroMap;
   final bool isDark;
 
   @override

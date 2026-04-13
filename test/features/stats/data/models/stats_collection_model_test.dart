@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:insight/features/upload/data/model/stats_collection_model.dart';
+import 'package:insight/features/upload/data/model/game_session_model.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
 
 PlayerStats _buildStats(GameMode mode) => PlayerStats(
   mode: mode,

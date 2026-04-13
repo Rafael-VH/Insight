@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/settings/domain/entities/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

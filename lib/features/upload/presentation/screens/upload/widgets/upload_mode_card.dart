@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/utils/stats_validator.dart';
+import 'package:insight/features/parser/utils/mlbb_validator.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
-import 'package:insight/features/ocr/domain/entities/image_source_type.dart';
+import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 
 /// Tarjeta de carga de imagen completamente rediseñada.

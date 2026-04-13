@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
 
 abstract class StatsEvent extends Equatable {
   const StatsEvent();

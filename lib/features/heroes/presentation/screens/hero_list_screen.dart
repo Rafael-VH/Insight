@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart';
-import 'package:insight/features/heroes/domain/entities/mlbbhero.dart';
+import 'package:insight/features/heroes/domain/entities/hero_entity.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_event.dart';
 import 'package:insight/features/heroes/presentation/bloc/hero_state.dart';
@@ -50,7 +50,7 @@ class _HeroListScreenState extends State<HeroListScreen> {
 
   // ── Helpers ───────────────────────────────────────────────────
 
-  List<MlbbHero> _applyRoleFilter(List<MlbbHero> heroes) {
+  List<HeroEntity> _applyRoleFilter(List<HeroEntity> heroes) {
     if (_activeRole == 'Todos') return heroes;
     // Filtramos por la primera letra del nombre del héroe como heurística
     // ya que MlbbHero solo tiene heroId, name e iconUrl.
@@ -61,7 +61,7 @@ class _HeroListScreenState extends State<HeroListScreen> {
 
   void _navigateToDetail(BuildContext context, int heroId) {
     final state = context.read<HeroBloc>().state;
-    final heroMap = <int, MlbbHero>{};
+    final heroMap = <int, HeroEntity>{};
     if (state is HeroListLoaded) {
       for (final h in state.heroes) {
         heroMap[h.heroId] = h;

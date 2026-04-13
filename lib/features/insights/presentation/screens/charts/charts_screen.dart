@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:insight/features/parser/domain/entities/player_stats.dart';
-import 'package:insight/features/upload/domain/entities/stats_collection.dart';
+import 'package:insight/features/parser/domain/entities/player_performance.dart';
+import 'package:insight/features/upload/domain/entities/game_session.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 
 // Widgets locales de esta pantalla

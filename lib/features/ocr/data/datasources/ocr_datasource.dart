@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:insight/core/errors/failures.dart';
+import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/ocr/data/models/ocr_result_model.dart';
-import 'package:insight/features/ocr/domain/entities/image_source_type.dart';
+import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 
 abstract class OcrDataSource {
