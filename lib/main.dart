@@ -17,13 +17,19 @@ import 'package:insight/features/settings/presentation/config/theme_config.dart'
 import 'package:insight/features/ocr/presentation/bloc/ocr_bloc.dart';
 import 'package:insight/features/upload/presentation/bloc/upload_bloc.dart';
 
-void main() {
+Future<void> main() async {
   // Captura errores de Flutter (widgets, rendering, etc.)
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     debugPrint('=== FLUTTER ERROR ===');
     debugPrint(details.toString());
   };
+
+  //
+  await Supabase.initialize(
+    url: 'https://kksdrjxusgqjgxbjqthy.supabase.co',
+    anonKey: 'sb_publishable_i-GstcS_ma-MYG_t5TFnZQ_JgISZk0J',
+  );
 
   // Captura errores fuera del contexto de Flutter (async, Dart puro)
   runZonedGuarded(
