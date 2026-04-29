@@ -5,7 +5,7 @@ import 'package:insight/features/parser/domain/entities/player_performance.dart'
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-PlayerStats _buildStats({
+PlayerPerformance _buildStats({
   int totalGames = 1000,
   double winRate = 59.29,
   int mvpCount = 200,
@@ -29,7 +29,7 @@ PlayerStats _buildStats({
   int maxDamageTaken = 12000,
   int maxGold = 1100,
 }) {
-  return PlayerStats(
+  return PlayerPerformance(
     mode: GameMode.total,
     totalGames: totalGames,
     winRate: winRate,

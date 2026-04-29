@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 
-class ImageUploadCard extends StatelessWidget {
-  const ImageUploadCard({
+class UploadImagePickerCard extends StatelessWidget {
+  const UploadImagePickerCard({
     super.key,
     required this.gameMode,
     required this.imagePath,

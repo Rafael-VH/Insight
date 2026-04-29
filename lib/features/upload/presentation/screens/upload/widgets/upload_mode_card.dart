@@ -11,8 +11,8 @@ import 'package:insight/features/parser/presentation/utils/game_mode_extensions.
 /// - Header con color del modo y badge de estado
 /// - Zona de imagen con estado vacío / cargado / procesando
 /// - Footer con botones de galería y cámara inline
-class UploadImageCardWithOverlay extends StatelessWidget {
-  const UploadImageCardWithOverlay({
+class UploadModeCard extends StatelessWidget {
+  const UploadModeCard({
     super.key,
     required this.mode,
     required this.imagePath,

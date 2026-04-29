@@ -4,7 +4,7 @@ import 'package:insight/features/parser/domain/entities/game_mode.dart';
 import 'package:insight/features/parser/domain/entities/player_performance.dart';
 import 'package:insight/features/upload/domain/entities/game_session.dart';
 
-PlayerStats _buildStats(GameMode mode) => PlayerStats(
+PlayerPerformance _buildStats(GameMode mode) => PlayerPerformance(
   mode: mode,
   totalGames: 500,
   winRate: 58.5,

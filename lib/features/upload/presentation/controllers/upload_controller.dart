@@ -9,7 +9,7 @@ import 'package:insight/features/parser/presentation/utils/game_mode_extensions.
 
 /// Resultado del procesamiento de OCR con validación
 class OcrProcessingResult {
-  final PlayerStats? stats;
+  final PlayerPerformance? stats;
   final ValidationResult? validation;
   final String? imagePath;
   final List<String> extractionLog;
@@ -32,7 +32,7 @@ class StatsUploadController extends ChangeNotifier {
   final StatsUploadType uploadType;
 
   late final Map<GameMode, String?> _uploadedImages;
-  late final Map<GameMode, PlayerStats?> _parsedStats;
+  late final Map<GameMode, PlayerPerformance?> _parsedStats;
   late final Map<GameMode, ValidationResult?> _validationResults;
   late final Map<GameMode, bool> _isProcessing;
   late final Map<GameMode, List<String>> _extractionLogs;
@@ -47,7 +47,7 @@ class StatsUploadController extends ChangeNotifier {
   }
 
   Map<GameMode, String?> get uploadedImages => Map.unmodifiable(_uploadedImages);
-  Map<GameMode, PlayerStats?> get parsedStats => Map.unmodifiable(_parsedStats);
+  Map<GameMode, PlayerPerformance?> get parsedStats => Map.unmodifiable(_parsedStats);
   Map<GameMode, ValidationResult?> get validationResults => Map.unmodifiable(_validationResults);
   Map<GameMode, bool> get isProcessing => Map.unmodifiable(_isProcessing);
   GameMode? get currentProcessingMode => _currentProcessingMode;

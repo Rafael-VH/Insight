@@ -4,8 +4,8 @@ import 'package:insight/features/upload/domain/entities/game_session.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 import 'package:intl/intl.dart';
 
-class StatsCollectionCard extends StatelessWidget {
-  const StatsCollectionCard({super.key, required this.collection, required this.onTap, this.badge});
+class SessionSummaryCard extends StatelessWidget {
+  const SessionSummaryCard({super.key, required this.collection, required this.onTap, this.badge});
 
   final StatsCollection collection;
   final VoidCallback onTap;
@@ -138,7 +138,7 @@ class StatsCollectionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip(PlayerStats stats) {
+  Widget _buildStatChip(PlayerPerformance stats) {
     return Chip(
       label: Text(
         stats.mode.shortName,

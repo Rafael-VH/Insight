@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
         ),
 
         // ── Stats (solo guardado post-OCR) ────────────────────
-        BlocProvider<StatsBloc>(create: (_) => di.sl<StatsBloc>()),
+        BlocProvider<UploadBloc>(create: (_) => di.sl<UploadBloc>()),
 
         // ── OCR ───────────────────────────────────────────────
         BlocProvider<OcrBloc>(create: (_) => di.sl<OcrBloc>()),

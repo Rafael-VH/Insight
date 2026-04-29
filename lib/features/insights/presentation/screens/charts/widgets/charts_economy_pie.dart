@@ -8,7 +8,7 @@ import 'charts_shared_widgets.dart';
 class ChartsEconomyPie extends StatefulWidget {
   const ChartsEconomyPie({super.key, required this.stats});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   @override
   State<ChartsEconomyPie> createState() => _ChartsEconomyPieState();

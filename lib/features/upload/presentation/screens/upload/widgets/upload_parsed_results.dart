@@ -9,10 +9,10 @@ import 'package:insight/features/insights/presentation/widgets/session_stats_car
 ///
 /// Muestra un resumen compacto de completitud + tabla de campos
 /// por cada modo procesado, seguido del widget de verificación completo.
-class UploadStatsSection extends StatelessWidget {
-  const UploadStatsSection({super.key, required this.parsedStats, required this.hasInvalidStats});
+class UploadParsedResults extends StatelessWidget {
+  const UploadParsedResults({super.key, required this.parsedStats, required this.hasInvalidStats});
 
-  final Map<GameMode, PlayerStats?> parsedStats;
+  final Map<GameMode, PlayerPerformance?> parsedStats;
   final bool hasInvalidStats;
 
   @override
@@ -136,7 +136,7 @@ class _ModeResultCard extends StatefulWidget {
   });
 
   final GameMode mode;
-  final PlayerStats stats;
+  final PlayerPerformance stats;
   final bool isDark;
   final ColorScheme colorScheme;
 
@@ -258,7 +258,7 @@ class _ModeResultCardState extends State<_ModeResultCard> {
                 // Widget de verificación completo
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  child: StatsVerificationWidget(gameMode: widget.mode, stats: widget.stats),
+                  child: SessionStatsCard(gameMode: widget.mode, stats: widget.stats),
                 ),
               ],
             ),

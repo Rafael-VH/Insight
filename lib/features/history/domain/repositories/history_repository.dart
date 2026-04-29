@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:insight/core/errors/app_failures.dart';
-import 'package:insight/features/history/domain/entities/stats_collection.dart';
+import 'package:insight/features/history/domain/entities/game_session.dart';
 
 /// Contrato del repositorio de historial.
 ///

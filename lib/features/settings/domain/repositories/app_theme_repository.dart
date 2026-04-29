@@ -3,7 +3,7 @@ import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/settings/domain/entities/app_theme.dart';
 
 /// Repositorio para gestionar temas personalizados
-abstract class ThemeRepository {
+abstract class AppThemeRepository {
   /// Obtiene todos los temas disponibles (predefinidos + personalizados)
   Future<Either<Failure, List<AppTheme>>> getAllThemes();
 

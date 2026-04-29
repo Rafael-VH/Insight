@@ -4,10 +4,10 @@ import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 import 'package:insight/features/ocr/domain/repositories/ocr_repository.dart';
 import 'package:insight/features/upload/domain/usecases/base_usecase.dart';
 
-class PickImageAndRecognizeText implements UseCase<OcrResult, ImageSourceParams> {
+class RecognizeImageText implements UseCase<OcrResult, ImageSourceParams> {
   final OcrRepository repository;
 
-  PickImageAndRecognizeText(this.repository);
+  RecognizeImageText(this.repository);
 
   @override
   Future<Either<Failure, OcrResult>> call(ImageSourceParams params) async {

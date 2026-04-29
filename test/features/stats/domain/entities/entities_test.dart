@@ -5,12 +5,12 @@ import 'package:insight/features/upload/domain/entities/game_session.dart';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-PlayerStats _buildPlayerStats({
+PlayerPerformance _buildPlayerStats({
   GameMode mode = GameMode.total,
   int totalGames = 1000,
   double winRate = 59.29,
 }) {
-  return PlayerStats(
+  return PlayerPerformance(
     mode: mode,
     totalGames: totalGames,
     winRate: winRate,
@@ -100,7 +100,7 @@ void main() {
       test('deserializa correctamente desde un mapa válido', () {
         final stats = _buildPlayerStats(mode: GameMode.classic, totalGames: 500, winRate: 61.5);
         final json = stats.toJson();
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.mode, equals(GameMode.classic));
         expect(restored.totalGames, equals(500));
         expect(restored.winRate, closeTo(61.5, 0.001));
@@ -109,21 +109,21 @@ void main() {
       test('usa GameMode.total como fallback para modo desconocido', () {
         final json = _buildPlayerStats().toJson();
         json['mode'] = 'unknown_mode';
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.mode, equals(GameMode.total));
       });
 
       test('tolera valores int donde se espera double', () {
         final json = _buildPlayerStats().toJson();
         json['winRate'] = 60; // int en lugar de double
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.winRate, closeTo(60.0, 0.001));
       });
 
       test('tolera valores double donde se espera int', () {
         final json = _buildPlayerStats().toJson();
         json['totalGames'] = 500.0; // double en lugar de int
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.totalGames, equals(500));
       });
 
@@ -131,7 +131,7 @@ void main() {
         final json = _buildPlayerStats().toJson();
         json['totalGames'] = '750';
         json['winRate'] = '58.33';
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.totalGames, equals(750));
         expect(restored.winRate, closeTo(58.33, 0.01));
       });
@@ -140,14 +140,14 @@ void main() {
         final json = _buildPlayerStats().toJson();
         json['totalGames'] = null;
         json['kda'] = null;
-        final restored = PlayerStats.fromJson(json);
+        final restored = PlayerPerformance.fromJson(json);
         expect(restored.totalGames, equals(0));
         expect(restored.kda, equals(0.0));
       });
 
       test('ida y vuelta toJson → fromJson preserva los datos', () {
         final original = _buildPlayerStats(mode: GameMode.brawl, totalGames: 300, winRate: 62.75);
-        final restored = PlayerStats.fromJson(original.toJson());
+        final restored = PlayerPerformance.fromJson(original.toJson());
         expect(restored.mode, equals(original.mode));
         expect(restored.totalGames, equals(original.totalGames));
         expect(restored.winRate, closeTo(original.winRate, 0.001));

@@ -13,7 +13,7 @@ import 'charts_win_rate_gauge.dart';
 class ChartsModeChartsPage extends StatelessWidget {
   const ChartsModeChartsPage({super.key, required this.stats});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   @override
   Widget build(BuildContext context) {

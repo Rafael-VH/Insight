@@ -5,10 +5,10 @@ import 'package:insight/features/settings/data/datasources/theme_datasource.dart
 import 'package:insight/features/settings/domain/entities/app_theme.dart';
 import 'package:insight/features/settings/domain/repositories/app_theme_repository.dart';
 
-class ThemeRepositoryImpl implements ThemeRepository {
+class AppThemeRepositoryImpl implements AppThemeRepository {
   final ThemeDataSource dataSource;
 
-  ThemeRepositoryImpl({required this.dataSource});
+  AppThemeRepositoryImpl({required this.dataSource});
 
   @override
   Future<Either<Failure, List<AppTheme>>> getAllThemes() async {

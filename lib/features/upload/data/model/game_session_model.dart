@@ -38,16 +38,16 @@ class StatsCollectionModel extends StatsCollection {
     return StatsCollectionModel(
       // Verificar null correctamente
       totalStats: json['totalStats'] != null
-          ? PlayerStats.fromJson(json['totalStats'] as Map<String, dynamic>)
+          ? PlayerPerformance.fromJson(json['totalStats'] as Map<String, dynamic>)
           : null,
       rankedStats: json['rankedStats'] != null
-          ? PlayerStats.fromJson(json['rankedStats'] as Map<String, dynamic>)
+          ? PlayerPerformance.fromJson(json['rankedStats'] as Map<String, dynamic>)
           : null,
       classicStats: json['classicStats'] != null
-          ? PlayerStats.fromJson(json['classicStats'] as Map<String, dynamic>)
+          ? PlayerPerformance.fromJson(json['classicStats'] as Map<String, dynamic>)
           : null,
       brawlStats: json['brawlStats'] != null
-          ? PlayerStats.fromJson(json['brawlStats'] as Map<String, dynamic>)
+          ? PlayerPerformance.fromJson(json['brawlStats'] as Map<String, dynamic>)
           : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       name: json['name'] as String? ?? '',

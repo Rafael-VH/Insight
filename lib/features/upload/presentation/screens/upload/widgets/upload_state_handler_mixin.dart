@@ -132,7 +132,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
 
   // ── Stats BLoC Handlers ────────────────────────────────────────
 
-  void handleStatsState(StatsState state) {
+  void handleStatsState(UploadState state) {
     if (state is StatsSaving) {
       _handleSavingState();
     } else {
@@ -228,7 +228,7 @@ mixin UploadStateHandlerMixin<T extends StatefulWidget> on State<T> {
     await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) return;
 
-    context.read<StatsBloc>().add(SaveStatsCollectionEvent(collection));
+    context.read<UploadBloc>().add(SaveStatsCollectionEvent(collection));
   }
 
   /// Muestra el diálogo de validación tras procesar una imagen.

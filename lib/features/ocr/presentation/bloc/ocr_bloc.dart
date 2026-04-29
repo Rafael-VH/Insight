@@ -6,8 +6,8 @@ import 'package:insight/features/ocr/presentation/bloc/ocr_event.dart';
 import 'package:insight/features/ocr/presentation/bloc/ocr_state.dart';
 
 class OcrBloc extends Bloc<OcrEvent, OcrState> {
-  final PickImageAndRecognizeText pickImageAndRecognizeText;
-  final CopyTextToClipboard copyTextToClipboard;
+  final RecognizeImageText pickImageAndRecognizeText;
+  final CopyToClipboard copyTextToClipboard;
 
   OcrBloc({required this.pickImageAndRecognizeText, required this.copyTextToClipboard})
     : super(OcrInitial()) {

@@ -1,6 +1,6 @@
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
 
-class PlayerStats {
+class PlayerPerformance {
   final GameMode mode;
   final int totalGames;
   final double winRate;
@@ -34,7 +34,7 @@ class PlayerStats {
   final int danoTomadoMaxMin;
   final int danoCausadoMaxMin;
 
-  const PlayerStats({
+  const PlayerPerformance({
     required this.mode,
     required this.totalGames,
     required this.winRate,
@@ -63,7 +63,7 @@ class PlayerStats {
     required this.danoCausadoMaxMin,
   });
 
-  PlayerStats copyWith({
+  PlayerPerformance copyWith({
     GameMode? mode,
     int? totalGames,
     double? winRate,
@@ -91,7 +91,7 @@ class PlayerStats {
     int? danoTomadoMaxMin,
     int? danoCausadoMaxMin,
   }) {
-    return PlayerStats(
+    return PlayerPerformance(
       mode: mode ?? this.mode,
       totalGames: totalGames ?? this.totalGames,
       winRate: winRate ?? this.winRate,
@@ -166,8 +166,8 @@ class PlayerStats {
     return int.tryParse(v.toString()) ?? 0;
   }
 
-  factory PlayerStats.fromJson(Map<String, dynamic> json) {
-    return PlayerStats(
+  factory PlayerPerformance.fromJson(Map<String, dynamic> json) {
+    return PlayerPerformance(
       mode: GameMode.values.firstWhere((e) => e.name == json['mode'], orElse: () => GameMode.total),
       totalGames: _toInt(json['totalGames']),
       winRate: _toDouble(json['winRate']),

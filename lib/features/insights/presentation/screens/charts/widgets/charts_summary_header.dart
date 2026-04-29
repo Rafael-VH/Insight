@@ -7,7 +7,7 @@ import 'charts_shared_widgets.dart';
 class ChartsSummaryHeader extends StatelessWidget {
   const ChartsSummaryHeader({super.key, required this.stats});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   @override
   Widget build(BuildContext context) {

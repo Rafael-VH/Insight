@@ -53,7 +53,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         title: 'Inicio',
         icon: Icons.home_rounded,
         color: const Color(0xFF3B82F6),
-        page: const HomeScreen(),
+        page: const UploadHomeScreen(),
         section: 'General',
       ),
       NavigationItem(

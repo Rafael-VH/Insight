@@ -17,7 +17,7 @@ class ChartsScreen extends StatefulWidget {
 
 class _ChartsScreenState extends State<ChartsScreen> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  late final List<PlayerStats> _availableStats;
+  late final List<PlayerPerformance> _availableStats;
 
   @override
   void initState() {

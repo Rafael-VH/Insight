@@ -95,7 +95,7 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
 
     return BlocListener<OcrBloc, OcrState>(
       listener: (_, state) => handleOcrState(state),
-      child: BlocListener<StatsBloc, StatsState>(
+      child: BlocListener<UploadBloc, UploadState>(
         listener: (_, state) => handleStatsState(state),
         child: Scaffold(
           appBar: UploadAppBar(
@@ -142,7 +142,7 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
           // ── Estadísticas extraídas ────────────────────────
           if (_controller.hasAnyParsedStats) ...[
             const SizedBox(height: 20),
-            UploadStatsSection(
+            UploadParsedResults(
               parsedStats: _controller.parsedStats,
               hasInvalidStats: _controller.hasInvalidStats(),
             ),
@@ -159,7 +159,7 @@ class _UploadScreenState extends State<UploadScreen> with UploadStateHandlerMixi
 
       return Padding(
         padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-        child: UploadImageCardWithOverlay(
+        child: UploadModeCard(
           key: ValueKey(mode),
           mode: mode,
           imagePath: _controller.uploadedImages[mode],

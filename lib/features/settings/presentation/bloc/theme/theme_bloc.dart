@@ -7,7 +7,7 @@ import 'package:insight/features/settings/domain/repositories/app_theme_reposito
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   final SettingsRepository settingsRepository;
-  final ThemeRepository themeRepository;
+  final AppThemeRepository themeRepository;
 
   ThemeBloc({required this.settingsRepository, required this.themeRepository})
     : super(ThemeInitial()) {

@@ -3,11 +3,11 @@ import 'package:insight/features/parser/utils/mlbb_parser.dart';
 import 'package:insight/features/parser/domain/entities/game_mode.dart';
 import 'package:insight/features/parser/domain/entities/player_performance.dart';
 
-class StatsVerificationWidget extends StatelessWidget {
-  const StatsVerificationWidget({super.key, required this.gameMode, required this.stats});
+class SessionStatsCard extends StatelessWidget {
+  const SessionStatsCard({super.key, required this.gameMode, required this.stats});
 
   final GameMode gameMode;
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   @override
   Widget build(BuildContext context) {

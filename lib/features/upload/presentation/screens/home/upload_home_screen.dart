@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:insight/features/upload/domain/entities/upload_mode.dart';
 import 'package:insight/features/upload/presentation/screens/upload/upload_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class UploadHomeScreen extends StatelessWidget {
+  const UploadHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

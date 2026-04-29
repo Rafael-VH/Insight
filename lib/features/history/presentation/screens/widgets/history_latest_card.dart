@@ -23,7 +23,7 @@ class HistoryLatestCard extends StatelessWidget {
   final VoidCallback onOptionsPressed;
 
   // Obtiene la stat con más datos para mostrar métricas
-  PlayerStats? get _primaryStat =>
+  PlayerPerformance? get _primaryStat =>
       collection.totalStats ??
       collection.rankedStats ??
       collection.classicStats ??

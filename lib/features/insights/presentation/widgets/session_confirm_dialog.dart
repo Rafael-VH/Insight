@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Widget que proporciona diálogos reutilizables para guardar estadísticas
-class SaveStatsDialog {
+class SessionConfirmDialog {
   /// Muestra un diálogo de éxito
   static void showSuccess(BuildContext context, {required String message, VoidCallback? onClose}) {
     final colorScheme = Theme.of(context).colorScheme;

@@ -16,7 +16,7 @@ class DialogService {
     if (useAwesome) {
       _showAwesomeSuccess(context, message, duration);
     } else {
-      SaveStatsDialog.showSuccess(context, message: message, onClose: onClose);
+      SessionConfirmDialog.showSuccess(context, message: message, onClose: onClose);
     }
   }
 
@@ -33,7 +33,7 @@ class DialogService {
     if (useAwesome) {
       _showAwesomeError(context, title, message, errorDetails, duration);
     } else {
-      SaveStatsDialog.showError(
+      SessionConfirmDialog.showError(
         context,
         title: title,
         message: message,
@@ -51,7 +51,7 @@ class DialogService {
     if (useAwesome) {
       _showAwesomeLoading(context, message);
     } else {
-      SaveStatsDialog.showSaving(context);
+      SessionConfirmDialog.showSaving(context);
     }
   }
 
@@ -67,7 +67,7 @@ class DialogService {
     if (useAwesome) {
       return _showAwesomeConfirmation(context, title, message, confirmButtonText, cancelButtonText);
     } else {
-      return SaveStatsDialog.showConfirmation(
+      return SessionConfirmDialog.showConfirmation(
         context,
         title: title,
         message: message,

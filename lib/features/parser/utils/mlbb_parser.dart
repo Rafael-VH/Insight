@@ -3,7 +3,7 @@ import 'package:insight/features/parser/domain/entities/player_performance.dart'
 
 /// Resultado del parseo con información de diagnóstico
 class ParseResult {
-  final PlayerStats? stats;
+  final PlayerPerformance? stats;
   final List<String> extractionLog;
   final Map<String, dynamic> rawMatches;
 
@@ -265,7 +265,7 @@ class StatsParser {
   static final List<String> _extractionLog = [];
   static final Map<String, dynamic> _rawMatches = {};
 
-  static PlayerStats? parseStats(String text, GameMode mode) {
+  static PlayerPerformance? parseStats(String text, GameMode mode) {
     if (text.isEmpty) return null;
 
     final stats = parseFromText(text);
@@ -307,11 +307,11 @@ class StatsParser {
     );
   }
 
-  static PlayerStats? parseFromText(String text) {
+  static PlayerPerformance? parseFromText(String text) {
     return _parseFromTextWithLogging(text);
   }
 
-  static PlayerStats? _parseFromTextWithLogging(String text) {
+  static PlayerPerformance? _parseFromTextWithLogging(String text) {
     if (text.isEmpty) return null;
 
     try {
@@ -476,7 +476,7 @@ class StatsParser {
 
       _log('\n--- Creando objeto PlayerStats ---');
 
-      return PlayerStats(
+      return PlayerPerformance(
         mode: mode,
         totalGames: totalGames,
         winRate: winRate,
@@ -623,7 +623,7 @@ class StatsParser {
     print('[StatsParser] $message');
   }
 
-  static List<StatField> getFieldsForVerification(PlayerStats stats) {
+  static List<StatField> getFieldsForVerification(PlayerPerformance stats) {
     return [
       StatField('Partidas Totales', stats.totalGames.toString()),
       StatField('Tasa de Victorias', '${stats.winRate}%'),

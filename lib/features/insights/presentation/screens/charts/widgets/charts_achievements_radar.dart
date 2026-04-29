@@ -8,7 +8,7 @@ import 'charts_shared_widgets.dart';
 class ChartsAchievementsRadar extends StatelessWidget {
   const ChartsAchievementsRadar({super.key, required this.stats});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   static double _norm(num value, num maxRef) {
     if (maxRef <= 0) return 0.0;

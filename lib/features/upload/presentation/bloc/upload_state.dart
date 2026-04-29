@@ -1,15 +1,15 @@
 import 'package:equatable/equatable.dart';
 
-abstract class StatsState extends Equatable {
-  const StatsState();
+abstract class UploadState extends Equatable {
+  const UploadState();
 
   @override
   List<Object?> get props => [];
 }
 
-class StatsInitial extends StatsState {}
+class StatsInitial extends UploadState {}
 
-class StatsSaving extends StatsState {
+class StatsSaving extends UploadState {
   final String message;
   const StatsSaving(this.message);
 
@@ -17,7 +17,7 @@ class StatsSaving extends StatsState {
   List<Object> get props => [message];
 }
 
-class StatsSaved extends StatsState {
+class StatsSaved extends UploadState {
   final String message;
 
   const StatsSaved(this.message);
@@ -26,7 +26,7 @@ class StatsSaved extends StatsState {
   List<Object> get props => [message];
 }
 
-class StatsError extends StatsState {
+class StatsError extends UploadState {
   final String message;
   final String? errorDetails;
 

@@ -34,7 +34,7 @@ class ValidationResult {
 /// Validador de estadísticas
 class StatsValidator {
   /// Valida las estadísticas extraídas
-  static ValidationResult validate(PlayerStats stats) {
+  static ValidationResult validate(PlayerPerformance stats) {
     final List<String> missingFields = [];
     final List<String> warningFields = [];
     final Map<String, dynamic> extractedValues = {}; // NUEVO

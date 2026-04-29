@@ -4,21 +4,21 @@ import 'package:insight/features/upload/domain/entities/game_session.dart';
 import 'package:insight/features/parser/presentation/utils/game_mode_extensions.dart';
 import 'package:intl/intl.dart';
 
-class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key, required this.collection});
+class SessionDetailScreen extends StatefulWidget {
+  const SessionDetailScreen({super.key, required this.collection});
 
   final StatsCollection collection;
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState();
+  State<SessionDetailScreen> createState() => _SessionDetailScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen> {
+class _SessionDetailScreenState extends State<SessionDetailScreen> {
   int _activeTabIndex = 0;
 
-  List<PlayerStats> get _stats => widget.collection.availableStats;
+  List<PlayerPerformance> get _stats => widget.collection.availableStats;
 
-  PlayerStats get _activeStat => _stats[_activeTabIndex];
+  PlayerPerformance get _activeStat => _stats[_activeTabIndex];
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   // ── Grupos de campos ──────────────────────────────────────────
 
-  List<_StatField> _getPrimaryFields(PlayerStats s) => [
+  List<_StatField> _getPrimaryFields(PlayerPerformance s) => [
     _StatField('Partidas totales', '${s.totalGames}', s.totalGames > 0),
     _StatField(
       'Win Rate',
@@ -154,7 +154,7 @@ class _DetailScreenState extends State<DetailScreen> {
     ),
   ];
 
-  List<_StatField> _getPerformanceFields(PlayerStats s) => [
+  List<_StatField> _getPerformanceFields(PlayerPerformance s) => [
     _StatField(
       'Participación equipo',
       s.teamFightParticipation > 0 ? '${s.teamFightParticipation.toStringAsFixed(1)}%' : '—',
@@ -185,7 +185,7 @@ class _DetailScreenState extends State<DetailScreen> {
     _StatField('MVP Perdedor', s.mvpLoss > 0 ? '${s.mvpLoss}' : '—', true),
   ];
 
-  List<_StatField> _getAchievementFields(PlayerStats s) => [
+  List<_StatField> _getAchievementFields(PlayerPerformance s) => [
     _StatField('Legendario', '${s.legendary}', s.legendary > 0),
     _StatField('Savage', '${s.savage}', s.savage > 0),
     _StatField('Maniac', '${s.maniac}', s.maniac > 0),
@@ -259,8 +259,8 @@ class _SessionBand extends StatelessWidget {
   });
 
   final StatsCollection collection;
-  final List<PlayerStats> stats;
-  final PlayerStats activeStat;
+  final List<PlayerPerformance> stats;
+  final PlayerPerformance activeStat;
   final String formattedDate;
   final bool isDark;
   final ColorScheme colorScheme;
@@ -440,7 +440,7 @@ class _ModeChip extends StatelessWidget {
 class _ModeTabs extends StatelessWidget {
   const _ModeTabs({required this.stats, required this.activeIndex, required this.onChanged});
 
-  final List<PlayerStats> stats;
+  final List<PlayerPerformance> stats;
   final int activeIndex;
   final ValueChanged<int> onChanged;
 
@@ -521,7 +521,7 @@ class _ModeTabs extends StatelessWidget {
 class _CompletenessBar extends StatelessWidget {
   const _CompletenessBar({required this.stats, required this.isDark, required this.colorScheme});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
   final bool isDark;
   final ColorScheme colorScheme;
 

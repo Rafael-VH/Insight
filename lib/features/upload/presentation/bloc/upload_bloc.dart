@@ -7,24 +7,21 @@ import 'package:insight/features/upload/presentation/bloc/upload_state.dart';
 
 /// BLoC del módulo Stats — post-refactor.
 ///
-/// Su única responsabilidad es orquestar el guardado de una
-/// [StatsCollection] nueva tras el flujo de OCR y notificar al
-/// [HistoryBloc] para que recargue la lista.
+/// Su única responsabilidad es orquestar el guardado de una [StatsCollection] nueva tras el flujo de OCR y notificar al [HistoryBloc] para que recargue la lista.
 ///
-/// Todo lo relacionado con el historial (carga, eliminación,
-/// renombrado, export/import) vive ahora en [HistoryBloc].
-class StatsBloc extends Bloc<StatsEvent, StatsState> {
+/// Todo lo relacionado con el historial (carga, eliminación, renombrado, export/import) vive ahora en [HistoryBloc].
+class UploadBloc extends Bloc<UploadEvent, UploadState> {
   final SaveStatsCollection saveStatsCollection;
   final HistoryBloc historyBloc;
 
-  StatsBloc({required this.saveStatsCollection, required this.historyBloc})
+  UploadBloc({required this.saveStatsCollection, required this.historyBloc})
     : super(StatsInitial()) {
     on<SaveStatsCollectionEvent>(_onSaveStatsCollection);
   }
 
   Future<void> _onSaveStatsCollection(
     SaveStatsCollectionEvent event,
-    Emitter<StatsState> emit,
+    Emitter<UploadState> emit,
   ) async {
     try {
       if (!event.collection.hasAnyStats) {

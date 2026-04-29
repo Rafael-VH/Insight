@@ -111,7 +111,7 @@ Future<void> init() async {
 
   // Data
   sl.registerLazySingleton<ThemeDataSource>(() => ThemeDataSourceImpl(sharedPreferences: sl()));
-  sl.registerLazySingleton<ThemeRepository>(() => ThemeRepositoryImpl(dataSource: sl()));
+  sl.registerLazySingleton<AppThemeRepository>(() => AppThemeRepositoryImpl(dataSource: sl()));
 
   // Presentation
   sl.registerFactory(() => ThemeBloc(settingsRepository: sl(), themeRepository: sl()));
@@ -190,7 +190,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => SaveStatsCollection(sl<HistoryRepository>()));
 
-  sl.registerFactory(() => StatsBloc(saveStatsCollection: sl(), historyBloc: sl()));
+  sl.registerFactory(() => UploadBloc(saveStatsCollection: sl(), historyBloc: sl()));
 
   // ================================================================
   // OCR
@@ -203,8 +203,8 @@ Future<void> init() async {
   sl.registerLazySingleton<OcrRepository>(() => OcrRepositoryImpl(dataSource: sl()));
 
   // Domain — Use cases
-  sl.registerLazySingleton(() => PickImageAndRecognizeText(sl()));
-  sl.registerLazySingleton(() => CopyTextToClipboard(sl()));
+  sl.registerLazySingleton(() => RecognizeImageText(sl()));
+  sl.registerLazySingleton(() => CopyToClipboard(sl()));
 
   // Presentation
   sl.registerFactory(() => OcrBloc(pickImageAndRecognizeText: sl(), copyTextToClipboard: sl()));

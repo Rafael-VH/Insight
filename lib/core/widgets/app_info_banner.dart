@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class InfoBanner extends StatelessWidget {
-  const InfoBanner({
+class AppInfoBanner extends StatelessWidget {
+  const AppInfoBanner({
     super.key,
     required this.message,
     this.icon = Icons.info_outline,

@@ -1,10 +1,10 @@
 import 'package:insight/features/parser/domain/entities/player_performance.dart';
 
 class StatsCollection {
-  final PlayerStats? totalStats;
-  final PlayerStats? rankedStats;
-  final PlayerStats? classicStats;
-  final PlayerStats? brawlStats;
+  final PlayerPerformance? totalStats;
+  final PlayerPerformance? rankedStats;
+  final PlayerPerformance? classicStats;
+  final PlayerPerformance? brawlStats;
   final DateTime createdAt;
   final String name;
 
@@ -20,8 +20,8 @@ class StatsCollection {
   bool get hasAnyStats =>
       totalStats != null || rankedStats != null || classicStats != null || brawlStats != null;
 
-  List<PlayerStats> get availableStats {
-    final List<PlayerStats> stats = [];
+  List<PlayerPerformance> get availableStats {
+    final List<PlayerPerformance> stats = [];
     if (totalStats != null) stats.add(totalStats!);
     if (rankedStats != null) stats.add(rankedStats!);
     if (classicStats != null) stats.add(classicStats!);
@@ -31,10 +31,10 @@ class StatsCollection {
 
   // Método copyWith para facilitar actualizaciones
   StatsCollection copyWith({
-    PlayerStats? totalStats,
-    PlayerStats? rankedStats,
-    PlayerStats? classicStats,
-    PlayerStats? brawlStats,
+    PlayerPerformance? totalStats,
+    PlayerPerformance? rankedStats,
+    PlayerPerformance? classicStats,
+    PlayerPerformance? brawlStats,
     DateTime? createdAt,
     String? name,
   }) {

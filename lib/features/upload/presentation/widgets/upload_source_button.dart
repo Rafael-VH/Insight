@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:insight/features/upload/domain/entities/upload_mode.dart';
 
-class StatsUploadButton extends StatelessWidget {
-  const StatsUploadButton({
+class UploadSourceButton extends StatelessWidget {
+  const UploadSourceButton({
     super.key,
     required this.uploadType,
     required this.icon,

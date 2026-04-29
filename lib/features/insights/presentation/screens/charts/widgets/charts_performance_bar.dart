@@ -8,7 +8,7 @@ import 'charts_shared_widgets.dart';
 class ChartsPerformanceBar extends StatelessWidget {
   const ChartsPerformanceBar({super.key, required this.stats});
 
-  final PlayerStats stats;
+  final PlayerPerformance stats;
 
   List<BarEntry> _buildEntries(Color color) {
     final totalGames = stats.totalGames > 0 ? stats.totalGames.toDouble() : 1.0;

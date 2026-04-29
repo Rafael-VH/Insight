@@ -161,7 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _showDetail(StatsCollection collection) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => DetailScreen(collection: collection)),
+      MaterialPageRoute(builder: (_) => SessionDetailScreen(collection: collection)),
     );
   }
 
