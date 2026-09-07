@@ -62,19 +62,6 @@ import 'package:insight/features/history/domain/usecases/update_stats_collection
 // ── History — Presentation ────────────────────────────────────────
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 
-// ── Heroes — Data ─────────────────────────────────────────────────
-import 'package:insight/features/heroes/data/datasources/hero_cache_datasource.dart';
-import 'package:insight/features/heroes/data/datasources/hero_remote_datasource.dart';
-import 'package:insight/features/heroes/data/repositories/hero_repository_impl.dart';
-
-// ── Heroes — Domain ───────────────────────────────────────────────
-import 'package:insight/features/heroes/domain/repositories/hero_repository.dart';
-import 'package:insight/features/heroes/domain/usecases/get_heroes.dart';
-import 'package:insight/features/heroes/domain/usecases/get_hero_detail.dart';
-
-// ── Heroes — Presentation ──────────────────────────────────────────
-import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
-
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -208,33 +195,6 @@ Future<void> init() async {
 
   // Presentation
   sl.registerFactory(() => OcrBloc(pickImageAndRecognizeText: sl(), copyTextToClipboard: sl()));
-
-  // ================================================================
-  // HEROES
-  // ================================================================
-
-  // Data
-  sl.registerLazySingleton<HeroRemoteDataSource>(() => HeroRemoteDataSourceImpl(client: sl()));
-  sl.registerLazySingleton<HeroCacheDataSource>(
-    () => HeroCacheDataSourceImpl(prefs: sl<SharedPreferences>()),
-  );
-  // Singleton: el caché en memoria persiste entre navegaciones.
-  sl.registerLazySingleton<HeroRepository>(() => HeroRepositoryImpl(remote: sl(), cache: sl()));
-
-  // Domain — Use cases
-  sl.registerLazySingleton(() => GetHeroes(sl()));
-  sl.registerLazySingleton(() => GetHeroDetail(sl()));
-
-  // Presentation
-  //
-  // HeroBloc es Singleton para que:
-  //   1. La lista no se pierda al entrar al detalle y volver.
-  //   2. El detalle ya cargado se cachee mientras la pantalla
-  //      permanezca en el stack de navegación.
-  //
-  // Si necesitas un detalle completamente fresco en cada apertura,
-  // usa registerFactory() en su lugar.
-  sl.registerLazySingleton(() => HeroBloc(getHeroes: sl(), getHeroDetail: sl()));
 
   // ================================================================
   // NAVIGATION

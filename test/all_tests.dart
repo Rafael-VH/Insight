@@ -27,10 +27,6 @@ import 'features/stats/presentation/controllers/stats_upload_controller_test.dar
 import 'features/settings/domain/entities/settings_entities_test.dart'
     as settings_entities;
 
-// Heroes — Models & BLoC
-import 'features/heroes/data/models/hero_model_test.dart' as hero_models;
-import 'features/heroes/bloc/hero_bloc_test.dart' as hero_bloc;
-
 // Navigation — BLoC
 import 'features/navigation/bloc/navigation_bloc_test.dart' as nav_bloc;
 
@@ -47,10 +43,6 @@ void main() {
 
   // Settings module
   settings_entities.main();
-
-  // Heroes module
-  hero_models.main();
-  hero_bloc.main();
 
   // Navigation module
   nav_bloc.main();

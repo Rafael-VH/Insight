@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insight/core/injection/injection_container.dart';
-import 'package:insight/features/heroes/presentation/bloc/hero_bloc.dart';
-import 'package:insight/features/heroes/presentation/screens/hero_list_screen.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
 import 'package:insight/features/history/presentation/screens/history_screen.dart';
 import 'package:insight/features/navigation/domain/entities/navigation_item.dart';
@@ -66,44 +64,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         // todos sus hijos (bottom sheets, diálogos, etc.).
         page: BlocProvider.value(value: sl<HistoryBloc>(), child: const HistoryScreen()),
         section: 'General',
-      ),
-
-      // ── Enciclopedia ──────────────────────────────────────────
-      NavigationItem(
-        id: 'heroes',
-        title: 'Héroes',
-        icon: Icons.sports_esports_rounded,
-        color: const Color(0xFFDC2626),
-        page: BlocProvider.value(value: sl<HeroBloc>(), child: const HeroListScreen()),
-        section: 'Enciclopedia',
-      ),
-      // Próximas secciones — páginas placeholder hasta implementarlas
-      NavigationItem(
-        id: 'items',
-        title: 'Ítems',
-        icon: Icons.shield_rounded,
-        color: const Color(0xFF7C3AED),
-        page: const _PlaceholderPage(title: 'Ítems', icon: Icons.shield_rounded),
-        section: 'Enciclopedia',
-        badge: 'Pronto',
-      ),
-      NavigationItem(
-        id: 'academy',
-        title: 'Academia',
-        icon: Icons.school_rounded,
-        color: const Color(0xFFF59E0B),
-        page: const _PlaceholderPage(title: 'Academia', icon: Icons.school_rounded),
-        section: 'Enciclopedia',
-        badge: 'Pronto',
-      ),
-      NavigationItem(
-        id: 'rankings',
-        title: 'Rankings',
-        icon: Icons.leaderboard_rounded,
-        color: const Color(0xFFEC4899),
-        page: const _PlaceholderPage(title: 'Rankings', icon: Icons.leaderboard_rounded),
-        section: 'Enciclopedia',
-        badge: 'Pronto',
       ),
 
       // ── App ───────────────────────────────────────────────────
