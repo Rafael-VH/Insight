@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:insight/core/injection/injection_container.dart' as di;
 import 'package:insight/core/presentation/splash/splash_screen.dart';
 import 'package:insight/features/history/presentation/bloc/history_bloc.dart';
@@ -30,12 +29,6 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-
-      // Inicialización de Supabase
-      await Supabase.initialize(
-        url: 'https://kksdrjxusgqjgxbjqthy.supabase.co',
-        anonKey: 'sb_publishable_i-GstcS_ma-MYG_t5TFnZQ_JgISZk0J',
-      );
 
       // Orientación fija para evitar reflows durante el inicio
       await SystemChrome.setPreferredOrientations([
