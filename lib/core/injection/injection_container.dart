@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get_it/get_it.dart';
@@ -80,7 +79,6 @@ Future<void> init() async {
   }
 
   sl.registerLazySingleton(() => sharedPreferences);
-  sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => ImagePicker());
 
   // TextRecognizer — puede fallar si ML Kit no está disponible
@@ -200,7 +198,7 @@ Future<void> init() async {
   // NAVIGATION
   // ================================================================
 
-  sl.registerFactory(() => NavigationBloc(totalDestinations: 7));
+  sl.registerFactory(() => NavigationBloc(totalDestinations: 3));
 
   debugPrint('✓ Todos los servicios registrados');
 }
