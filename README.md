@@ -149,7 +149,6 @@ lib/
     ├── ocr/                            # Integración con Google ML Kit
     ├── upload/                         # Flujo inicial de carga y procesamiento post-OCR
     ├── history/                        # CRUD de sesiones guardadas y persistencia
-    ├── heroes/                         # Enciclopedia de héroes (Data, Domain, Presentation)
     ├── settings/                       # Preferencias, temas y gestión de datos
     └── academy/ items/ insights/       # Módulos en desarrollo (Placeholders)
 ```
