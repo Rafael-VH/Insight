@@ -118,7 +118,6 @@ Centraliza operaciones de exportación/importación en formato `.json` y elimina
 | **google_mlkit_text_recognition** | `^0.15.1` | Motor OCR — procesa imágenes |
 | **flutter_bloc** | `^9.1.1` | Gestión de estado reactiva |
 | **get_it** | `^9.2.1` | Inyección de dependencias |
-| **http** | `^1.2.0` | Cliente para peticiones remotas (Héroes) |
 | **shared_preferences** | `^2.5.4` | Almacenamiento local persistente |
 | **fl_chart** | `^1.2.0` | Visualización de datos y gráficos |
 | **image_picker** | `^1.2.1` | Acceso a cámara y galería |
@@ -150,16 +149,15 @@ lib/
     ├── upload/                         # Flujo inicial de carga y procesamiento post-OCR
     ├── history/                        # CRUD de sesiones guardadas y persistencia
     ├── settings/                       # Preferencias, temas y gestión de datos
-    └── academy/ items/ insights/       # Módulos en desarrollo (Placeholders)
+    └── insights/                       # Análisis detallado y gráficos de sesiones
 ```
 
 ### BLoCs Principales
 
-- `NavigationBloc`: Gestiona las 7 rutas del menú lateral y badges.
+- `NavigationBloc`: Gestiona las 3 rutas del menú lateral y badges.
 - `HistoryBloc`: CRUD completo y persistencia del historial.
 - `UploadBloc`: Orquestación del flujo de guardado post-OCR.
 - `OcrBloc`: Ciclo de vida del procesamiento de imágenes.
-- `HeroBloc`: Gestión de datos de héroes (remoto + caché).
 - `SettingsBloc` & `ThemeBloc`: Configuración global y apariencia.
 
 ---
