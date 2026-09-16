@@ -135,13 +135,14 @@ void main() {
         expect: () => [isA<NavigationError>()],
       );
 
-      test('getBadge retorna el badge correcto después de actualizar', () {
+      test('getBadge retorna el badge correcto después de actualizar', () async {
+        final states = <NavigationState>[];
+        final subscription = bloc.stream.listen(states.add);
         bloc.add(const UpdateNavigationBadge(index: 2, badge: '3'));
-        // Pequeño delay para que el evento se procese
-        Future.delayed(
-          Duration.zero,
-          () => expect(bloc.getBadge(2), equals('3')),
-        );
+        await Future.delayed(Duration.zero);
+        expect(states.last, isA<NavigationBadgeUpdated>());
+        expect(bloc.getBadge(2), equals('3'));
+        await subscription.cancel();
       });
     });
 

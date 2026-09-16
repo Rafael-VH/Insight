@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Insight · Cómo se relaciona el código",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/Rafael-VH/Insight", "provider": "github", "link_mode": "web", "revision": "b9eef13ecbf9dce4ba545302459667db29e5d128" },
+    "viewBox": [1360, 780],
+    "views": [
+      { "id": "flujo-ocr", "label": "Flujo principal OCR", "focus": ["usuario", "uploadUi", "ocrBloc", "mlkit", "parser", "uploadBloc", "historyRepo", "sharedprefs"], "note": "Captura → OCR → parseo → validación → guardado local." },
+      { "id": "historial", "label": "Historial y gráficos", "focus": ["historyRepo", "sharedprefs", "historyBloc", "historyUi", "jsonIo"], "note": "Recarga, export/import JSON y visualización con fl_chart." },
+      { "id": "ajustes-tema", "label": "Ajustes y tema", "focus": ["shellUi", "sharedprefs"], "note": "SettingsBloc y ThemeBloc persisten configuración via SharedPreferences." }
+    ]
+  },
+  "components": [
+    { "id": "usuario", "type": "external", "label": "Galería / Cámara", "sublabel": "captura de pantalla MLBB", "pos": [40, 96], "size": [150, 64] },
+    { "id": "uploadUi", "type": "frontend", "label": "Subida de imagen", "sublabel": "UploadScreen + StatsUploadController", "tag": "ChangeNotifier", "pos": [240, 70], "size": [240, 84],
+      "sources": [
+        { "path": "lib/features/upload/presentation/screens/upload/upload_screen.dart" },
+        { "path": "lib/features/upload/presentation/controllers/upload_controller.dart" }
+      ] },
+    { "id": "parser", "type": "backend", "label": "MlbbParser + Validator", "sublabel": "regex → ParseResult · GameMode", "pos": [530, 70], "size": [215, 84],
+      "sources": [
+        { "path": "lib/features/parser/utils/mlbb_parser.dart" },
+        { "path": "lib/features/parser/utils/mlbb_validator.dart" }
+      ] },
+    { "id": "historyUi", "type": "frontend", "label": "Historial + Insights", "sublabel": "HistoryScreen · fl_chart · detalle", "pos": [800, 70], "size": [220, 84],
+      "sources": [
+        { "path": "lib/features/history/presentation/screens/history_screen.dart" },
+        { "path": "lib/features/insights/presentation/screens/charts/charts_screen.dart" }
+      ] },
+    { "id": "shellUi", "type": "frontend", "label": "Shell + Ajustes/Tema", "sublabel": "MainScreen · SettingsBloc · ThemeBloc", "pos": [1070, 70], "size": [220, 84],
+      "sources": [
+        { "path": "lib/features/navigation/presentation/screens/main_screen.dart" },
+        { "path": "lib/features/settings/presentation/screens/settings_screen.dart" }
+      ] },
+    { "id": "ocrBloc", "type": "backend", "label": "OcrBloc", "sublabel": "RecognizeImageText use case", "pos": [70, 278], "size": [220, 72],
+      "sources": [
+        { "path": "lib/features/ocr/presentation/bloc/ocr_bloc.dart" },
+        { "path": "lib/features/ocr/domain/usecases/recognize_image_text.dart" }
+      ] },
+    { "id": "uploadBloc", "type": "backend", "label": "UploadBloc · guardar", "sublabel": "SaveStatsCollection use case", "pos": [300, 278], "size": [220, 80],
+      "sources": [
+        { "path": "lib/features/upload/presentation/bloc/upload_bloc.dart" },
+        { "path": "lib/features/upload/domain/usecases/save_game_session.dart" }
+      ] },
+    { "id": "historyBloc", "type": "backend", "label": "HistoryBloc", "sublabel": "LazySingleton · lista precargada", "pos": [580, 278], "size": [190, 80],
+      "sources": [ { "path": "lib/features/history/presentation/bloc/history_bloc.dart" } ] },
+    { "id": "mlkit", "type": "external", "label": "Google ML Kit", "sublabel": "TextRecognizer OCR on-device", "pos": [40, 530], "size": [200, 72],
+      "sources": [ { "path": "lib/features/ocr/data/datasources/ocr_datasource.dart" } ] },
+    { "id": "historyRepo", "type": "backend", "label": "HistoryRepository", "sublabel": "impl + LocalStorageDataSource", "pos": [270, 526], "size": [250, 80],
+      "sources": [
+        { "path": "lib/features/history/data/repositories/history_repository_impl.dart" },
+        { "path": "lib/features/upload/data/datasources/local_storage_datasource.dart" }
+      ] },
+    { "id": "sharedprefs", "type": "database", "label": "SharedPreferences", "sublabel": "stats_collections · ajustes · tema", "pos": [570, 530], "size": [200, 72],
+      "sources": [
+        { "path": "lib/features/settings/data/datasources/settings_datasource.dart" },
+        { "path": "lib/features/settings/data/datasources/theme_datasource.dart" }
+      ] },
+    { "id": "jsonIo", "type": "external", "label": "Exportar / Importar JSON", "sublabel": "file_picker · share_plus", "pos": [830, 650], "size": [180, 68],
+      "sources": [ { "path": "lib/features/upload/data/datasources/json_export_datasource.dart" } ] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Insight · app 100% local (sin backend)", "wraps": ["uploadUi", "parser", "historyUi", "shellUi", "ocrBloc", "uploadBloc", "historyBloc", "mlkit", "historyRepo", "sharedprefs", "jsonIo"], "pad": 24 }
+  ],
+  "connections": [
+    { "id": "pick-image", "from": "usuario", "to": "uploadUi", "label": "galería / cámara (image_picker)", "fromSide": "right", "toSide": "left", "labelDx": -50, "labelDy": 60 },
+    { "id": "ocr-event", "from": "uploadUi", "to": "ocrBloc", "label": "ProcessImageEvent ⇒ OcrResult", "fromSide": "bottom", "toSide": "top", "labelDx": -50 },
+    { "id": "ocr-call", "from": "ocrBloc", "to": "mlkit", "label": "OcrDataSource · texto (on-device)", "fromSide": "bottom", "toSide": "top", "labelDx": -30 },
+    { "id": "parse-text", "from": "uploadUi", "to": "parser", "label": "parse + validate ⇒ ParseResult", "fromSide": "right", "toSide": "left", "labelDy": 60 },
+    { "id": "save-event", "from": "uploadUi", "to": "uploadBloc", "label": "SaveStatsCollectionEvent (confirmación)", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelDx": 75 },
+    { "id": "save-to-repo", "from": "uploadBloc", "to": "historyRepo", "label": "guarda StatsCollection", "fromSide": "bottom", "toSide": "top", "labelDx": 26 },
+    { "id": "repo-to-prefs", "from": "historyRepo", "to": "sharedprefs", "label": "'stats_collections' (JSON)", "fromSide": "right", "toSide": "left", "labelDy": -52 },
+    { "id": "reload-history", "from": "uploadBloc", "to": "historyBloc", "label": "dispara LoadAll (reload)", "variant": "dashed", "fromSide": "right", "toSide": "left", "labelDy": 70 },
+    { "id": "list-to-ui", "from": "historyBloc", "to": "historyUi", "label": "colecciones → charts", "fromSide": "top", "toSide": "bottom", "via": [[675, 210], [910, 210]], "labelSegment": 1 },
+    { "id": "settings-to-prefs", "from": "shellUi", "to": "sharedprefs", "label": "SettingsBloc · ThemeBloc ⇒ datasources", "fromSide": "bottom", "toSide": "top", "via": [[1180, 480], [670, 480]], "labelSegment": 1 },
+    { "id": "json-export", "from": "historyRepo", "to": "jsonIo", "label": "exportar / importar", "variant": "dashed", "fromSide": "bottom", "toSide": "left", "via": [[395, 684], [810, 684]], "labelSegment": 1 }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Pipeline OCR principal", "items": [
+      "El controller dispara OcrBloc (ProcessImageEvent) y recibe OcrResult",
+      "StatsUploadController invoca MlbbParser y MlbbValidator directamente",
+      "UploadBloc solo guarda y dispara el reload de HistoryBloc (BLoC → BLoC)"
+    ] },
+    { "dot": "emerald", "title": "Persistencia 100% local", "items": [
+      "SharedPreferences guarda stats_collections, ajustes y tema",
+      "HistoryRepositoryImpl reutiliza el LocalStorageDataSource de upload",
+      "Sin red ni backend: todo el procesamiento ocurre en el dispositivo"
+    ] },
+    { "dot": "violet", "title": "Convenios de arquitectura", "items": [
+      "Clean Architecture por feature: data · domain · presentation",
+      "flutter_bloc 9 + get_it: 6 BLoCs inyectados desde main.dart (di.sl)",
+      "Repos devuelven Either<Failure, T> (dartz); errores en core/errors",
+      "Navegación: Splash → MainScreen con 3 tabs en IndexedStack"
+    ] }
+  ]
+}

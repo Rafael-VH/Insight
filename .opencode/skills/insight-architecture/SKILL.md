@@ -38,7 +38,6 @@ lib/
 - **Flutter SDK**: >=3.10.3
 - **State Management**: BLoC (flutter_bloc)
 - **Dependency Injection**: GetIt
-- **HTTP Client**: http package
 - **OCR**: Google ML Kit
 
 ## Development Rules

@@ -22,6 +22,7 @@ class _CompiledPatterns {
   // ==================== TOTAL GAMES PATTERNS ====================
   static final List<RegExp> totalGames = [
     RegExp(r'(\d+)\s*Partidas?\s*(?:Totales?|Jugadas?)?', caseSensitive: false),
+    RegExp(r'(?:Partidas?\s*(?:Jugadas?|Totales?))\s*[:\s]*([\d,]+)', caseSensitive: false),
     RegExp(r'(?:Total\s*)?Partidas?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Juegos?\s*Jugados?\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'(?:Nº|N°|Num)\s*Partidas?\s*[:\s]*(\d+)', caseSensitive: false),
@@ -32,7 +33,7 @@ class _CompiledPatterns {
 
   // ==================== MVP PATTERNS ====================
   static final List<RegExp> mvp = [
-    RegExp(r'(\d+)\s*MVP', caseSensitive: false),
+    RegExp(r'(\d+)[^\S\n]*MVP', caseSensitive: false),
     RegExp(r'MVP\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'Most\s*Valuable\s*Player\s*[:\s]*(\d+)', caseSensitive: false),
     RegExp(r'M\.?V\.?P\.?\s*[:\s]*(\d+)', caseSensitive: false),

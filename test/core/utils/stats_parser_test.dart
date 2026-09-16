@@ -28,6 +28,9 @@ Daño a Torre/Partida 1200
         final result = StatsParser.parseStats(text, GameMode.total);
         expect(result, isNotNull);
         expect(result!.mode, equals(GameMode.total));
+        expect(result.totalGames, equals(1500));
+        expect(result.mvpCount, equals(320));
+        expect(result.winRate, closeTo(59.29, 0.01));
       });
 
       test('detecta modo Clasificatoria correctamente', () {
@@ -70,7 +73,8 @@ Daño a Torre/Partida 1200
       test('rawMatches tiene claves para campos encontrados', () {
         const text = '59.29 % KDA 4.5';
         final result = StatsParser.parseStatsWithDiagnostics(text, GameMode.total);
-        expect(result.rawMatches, isA<Map<String, dynamic>>());
+        expect(result.rawMatches, contains('Tasa de Victorias'));
+        expect(result.rawMatches['KDA'], equals(4.5));
       });
     });
 
@@ -113,6 +117,24 @@ Daño a Torre/Partida 1200
         const text = 'Partidas Jugadas: 800';
         final result = StatsParser.parseStats(text, GameMode.total);
         expect(result!.totalGames, equals(800));
+      });
+
+      test('extrae partidas totales con dos puntos', () {
+        const text = 'Partidas Totales: 800';
+        final result = StatsParser.parseStats(text, GameMode.total);
+        expect(result!.totalGames, equals(800));
+      });
+
+      test('extrae variante singular y en minúsculas', () {
+        const text = 'partida jugada 800';
+        final result = StatsParser.parseStats(text, GameMode.total);
+        expect(result!.totalGames, equals(800));
+      });
+
+      test('extrae valor con separador de miles', () {
+        const text = 'Partidas Jugadas: 1,500';
+        final result = StatsParser.parseStats(text, GameMode.total);
+        expect(result!.totalGames, equals(1500));
       });
 
       test('retorna 0 si no se encuentran partidas', () {
@@ -299,6 +321,12 @@ Oro Máx./min 1246
         expect(result!.maxDamageDealt, equals(10134));
         expect(result.maxDamageTaken, equals(15555));
         expect(result.maxGold, equals(1246));
+      });
+
+      test('no captura número de línea adyacente sin línea de badge', () {
+        const text = 'Asesinato Doble 1929\nMVP Perdedor 165';
+        final result = StatsParser.parseStats(text, GameMode.total);
+        expect(result!.mvpCount, equals(0));
       });
     });
   });
