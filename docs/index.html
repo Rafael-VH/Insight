@@ -54,11 +54,40 @@
     margin: 0 auto;
     padding: 40px 24px 64px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .section-header {
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 12px;
+  }
+  .section-header .section-index {
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .section-header h2 { font-size: 1.25rem; font-weight: 700; margin-top: 4px; }
+  .section-header p { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+  .section-empty {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-style: italic;
+    padding: 14px 18px;
+    border: 1px dashed var(--panel-border);
+    border-radius: 10px;
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
   }
   .card {
     background: var(--panel);
@@ -143,7 +172,7 @@
 </header>
 <main>
   <div id="grid-wrap">
-    <div id="grid" class="grid"></div>
+    <div id="sections"></div>
     <div id="notice" class="notice" hidden>
       No se pudo cargar <code>diagrams.json</code>. Si abriste este archivo directamente
       (<code>file://</code>), el navegador bloquea la carga del manifiesto. Visita la
@@ -160,7 +189,7 @@
   <code>diagrams.json</code> · <a href="https://github.com/Rafael-VH/Insight">Repositorio</a>
 </footer>
 <script>
-  var gridEl = document.getElementById("grid");
+  var sectionsEl = document.getElementById("sections");
   var gridWrap = document.getElementById("grid-wrap");
   var viewerEl = document.getElementById("viewer");
   var frameEl = document.getElementById("diagram-frame");
@@ -184,37 +213,80 @@
     }
   }
 
-  function render(diagrams) {
-    gridEl.innerHTML = "";
-    diagrams.forEach(function (d) {
-      var card = document.createElement("article");
-      card.className = "card";
-      card.addEventListener("click", function () { openDiagram(d.href); });
+  function buildCard(d) {
+    var card = document.createElement("article");
+    card.className = "card";
+    card.addEventListener("click", function () { openDiagram(d.href); });
 
-      var badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = d.type;
+    var badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = d.type;
+
+    var title = document.createElement("h2");
+    title.textContent = d.title;
+
+    var desc = document.createElement("p");
+    desc.textContent = d.description;
+
+    var footer = document.createElement("footer");
+    var date = document.createElement("span");
+    date.textContent = d.updated;
+    var hint = document.createElement("span");
+    hint.className = "open-hint";
+    hint.textContent = "Abrir diagrama →";
+    footer.appendChild(date);
+    footer.appendChild(hint);
+
+    card.appendChild(badge);
+    card.appendChild(title);
+    card.appendChild(desc);
+    card.appendChild(footer);
+    return card;
+  }
+
+  function render(data) {
+    sectionsEl.innerHTML = "";
+    var bySection = {};
+    data.diagrams.forEach(function (d) {
+      (bySection[d.section] = bySection[d.section] || []).push(d);
+    });
+
+    data.sections.forEach(function (section, idx) {
+      var sectionEl = document.createElement("section");
+      sectionEl.className = "section";
+
+      var header = document.createElement("div");
+      header.className = "section-header";
+
+      var index = document.createElement("div");
+      index.className = "section-index";
+      index.textContent = "Sección " + (idx + 1) + " · " + section.id;
 
       var title = document.createElement("h2");
-      title.textContent = d.title;
+      title.textContent = section.title;
 
       var desc = document.createElement("p");
-      desc.textContent = d.description;
+      desc.textContent = section.description;
 
-      var footer = document.createElement("footer");
-      var date = document.createElement("span");
-      date.textContent = d.updated;
-      var hint = document.createElement("span");
-      hint.className = "open-hint";
-      hint.textContent = "Abrir diagrama →";
-      footer.appendChild(date);
-      footer.appendChild(hint);
+      header.appendChild(index);
+      header.appendChild(title);
+      header.appendChild(desc);
+      sectionEl.appendChild(header);
 
-      card.appendChild(badge);
-      card.appendChild(title);
-      card.appendChild(desc);
-      card.appendChild(footer);
-      gridEl.appendChild(card);
+      var diagrams = bySection[section.id] || [];
+      if (diagrams.length === 0) {
+        var empty = document.createElement("div");
+        empty.className = "section-empty";
+        empty.textContent = "Aún no hay diagramas en esta sección.";
+        sectionEl.appendChild(empty);
+      } else {
+        var grid = document.createElement("div");
+        grid.className = "grid";
+        diagrams.forEach(function (d) { grid.appendChild(buildCard(d)); });
+        sectionEl.appendChild(grid);
+      }
+
+      sectionsEl.appendChild(sectionEl);
     });
   }
 
@@ -228,8 +300,8 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     })
-    .then(function (diagrams) {
-      render(diagrams);
+    .then(function (data) {
+      render(data);
       var fromHash = parseHash();
       if (fromHash) openDiagram(fromHash);
     })

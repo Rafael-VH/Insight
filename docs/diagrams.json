@@ -1,9 +1,44 @@
-[
-  {
-    "title": "Insight · Cómo se relaciona el código",
-    "type": "architecture",
-    "description": "Mapa interactivo de la arquitectura: pipeline OCR (ML Kit), BLoCs, parser MLBB, repositorios y persistencia 100% local con SharedPreferences.",
-    "href": "architecture/insight-arquitectura.html",
-    "updated": "2026-09-16"
-  }
-]
+{
+  "sections": [
+    {
+      "id": "arquitectura",
+      "title": "Arquitectura",
+      "description": "Visión global del sistema, capas, dependencias y decisiones de alto nivel."
+    },
+    {
+      "id": "frontend",
+      "title": "Frontend",
+      "description": "Pantallas, widgets, estado (BLoCs) y flujo de interfaz de usuario."
+    },
+    {
+      "id": "datos",
+      "title": "Datos",
+      "description": "Modelos, repositorios, datasources y persistencia local."
+    },
+    {
+      "id": "ocr-parser",
+      "title": "OCR & Parser",
+      "description": "Pipeline de reconocimiento de texto con ML Kit y parseo de estadísticas MLBB."
+    },
+    {
+      "id": "navegacion",
+      "title": "Navegación",
+      "description": "Rutas, shell de navegación y ciclo de vida de pantallas."
+    },
+    {
+      "id": "configuracion",
+      "title": "Configuración",
+      "description": "Ajustes, temas y preferencias persistidas."
+    }
+  ],
+  "diagrams": [
+    {
+      "title": "Insight · Cómo se relaciona el código",
+      "section": "arquitectura",
+      "type": "architecture",
+      "description": "Mapa interactivo de la arquitectura: pipeline OCR (ML Kit), BLoCs, parser MLBB, repositorios y persistencia 100% local con SharedPreferences.",
+      "href": "architecture/insight-arquitectura.html",
+      "updated": "2026-09-16"
+    }
+  ]
+}
