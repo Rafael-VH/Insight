@@ -39,6 +39,14 @@
       "description": "Mapa interactivo de la arquitectura: pipeline OCR (ML Kit), BLoCs, parser MLBB, repositorios y persistencia 100% local con SharedPreferences.",
       "href": "architecture/insight-arquitectura.html",
       "updated": "2026-09-16"
+    },
+    {
+      "title": "Frontend · Flujo de interacción",
+      "section": "frontend",
+      "type": "workflow",
+      "description": "Flujo de interacción usuario → pantalla → BLoC → estado → widget, y la coordinación multimodo del StatsUploadController con MlbbParser.",
+      "href": "architecture/frontend-interaccion.html",
+      "updated": "2026-09-16"
     }
   ]
 }

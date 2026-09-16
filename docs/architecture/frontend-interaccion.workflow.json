@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Frontend · Flujo de interacción",
+    "quality_profile": "showcase",
+    "viewBox": [1080, 720],
+    "views": [
+      { "id": "evento-a-vista", "label": "Evento a vista", "focus": ["tap", "screen", "bloc", "state", "widget"], "note": "Una interacción viaja del gesto del usuario al redibujado del widget." },
+      { "id": "cambio-modo", "label": "Cambio de modo de juego", "focus": ["screen", "controller", "parser"], "note": "El controller coordina el parseo según el modo de juego." }
+    ]
+  },
+  "lanes": [
+    { "id": "usuario", "label": "Usuario" },
+    { "id": "presentacion", "label": "Presentación" },
+    { "id": "estado", "label": "Estado (BLoC / Controller)" },
+    { "id": "vista", "label": "Vista (widgets)" }
+  ],
+  "mainPath": ["tap", "screen", "bloc", "state", "widget"],
+  "nodes": [
+    { "id": "tap", "lane": "usuario", "col": 0, "type": "external", "label": "Gesto / tap", "sublabel": "acción del usuario" },
+    { "id": "screen", "lane": "presentacion", "col": 1, "type": "frontend", "label": "Screen", "sublabel": "recibe el gesto", "tag": "Widget" },
+    { "id": "bloc", "lane": "estado", "col": 2, "type": "backend", "label": "BLoC.add(event)", "sublabel": "despacha evento", "tag": "flutter_bloc", "width": 110 },
+    { "id": "controller", "lane": "presentacion", "col": 2, "type": "backend", "label": "StatsUploadController", "sublabel": "orquesta modos", "tag": "ChangeNotifier", "width": 156 },
+    { "id": "parser", "lane": "estado", "col": 3, "type": "backend", "label": "MlbbParser", "sublabel": "regex → stats", "tag": "puro" },
+    { "id": "state", "lane": "estado", "col": 4, "type": "security", "label": "emit(state)", "sublabel": "nuevo estado", "tag": "inmutable" },
+    { "id": "widget", "lane": "vista", "col": 5, "type": "frontend", "label": "BlocBuilder", "sublabel": "rebuild widget", "tag": "reactivo" }
+  ],
+  "edges": [
+    { "from": "tap", "to": "screen", "label": "interacción", "variant": "emphasis", "role": "main" },
+    { "from": "screen", "to": "bloc", "label": "add(event)", "role": "main" },
+    { "from": "screen", "to": "controller", "label": "invoca", "role": "branch" },
+    { "from": "controller", "to": "parser", "label": "parse(texto)", "role": "branch" },
+    { "from": "parser", "to": "state", "label": "resultado", "role": "branch" },
+    { "from": "bloc", "to": "state", "variant": "emphasis", "role": "main" },
+    { "from": "state", "to": "widget", "label": "rebuild", "variant": "emphasis", "role": "main" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Flujo principal", "items": [
+      "El gesto llega a la Screen y despacha un evento al BLoC",
+      "El BLoC emite un nuevo estado inmutable",
+      "BlocBuilder reconstruye los widgets afectados"
+    ] },
+    { "dot": "violet", "title": "Coordinación multimodo", "items": [
+      "StatsUploadController orquesta el parseo según el GameMode",
+      "MlbbParser es un servicio puro invocado directamente",
+      "El controller devuelve el resultado al BLoC para emitir estado"
+    ] },
+    { "dot": "emerald", "title": "Patrón reactivo", "items": [
+      "MultiBlocProvider inyecta todos los BLoCs desde main.dart",
+      "Los estados usan Equatable para comparación eficiente",
+      "Cada BLoC se resuelve vía get_it (di.sl)"
+    ] }
+  ]
+}
