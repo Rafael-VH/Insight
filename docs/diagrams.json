@@ -1,0 +1,9 @@
+[
+  {
+    "title": "Insight · Cómo se relaciona el código",
+    "type": "architecture",
+    "description": "Mapa interactivo de la arquitectura: pipeline OCR (ML Kit), BLoCs, parser MLBB, repositorios y persistencia 100% local con SharedPreferences.",
+    "href": "architecture/insight-arquitectura.html",
+    "updated": "2026-09-16"
+  }
+]

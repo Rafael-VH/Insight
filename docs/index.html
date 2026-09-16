@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insight · Diagramas de arquitectura</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #131a2e;
+    --panel-border: #24304d;
+    --text: #e6ebf5;
+    --muted: #8b96ad;
+    --accent: #22d3ee;
+    --accent-soft: rgba(34, 211, 238, 0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  header h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .badge {
+    align-self: flex-start;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .card h2 { font-size: 1.1rem; font-weight: 600; }
+  .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.5; flex: 1; }
+  .card footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .card a:hover { text-decoration: underline; }
+  .notice {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .notice code {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+  }
+  .page-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.78rem;
+    padding: 24px;
+    border-top: 1px solid var(--panel-border);
+  }
+  .page-footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Insight <span>·</span> Diagramas</h1>
+  <p>Diagramas interactivos de la arquitectura del código</p>
+</header>
+<main>
+  <div id="grid" class="grid"></div>
+  <div id="notice" class="notice" hidden>
+    No se pudo cargar <code>diagrams.json</code>. Si abriste este archivo directamente
+    (<code>file://</code>), el navegador bloquea la carga del manifiesto. Visita la
+    página publicada en GitHub Pages o sirve la carpeta <code>docs/</code> con un
+    servidor local, por ejemplo <code>npx serve docs</code>.
+  </div>
+</main>
+<footer class="page-footer">
+  Para agregar un diagrama: genera el HTML dentro de <code>docs/</code> y registra una entrada en
+  <code>diagrams.json</code> · <a href="https://github.com/Rafael-VH/Insight">Repositorio</a>
+</footer>
+<script>
+  fetch("diagrams.json")
+    .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (diagrams) {
+      var grid = document.getElementById("grid");
+      diagrams.forEach(function (d) {
+        var card = document.createElement("article");
+        card.className = "card";
+
+        var badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = d.type;
+
+        var title = document.createElement("h2");
+        title.textContent = d.title;
+
+        var desc = document.createElement("p");
+        desc.textContent = d.description;
+
+        var footer = document.createElement("footer");
+        var date = document.createElement("span");
+        date.textContent = d.updated;
+        var link = document.createElement("a");
+        link.href = d.href;
+        link.textContent = "Abrir diagrama →";
+
+        footer.appendChild(date);
+        footer.appendChild(link);
+        card.appendChild(badge);
+        card.appendChild(title);
+        card.appendChild(desc);
+        card.appendChild(footer);
+        grid.appendChild(card);
+      });
+    })
+    .catch(function () {
+      document.getElementById("notice").hidden = false;
+    });
+</script>
+</body>
+</html>
