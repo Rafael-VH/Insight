@@ -20,10 +20,10 @@ El flujo completo desde la captura hasta el historial tiene cuatro pasos:
 ```text
   1. CAPTURA              2. EXTRACCIÓN             3. VALIDACIÓN             4. HISTORIAL
 ──────────────────    ──────────────────────    ──────────────────────    ──────────────────────
-Tomas una foto o  →   Google ML Kit reconoce →  MLBBValidator clasifica →  La sesión queda
-subes una captura     el texto y MLBBParser      cada campo como crítico     guardada con sus
+Tomas una foto o  →   Google ML Kit reconoce →  StatsValidator clasifica →  La sesión queda
+subes una captura     el texto y StatsParser     cada campo como crítico     guardada con sus
 de tu pantalla de     lo convierte en un         u opcional y calcula un     gráficos listos
-Mobile Legends        objeto PlayerStats          % de completitud           para consultar
+Mobile Legends        objeto PlayerPerformance  % de completitud           para consultar
 ```
 
 ### Dos modos de carga
@@ -76,15 +76,11 @@ Insight extrae y almacena **28 campos** por cada modo de juego escaneado, organi
 
 ### 🔍 Motor de OCR con validación inteligente
 
-El texto extraído por Google ML Kit pasa por `MLBBParser`, un motor de expresiones regulares con múltiples patrones alternativos por campo para tolerar las variaciones que el OCR puede introducir. A continuación, `MLBBValidator` distingue entre campos **críticos** y campos **opcionales**. El resultado es un informe de completitud con porcentaje y recomendaciones específicas.
+El texto extraído por Google ML Kit pasa por `StatsParser`, un motor de expresiones regulares con múltiples patrones alternativos por campo para tolerar las variaciones que el OCR puede introducir. A continuación, `StatsValidator` distingue entre campos **críticos** y campos **opcionales**. El resultado es un informe de completitud con porcentaje y recomendaciones específicas.
 
 ### 🎮 Cuatro modos de juego independientes
 
 Cada sesión guardada puede contener estadísticas de hasta cuatro modos distintos: **Total**, **Clasificatoria**, **Clásica** y **Coliseo**. El parser detecta automáticamente el modo a partir de palabras clave en el texto reconocido.
-
-### 🛡️ Enciclopedia de Héroes
-
-Nueva sección que permite consultar la lista completa de héroes de Mobile Legends, con detalles específicos integrados. Los datos se obtienen de forma remota y se almacenan en caché localmente para un acceso rápido y sin conexión.
 
 ### 📊 Análisis visual por modo de juego
 
@@ -105,7 +101,7 @@ Centraliza operaciones de exportación/importación en formato `.json` y elimina
 
 ### 🎨 Apariencia y Navegación
 
-- **Navigation Drawer**: Menú lateral organizado por secciones (General, Enciclopedia, App) para facilitar el acceso a las 7 destinos actuales.
+- **Navigation Drawer**: Menú lateral organizado por secciones (General, App) para facilitar el acceso a los 3 destinos actuales (Inicio, Historial y Configuración).
 - **Seis temas de color**: Esmeralda, Violeta, Azul Océano, Carmesí, Ámbar y Rosa, con soporte para modo oscuro.
 
 ---
@@ -144,7 +140,7 @@ lib/
 │
 └── features/
     ├── navigation/                     # Gestión de NavigationDrawer y flujo de la app
-    ├── parser/                         # MLBBParser y MLBBValidator (Motor de lógica)
+    ├── parser/                         # StatsParser y StatsValidator (Motor de lógica)
     ├── ocr/                            # Integración con Google ML Kit
     ├── upload/                         # Flujo inicial de carga y procesamiento post-OCR
     ├── history/                        # CRUD de sesiones guardadas y persistencia
