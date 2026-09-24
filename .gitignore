@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# CLI
+.atl/
+.commandcode/
+.engram/
+.opencode/
+
+# Evidencia regenerable de los diagramas (ver docs/diagramas/README.md)
+docs/diagramas/**/*.visual-check.*
