@@ -1,0 +1,10 @@
+{
+  "titulo": "Diagramas · Insight",
+  "descripcion": "Diagramas interactivos del proyecto Insight.",
+  "repoUrl": "https://github.com/Rafael-VH/Insight",
+  "rama": "main",
+  "basePath": "/Insight/",
+  "etiquetaBoton": "",
+  "hrefBoton": "../../index.html",
+  "inyector": ""
+}
