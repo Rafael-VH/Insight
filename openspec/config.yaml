@@ -1,0 +1,44 @@
+schema: spec-driven
+
+context: |
+  Stack: Flutter 3.44.9 / Dart 3.12.2 — app 'insight' (1.0.0+1), fully offline (heroes & Supabase removed).
+  Architecture: feature-first Clean Architecture (domain / data / presentation layers per feature).
+  State/DI: flutter_bloc 9 + get_it (sl); dartz Either for functional results.
+  Testing: flutter_test + bloc_test + mocktail. 187 tests total; 4 pre-existing failures (stats_parser, navigation_bloc, widget smoke test).
+  Style: flutter_lints 6.0.0 (via flutter analyze); dart format; code artifacts in English.
+  Conventions: GEMINI.md at project root; project skill .opencode/skills/insight-architecture.
+
+testing:
+  strict_tdd: true
+  runner: flutter test
+  framework: flutter_test
+  layers:
+    unit: true
+    integration: false
+    e2e: false
+  coverage: flutter test --coverage
+  linter: flutter analyze
+  formatter: dart format
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Follow feature-first Clean Architecture; respect the Dependency Rule (domain has no imports to data/presentation)
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing feature pattern (BLoC + GetIt + dartz)
+    tdd: true
+    test_command: flutter test
+  verify:
+    test_command: flutter test
+    build_command: flutter build
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
