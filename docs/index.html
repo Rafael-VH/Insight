@@ -1,326 +1,565 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Insight · Diagramas de arquitectura</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagramas · Insight</title>
+<meta name="description" content="Diagramas interactivos del proyecto Insight.">
+<meta name="color-scheme" content="light dark">
 <style>
+  *, *::before, *::after { box-sizing: border-box; }
+
   :root {
-    --bg: #0b1020;
-    --panel: #131a2e;
-    --panel-border: #24304d;
-    --text: #e6ebf5;
-    --muted: #8b96ad;
-    --accent: #22d3ee;
-    --accent-soft: rgba(34, 211, 238, 0.12);
+    --fondo: #f4f6f8;
+    --superficie: #ffffff;
+    --superficie-suave: #f8fafc;
+    --borde: #e3e7ec;
+    --texto: #131820;
+    --texto-suave: #5c6674;
+    --acento: #0d6e63;
+    --acento-texto: #ffffff;
+    --acento-suave: #d9f2ee;
+    --sombra: 0 1px 2px rgba(16, 24, 40, .05), 0 2px 6px rgba(16, 24, 40, .06);
+    --radio: 14px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root[data-theme="dark"] {
+    --fondo: #0d1117;
+    --superficie: #161b22;
+    --superficie-suave: #1c232d;
+    --borde: #272e38;
+    --texto: #e6edf5;
+    --texto-suave: #9aa6b4;
+    --acento: #2dd4bf;
+    --acento-texto: #06231f;
+    --acento-suave: #12312e;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .5);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0 clamp(1rem, 4vw, 3rem) 4rem;
+    background: var(--fondo);
+    color: var(--texto);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
-  header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--panel-border);
-    display: flex;
-    align-items: center;
-    gap: 16px;
+
+  .salto { position: absolute; left: -9999px; }
+  .salto:focus {
+    left: 1rem; top: 1rem; padding: .6rem .9rem;
+    background: var(--acento); color: var(--acento-texto);
+    border-radius: 8px; z-index: 10;
   }
-  .back-btn {
-    background: var(--accent-soft);
-    color: var(--accent);
-    border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    gap: 6px;
-  }
-  .back-btn:hover { border-color: var(--accent); }
-  .back-btn.show { display: inline-flex; }
-  header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; flex: 1; }
-  header h1 span { color: var(--accent); }
-  header .subtitle { color: var(--muted); font-size: 0.85rem; }
-  main { flex: 1; display: flex; flex-direction: column; }
-  #grid-wrap {
-    max-width: 1080px;
+
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+  header.encabezado {
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 40px 24px 64px;
+    padding: clamp(1.25rem, 3vw, 2rem) 0 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .marca { display: flex; flex-direction: column; gap: .35rem; }
+
+  .marca h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 3.4vw, 2.1rem);
+    letter-spacing: -.02em;
+  }
+
+  .marca p { margin: 0; color: var(--texto-suave); max-width: 62ch; }
+
+  .acciones-encabezado { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+  main { max-width: 1180px; margin: 0 auto; }
+  @media (min-width: 1000px) {
+    main { display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; align-items: start; }
+    .contenido { display: grid; gap: 1rem; }
+  }
+
+  .controles {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.15rem;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+  }
+  @media (min-width: 1000px) {
+    .controles { position: sticky; top: 1rem; }
+  }
+
+  .campo { display: flex; flex-direction: column; gap: .4rem; }
+
+  .campo label { font-size: .82rem; font-weight: 600; color: var(--texto-suave); }
+
+  .filtros-grupo { display: flex; flex-direction: column; gap: 1rem; }
+
+  .boton-filtros { display: none; }
+
+  @media (max-width: 999.98px) {
+    .boton-filtros { display: inline-flex; align-self: flex-start; }
+    .filtros-grupo { display: none; }
+    .filtros-grupo.abierto { display: flex; }
+  }
+
+  input[type="search"] {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-  }
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .section-header {
-    border-bottom: 1px solid var(--panel-border);
-    padding-bottom: 12px;
-  }
-  .section-header .section-index {
-    color: var(--accent);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .section-header h2 { font-size: 1.25rem; font-weight: 700; margin-top: 4px; }
-  .section-header p { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
-  .section-empty {
-    color: var(--muted);
-    font-size: 0.82rem;
-    font-style: italic;
-    padding: 14px 18px;
-    border: 1px dashed var(--panel-border);
+    padding: .65rem .8rem;
+    font: inherit;
+    color: var(--texto);
+    background: var(--superficie-suave);
+    border: 1px solid var(--borde);
     border-radius: 10px;
   }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 18px;
+  input[type="search"]::placeholder { color: var(--texto-suave); }
+
+  .filtros { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+  .filtros .rotulo { font-size: .82rem; font-weight: 600; color: var(--texto-suave); margin-right: .15rem; }
+
+  .chip {
+    font: inherit;
+    font-size: .86rem;
+    padding: .34rem .75rem;
+    color: var(--texto);
+    background: var(--superficie-suave);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    cursor: pointer;
   }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 22px;
+  .chip:hover { border-color: var(--acento); }
+  .chip[aria-pressed="true"] {
+    background: var(--acento);
+    border-color: var(--acento);
+    color: var(--acento-texto);
+    font-weight: 600;
+  }
+
+  .contador { margin: 1.5rem 0 .85rem; font-size: .88rem; color: var(--texto-suave); }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  }
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .tarjeta {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    cursor: pointer;
-    transition: border-color 0.15s ease, transform 0.15s ease;
+    gap: .7rem;
+    padding: 1.15rem;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
   }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .badge {
-    align-self: flex-start;
-    background: var(--accent-soft);
-    color: var(--accent);
-    font-size: 0.72rem;
-    font-weight: 600;
+
+  .tarjeta-fila { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+
+  .insignia {
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .04em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 4px 10px;
+    padding: .25rem .55rem;
     border-radius: 999px;
+    border: 1px solid transparent;
   }
-  .card h2 { font-size: 1.1rem; font-weight: 600; }
-  .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.5; flex: 1; }
-  .card .open-hint {
-    color: var(--accent);
-    font-size: 0.8rem;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.15s ease;
+  .insignia[data-tipo="architecture"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+  .insignia[data-tipo="workflow"]     { background: #ede9fe; color: #4c1d95; border-color: #ddd6fe; }
+  .insignia[data-tipo="sequence"]     { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .insignia[data-tipo="dataflow"]     { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+  .insignia[data-tipo="lifecycle"]    { background: #fce7f3; color: #9d174d; border-color: #fbcfe8; }
+
+  :root[data-theme="dark"] .insignia {
+    background: var(--acento-suave);
+    color: var(--acento);
+    border-color: var(--borde);
   }
-  .card:hover .open-hint { opacity: 1; }
-  #viewer {
-    flex: 1;
-    display: none;
-    flex-direction: column;
-  }
-  #viewer.show { display: flex; }
-  #viewer iframe {
-    flex: 1;
-    border: none;
-    width: 100%;
-    background: #fff;
-  }
-  #grid-wrap.hidden { display: none; }
-  .notice {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 24px;
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    max-width: 1080px;
-    margin: 40px auto 0;
-    width: 100%;
-  }
-  .notice code {
-    background: var(--accent-soft);
-    color: var(--accent);
-    padding: 2px 6px;
+
+  .fecha { font-size: .8rem; color: var(--texto-suave); }
+
+  .tarjeta h2 { margin: 0; font-size: 1.08rem; line-height: 1.35; }
+  .tarjeta h2 a { color: inherit; text-decoration: none; }
+  .tarjeta h2 a:hover { text-decoration: underline; }
+
+  .descripcion { margin: 0; color: var(--texto-suave); font-size: .92rem; }
+
+  .etiquetas { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+  .etiquetas li {
+    font-size: .76rem;
+    color: var(--texto-suave);
+    background: var(--superficie-suave);
+    border: 1px solid var(--borde);
     border-radius: 6px;
-    font-size: 0.82rem;
+    padding: .12rem .45rem;
   }
-  .page-footer {
+
+  .metricas { margin: 0; font-size: .8rem; color: var(--texto-suave); }
+
+  .acciones { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: auto; padding-top: .3rem; }
+
+  .boton {
+    font: inherit;
+    font-size: .88rem;
+    font-weight: 600;
+    padding: .5rem .9rem;
+    border-radius: 9px;
+    border: 1px solid var(--borde);
+    background: var(--superficie-suave);
+    color: var(--texto);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .boton:hover { border-color: var(--acento); }
+  .boton--principal { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
+  .boton--principal:hover { filter: brightness(1.08); }
+  .boton--sutil { font-size: .84rem; padding: .4rem .7rem; font-weight: 500; }
+
+  .vacio {
+    margin: 2rem 0 0;
+    padding: 2.5rem 1rem;
     text-align: center;
-    color: var(--muted);
-    font-size: 0.78rem;
-    padding: 24px;
-    border-top: 1px solid var(--panel-border);
+    color: var(--texto-suave);
+    background: var(--superficie);
+    border: 1px dashed var(--borde);
+    border-radius: var(--radio);
   }
-  .page-footer a { color: var(--accent); text-decoration: none; }
+
+  footer.pie {
+    max-width: 1180px;
+    margin: 3rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--borde);
+    font-size: .84rem;
+    color: var(--texto-suave);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.25rem;
+    justify-content: space-between;
+  }
+  footer.pie a { color: var(--texto-suave); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tarjeta { transition: box-shadow .15s ease, transform .15s ease; }
+    .tarjeta:hover { transform: translateY(-2px); }
+  }
 </style>
 </head>
 <body>
-<header>
-  <button id="back-btn" class="back-btn" title="Volver al dashboard">← Dashboard</button>
-  <h1>Insight <span>·</span> Diagramas</h1>
-  <span class="subtitle">Diagramas interactivos de la arquitectura del código</span>
-</header>
-<main>
-  <div id="grid-wrap">
-    <div id="sections"></div>
-    <div id="notice" class="notice" hidden>
-      No se pudo cargar <code>diagrams.json</code>. Si abriste este archivo directamente
-      (<code>file://</code>), el navegador bloquea la carga del manifiesto. Visita la
-      página publicada en GitHub Pages o sirve la carpeta <code>docs/</code> con un
-      servidor local, por ejemplo <code>npx serve docs</code>.
-    </div>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<header class="encabezado">
+  <div class="marca">
+    <h1>Diagramas · Insight</h1>
+    <p>Diagramas interactivos del proyecto. Se irán agregando más con el tiempo.</p>
   </div>
-  <div id="viewer">
-    <iframe id="diagram-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" title="Diagrama"></iframe>
+  <div class="acciones-encabezado">
+    <a class="boton boton--sutil" href="https://github.com/Rafael-VH/Insight">Repositorio</a>
+    <a class="boton boton--sutil" href="https://github.com/Rafael-VH/Insight/blob/main/README.md">README</a>
+    <button class="boton boton--sutil" type="button" id="boton-tema" aria-label="Cambiar tema">Modo oscuro</button>
+  </div>
+</header>
+
+<main id="contenido">
+  <section class="controles" aria-label="Filtros">
+    <div class="campo">
+      <label for="busqueda">Buscar</label>
+      <input type="search" id="busqueda" placeholder="Título, descripción, etiqueta…" autocomplete="off">
+    </div>
+    <button class="boton boton--sutil boton-filtros" type="button" id="boton-filtros"
+      aria-expanded="false" aria-controls="filtros-grupo">Filtros</button>
+    <div class="filtros-grupo" id="filtros-grupo">
+      <div class="filtros" id="filtros-tipo" role="group" aria-label="Filtrar por tipo"></div>
+      <div class="filtros" id="filtros-etiqueta" role="group" aria-label="Filtrar por etiqueta"></div>
+    </div>
+  </section>
+
+  <div class="contenido">
+    <p class="contador" id="contador" aria-live="polite"></p>
+
+    <ul class="grid" id="grid"></ul>
+
+    <p class="vacio" id="vacio" hidden>Ningún diagrama coincide con los filtros elegidos.</p>
+
+    <noscript>
+      <p class="vacio">Este dashboard necesita JavaScript para listar los diagramas. La
+      especificación de cada uno sigue siendo accesible desde <code>docs/diagramas/</code>.</p>
+    </noscript>
   </div>
 </main>
-<footer class="page-footer">
-  Para agregar un diagrama: genera el HTML dentro de <code>docs/</code> y añade una entrada en
-  <code>diagrams.json</code> · <a href="https://github.com/Rafael-VH/Insight">Repositorio</a>
+
+<footer class="pie">
+  <span>Generado por <code>tools/build-diagrams.mjs</code>.</span>
+  <span><a href="https://github.com/Rafael-VH/Insight">Rafael-VH/Insight</a></span>
 </footer>
+
+<script id="datos" type="application/json">{"total":2,"diagramas":[{"slug":"frontend-interaccion","titulo":"Frontend · Flujo de interacción","tipo":"workflow","tipoTexto":"Proceso","descripcion":"","etiquetas":[],"destacado":false,"nodos":7,"relaciones":7,"capitulos":2,"actualizado":"2026-09-24","archivo":"diagramas/frontend-interaccion/index.html","especificacion":"diagramas/frontend-interaccion/frontend-interaccion.json"},{"slug":"insight-arquitectura","titulo":"Insight · Cómo se relaciona el código","tipo":"architecture","tipoTexto":"Arquitectura","descripcion":"","etiquetas":[],"destacado":false,"nodos":12,"relaciones":11,"capitulos":3,"actualizado":"2026-09-24","archivo":"diagramas/insight-arquitectura/index.html","especificacion":"diagramas/insight-arquitectura/insight-arquitectura.json"}]}</script>
 <script>
-  var sectionsEl = document.getElementById("sections");
-  var gridWrap = document.getElementById("grid-wrap");
-  var viewerEl = document.getElementById("viewer");
-  var frameEl = document.getElementById("diagram-frame");
-  var backBtn = document.getElementById("back-btn");
-  var noticeEl = document.getElementById("notice");
+(function () {
+  "use strict";
 
-  function showDashboard() {
-    viewerEl.classList.remove("show");
-    gridWrap.classList.remove("hidden");
-    backBtn.classList.remove("show");
-    frameEl.removeAttribute("src");
+  var datos = JSON.parse(document.getElementById("datos").textContent);
+  var diagramas = datos.diagramas || [];
+
+  var estado = { texto: "", tipo: "todos", etiqueta: null };
+
+  var $grid = document.getElementById("grid");
+  var $contador = document.getElementById("contador");
+  var $vacio = document.getElementById("vacio");
+  var $busqueda = document.getElementById("busqueda");
+  var $tipos = document.getElementById("filtros-tipo");
+  var $etiquetas = document.getElementById("filtros-etiqueta");
+  var $botonTema = document.getElementById("boton-tema");
+  var $botonFiltros = document.getElementById("boton-filtros");
+  var $grupoFiltros = document.getElementById("filtros-grupo");
+
+  /* ---------- tema ---------- */
+
+  var CLAVE_TEMA = "diagramas-tema";
+  var media = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function leerTemaGuardado() {
+    try { return localStorage.getItem(CLAVE_TEMA); } catch (e) { return null; }
   }
 
-  function openDiagram(href) {
-    frameEl.src = href;
-    gridWrap.classList.add("hidden");
-    viewerEl.classList.add("show");
-    backBtn.classList.add("show");
-    if (location.hash !== "#diagram=" + encodeURIComponent(href)) {
-      history.pushState({ diagram: href }, "", "#diagram=" + encodeURIComponent(href));
+  function guardarTema(valor) {
+    try { localStorage.setItem(CLAVE_TEMA, valor); } catch (e) { /* modo privado */ }
+  }
+
+  function aplicarTema() {
+    var guardado = leerTemaGuardado();
+    var oscuro = guardado ? guardado === "dark" : media.matches;
+    document.documentElement.setAttribute("data-theme", oscuro ? "dark" : "light");
+    $botonTema.textContent = oscuro ? "Modo claro" : "Modo oscuro";
+  }
+
+  aplicarTema();
+  media.addEventListener("change", function () {
+    if (!leerTemaGuardado()) aplicarTema();
+  });
+
+  $botonTema.addEventListener("click", function () {
+    var oscuro = document.documentElement.getAttribute("data-theme") === "dark";
+    guardarTema(oscuro ? "light" : "dark");
+    aplicarTema();
+  });
+
+  $botonFiltros.addEventListener("click", function () {
+    var abierto = $grupoFiltros.classList.toggle("abierto");
+    $botonFiltros.setAttribute("aria-expanded", abierto ? "true" : "false");
+  });
+
+  /* ---------- formato ---------- */
+
+  function formatearFecha(iso) {
+    var partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!partes) return iso || "";
+    var fecha = new Date(Number(partes[1]), Number(partes[2]) - 1, Number(partes[3]));
+    try {
+      return new Intl.DateTimeFormat("es", { day: "numeric", month: "short", year: "numeric" }).format(fecha);
+    } catch (e) {
+      return iso;
     }
   }
 
-  function buildCard(d) {
-    var card = document.createElement("article");
-    card.className = "card";
-    card.addEventListener("click", function () { openDiagram(d.href); });
-
-    var badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = d.type;
-
-    var title = document.createElement("h2");
-    title.textContent = d.title;
-
-    var desc = document.createElement("p");
-    desc.textContent = d.description;
-
-    var footer = document.createElement("footer");
-    var date = document.createElement("span");
-    date.textContent = d.updated;
-    var hint = document.createElement("span");
-    hint.className = "open-hint";
-    hint.textContent = "Abrir diagrama →";
-    footer.appendChild(date);
-    footer.appendChild(hint);
-
-    card.appendChild(badge);
-    card.appendChild(title);
-    card.appendChild(desc);
-    card.appendChild(footer);
-    return card;
+  function plural(cantidad, singular) {
+    return cantidad + " " + singular + (cantidad === 1 ? "" : "s");
   }
 
-  function render(data) {
-    sectionsEl.innerHTML = "";
-    var bySection = {};
-    data.diagrams.forEach(function (d) {
-      (bySection[d.section] = bySection[d.section] || []).push(d);
-    });
-
-    data.sections.forEach(function (section, idx) {
-      var sectionEl = document.createElement("section");
-      sectionEl.className = "section";
-
-      var header = document.createElement("div");
-      header.className = "section-header";
-
-      var index = document.createElement("div");
-      index.className = "section-index";
-      index.textContent = "Sección " + (idx + 1) + " · " + section.id;
-
-      var title = document.createElement("h2");
-      title.textContent = section.title;
-
-      var desc = document.createElement("p");
-      desc.textContent = section.description;
-
-      header.appendChild(index);
-      header.appendChild(title);
-      header.appendChild(desc);
-      sectionEl.appendChild(header);
-
-      var diagrams = bySection[section.id] || [];
-      if (diagrams.length === 0) {
-        var empty = document.createElement("div");
-        empty.className = "section-empty";
-        empty.textContent = "Aún no hay diagramas en esta sección.";
-        sectionEl.appendChild(empty);
-      } else {
-        var grid = document.createElement("div");
-        grid.className = "grid";
-        diagrams.forEach(function (d) { grid.appendChild(buildCard(d)); });
-        sectionEl.appendChild(grid);
-      }
-
-      sectionsEl.appendChild(sectionEl);
-    });
-  }
-
-  function parseHash() {
-    var m = location.hash.match(/^#diagram=(.+)$/);
-    return m ? decodeURIComponent(m[1]) : null;
-  }
-
-  fetch("diagrams.json")
-    .then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      render(data);
-      var fromHash = parseHash();
-      if (fromHash) openDiagram(fromHash);
-    })
-    .catch(function () {
-      noticeEl.hidden = false;
-    });
-
-  backBtn.addEventListener("click", function () {
-    if (location.hash) history.pushState({}, "", location.pathname + location.search);
-    showDashboard();
-  });
-
-  window.addEventListener("popstate", function () {
-    if (parseHash()) {
-      openDiagram(parseHash());
-    } else {
-      showDashboard();
+  function textoTipo(tipo) {
+    for (var i = 0; i < diagramas.length; i++) {
+      if (diagramas[i].tipo === tipo) return diagramas[i].tipoTexto || tipo;
     }
+    return tipo;
+  }
+
+  /* ---------- chips ---------- */
+
+  function crearChip(etiqueta, activo, alPulsar) {
+    var boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "chip";
+    boton.textContent = etiqueta;
+    boton.setAttribute("aria-pressed", activo ? "true" : "false");
+    boton.addEventListener("click", alPulsar);
+    return boton;
+  }
+
+  function pintarFiltros() {
+    var tipos = [];
+    var etiquetas = [];
+    diagramas.forEach(function (diagrama) {
+      if (tipos.indexOf(diagrama.tipo) === -1) tipos.push(diagrama.tipo);
+      (diagrama.etiquetas || []).forEach(function (etiqueta) {
+        if (etiquetas.indexOf(etiqueta) === -1) etiquetas.push(etiqueta);
+      });
+    });
+    tipos.sort();
+    etiquetas.sort(function (a, b) { return a.localeCompare(b, "es"); });
+
+    $tipos.textContent = "";
+    var rotuloTipos = document.createElement("span");
+    rotuloTipos.className = "rotulo";
+    rotuloTipos.textContent = "Tipo:";
+    $tipos.appendChild(rotuloTipos);
+    $tipos.appendChild(crearChip("Todos", estado.tipo === "todos", function () {
+      estado.tipo = "todos";
+      pintarFiltros();
+      pintar();
+    }));
+    tipos.forEach(function (tipo) {
+      $tipos.appendChild(crearChip(textoTipo(tipo), estado.tipo === tipo, function () {
+        estado.tipo = tipo;
+        pintarFiltros();
+        pintar();
+      }));
+    });
+
+    $etiquetas.textContent = "";
+    if (etiquetas.length === 0) return;
+    var rotuloEtiquetas = document.createElement("span");
+    rotuloEtiquetas.className = "rotulo";
+    rotuloEtiquetas.textContent = "Etiqueta:";
+    $etiquetas.appendChild(rotuloEtiquetas);
+    etiquetas.forEach(function (etiqueta) {
+      $etiquetas.appendChild(crearChip(etiqueta, estado.etiqueta === etiqueta, function () {
+        estado.etiqueta = estado.etiqueta === etiqueta ? null : etiqueta;
+        pintarFiltros();
+        pintar();
+      }));
+    });
+  }
+
+  /* ---------- tarjetas ---------- */
+
+  function coincide(diagrama) {
+    if (estado.tipo !== "todos" && diagrama.tipo !== estado.tipo) return false;
+    if (estado.etiqueta && (diagrama.etiquetas || []).indexOf(estado.etiqueta) === -1) return false;
+    if (!estado.texto) return true;
+    var texto = [
+      diagrama.titulo,
+      diagrama.descripcion,
+      textoTipo(diagrama.tipo),
+      (diagrama.etiquetas || []).join(" ")
+    ].join(" ").toLowerCase();
+    return texto.indexOf(estado.texto) !== -1;
+  }
+
+  function crearTarjeta(diagrama) {
+    var tarjeta = document.createElement("li");
+    tarjeta.className = "tarjeta";
+
+    var fila = document.createElement("div");
+    fila.className = "tarjeta-fila";
+
+    var insignia = document.createElement("span");
+    insignia.className = "insignia";
+    insignia.setAttribute("data-tipo", diagrama.tipo);
+    insignia.textContent = textoTipo(diagrama.tipo);
+    fila.appendChild(insignia);
+
+    var fecha = document.createElement("time");
+    fecha.className = "fecha";
+    fecha.dateTime = diagrama.actualizado;
+    fecha.textContent = formatearFecha(diagrama.actualizado);
+    fila.appendChild(fecha);
+    tarjeta.appendChild(fila);
+
+    var titulo = document.createElement("h2");
+    var enlace = document.createElement("a");
+    enlace.href = diagrama.archivo;
+    enlace.textContent = diagrama.titulo;
+    titulo.appendChild(enlace);
+    tarjeta.appendChild(titulo);
+
+    if (diagrama.descripcion) {
+      var descripcion = document.createElement("p");
+      descripcion.className = "descripcion";
+      descripcion.textContent = diagrama.descripcion;
+      tarjeta.appendChild(descripcion);
+    }
+
+    if ((diagrama.etiquetas || []).length > 0) {
+      var lista = document.createElement("ul");
+      lista.className = "etiquetas";
+      diagrama.etiquetas.forEach(function (etiqueta) {
+        var elemento = document.createElement("li");
+        elemento.textContent = etiqueta;
+        lista.appendChild(elemento);
+      });
+      tarjeta.appendChild(lista);
+    }
+
+    var metricas = document.createElement("p");
+    metricas.className = "metricas";
+    var partes = [plural(diagrama.nodos, "nodo"), plural(diagrama.relaciones, "relación")];
+    if (diagrama.capitulos > 0) partes.push(plural(diagrama.capitulos, "capítulo"));
+    metricas.textContent = partes.join(" · ");
+    tarjeta.appendChild(metricas);
+
+    var acciones = document.createElement("div");
+    acciones.className = "acciones";
+
+    var abrir = document.createElement("a");
+    abrir.className = "boton boton--principal";
+    abrir.href = diagrama.archivo;
+    abrir.textContent = "Abrir diagrama";
+    acciones.appendChild(abrir);
+
+    var spec = document.createElement("a");
+    spec.className = "boton";
+    spec.href = diagrama.especificacion;
+    spec.target = "_blank";
+    spec.rel = "noopener";
+    spec.textContent = "Especificación";
+    acciones.appendChild(spec);
+
+    tarjeta.appendChild(acciones);
+    return tarjeta;
+  }
+
+  function pintar() {
+    var visibles = diagramas.filter(coincide);
+    $grid.textContent = "";
+    visibles.forEach(function (diagrama) {
+      $grid.appendChild(crearTarjeta(diagrama));
+    });
+    $vacio.hidden = visibles.length > 0;
+    $contador.textContent = visibles.length === diagramas.length
+      ? plural(diagramas.length, "diagrama")
+      : plural(visibles.length, "diagrama") + " de " + diagramas.length;
+
+    var activos = 0;
+    if (estado.tipo !== "todos") activos++;
+    if (estado.etiqueta) activos++;
+    $botonFiltros.textContent = activos > 0 ? "Filtros (" + activos + ")" : "Filtros";
+  }
+
+  $busqueda.addEventListener("input", function () {
+    estado.texto = $busqueda.value.trim().toLowerCase();
+    pintar();
   });
+
+  pintarFiltros();
+  pintar();
+})();
 </script>
 </body>
 </html>
