@@ -310,7 +310,7 @@
   <span><a href="https://github.com/Rafael-VH/Insight">Rafael-VH/Insight</a></span>
 </footer>
 
-<script id="datos" type="application/json">{"total":3,"diagramas":[{"slug":"insight-clean-architecture","titulo":"Insight · Arquitectura limpia","tipo":"architecture","tipoTexto":"Arquitectura","descripcion":"","etiquetas":[],"destacado":false,"nodos":12,"relaciones":10,"capitulos":3,"actualizado":"2026-09-26","archivo":"diagramas/insight-clean-architecture/index.html","especificacion":"diagramas/insight-clean-architecture/insight-clean-architecture.json"},{"slug":"frontend-interaccion","titulo":"Frontend · Flujo de interacción","tipo":"workflow","tipoTexto":"Proceso","descripcion":"","etiquetas":[],"destacado":false,"nodos":7,"relaciones":7,"capitulos":2,"actualizado":"2026-09-24","archivo":"diagramas/frontend-interaccion/index.html","especificacion":"diagramas/frontend-interaccion/frontend-interaccion.json"},{"slug":"insight-arquitectura","titulo":"Insight · Cómo se relaciona el código","tipo":"architecture","tipoTexto":"Arquitectura","descripcion":"","etiquetas":[],"destacado":false,"nodos":12,"relaciones":11,"capitulos":3,"actualizado":"2026-09-24","archivo":"diagramas/insight-arquitectura/index.html","especificacion":"diagramas/insight-arquitectura/insight-arquitectura.json"}]}</script>
+<script id="datos" type="application/json">{"total":3,"diagramas":[{"slug":"insight-clean-architecture","titulo":"Insight · Arquitectura limpia","tipo":"architecture","tipoTexto":"Arquitectura","descripcion":"Clean Architecture del proyecto: presentación, dominio y datos, con la regla de dependencia apuntando al centro.","etiquetas":["clean architecture","dominio","flutter"],"destacado":false,"nodos":12,"relaciones":10,"capitulos":3,"actualizado":"2026-09-26","archivo":"diagramas/insight-clean-architecture/index.html","especificacion":"diagramas/insight-clean-architecture/insight-clean-architecture.json"},{"slug":"frontend-interaccion","titulo":"Frontend · Flujo de interacción","tipo":"workflow","tipoTexto":"Proceso","descripcion":"Cómo viaja una interacción del gesto del usuario al redibujado del widget, por BLoCs y controllers.","etiquetas":["flutter","bloc","interacción"],"destacado":false,"nodos":7,"relaciones":7,"capitulos":2,"actualizado":"2026-09-24","archivo":"diagramas/frontend-interaccion/index.html","especificacion":"diagramas/frontend-interaccion/frontend-interaccion.json"},{"slug":"insight-arquitectura","titulo":"Insight · Cómo se relaciona el código","tipo":"architecture","tipoTexto":"Arquitectura","descripcion":"Cómo se relaciona el código del proyecto: OCR, historial, ajustes y persistencia con SharedPreferences.","etiquetas":["flutter","arquitectura"],"destacado":false,"nodos":12,"relaciones":11,"capitulos":3,"actualizado":"2026-09-24","archivo":"diagramas/insight-arquitectura/index.html","especificacion":"diagramas/insight-arquitectura/insight-arquitectura.json"}]}</script>
 <script>
 (function () {
   "use strict";
@@ -379,8 +379,8 @@
     }
   }
 
-  function plural(cantidad, singular) {
-    return cantidad + " " + singular + (cantidad === 1 ? "" : "s");
+  function plural(cantidad, singular, plural) {
+    return cantidad + " " + (cantidad === 1 ? singular : (plural || singular + "s"));
   }
 
   function textoTipo(tipo) {
@@ -509,7 +509,7 @@
 
     var metricas = document.createElement("p");
     metricas.className = "metricas";
-    var partes = [plural(diagrama.nodos, "nodo"), plural(diagrama.relaciones, "relación")];
+    var partes = [plural(diagrama.nodos, "nodo"), plural(diagrama.relaciones, "relación", "relaciones")];
     if (diagrama.capitulos > 0) partes.push(plural(diagrama.capitulos, "capítulo"));
     metricas.textContent = partes.join(" · ");
     tarjeta.appendChild(metricas);

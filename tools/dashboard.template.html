@@ -379,8 +379,8 @@
     }
   }
 
-  function plural(cantidad, singular) {
-    return cantidad + " " + singular + (cantidad === 1 ? "" : "s");
+  function plural(cantidad, singular, plural) {
+    return cantidad + " " + (cantidad === 1 ? singular : (plural || singular + "s"));
   }
 
   function textoTipo(tipo) {
@@ -509,7 +509,7 @@
 
     var metricas = document.createElement("p");
     metricas.className = "metricas";
-    var partes = [plural(diagrama.nodos, "nodo"), plural(diagrama.relaciones, "relación")];
+    var partes = [plural(diagrama.nodos, "nodo"), plural(diagrama.relaciones, "relación", "relaciones")];
     if (diagrama.capitulos > 0) partes.push(plural(diagrama.capitulos, "capítulo"));
     metricas.textContent = partes.join(" · ");
     tarjeta.appendChild(metricas);

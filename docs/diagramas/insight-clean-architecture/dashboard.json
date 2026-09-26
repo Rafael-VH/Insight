@@ -1,0 +1,4 @@
+{
+  "descripcion": "Clean Architecture del proyecto: presentación, dominio y datos, con la regla de dependencia apuntando al centro.",
+  "etiquetas": ["clean architecture", "dominio", "flutter"]
+}

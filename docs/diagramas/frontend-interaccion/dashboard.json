@@ -1,0 +1,4 @@
+{
+  "descripcion": "Cómo viaja una interacción del gesto del usuario al redibujado del widget, por BLoCs y controllers.",
+  "etiquetas": ["flutter", "bloc", "interacción"]
+}

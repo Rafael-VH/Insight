@@ -7,8 +7,12 @@
       "titulo": "Insight · Arquitectura limpia",
       "tipo": "architecture",
       "tipoTexto": "Arquitectura",
-      "descripcion": "",
-      "etiquetas": [],
+      "descripcion": "Clean Architecture del proyecto: presentación, dominio y datos, con la regla de dependencia apuntando al centro.",
+      "etiquetas": [
+        "clean architecture",
+        "dominio",
+        "flutter"
+      ],
       "destacado": false,
       "nodos": 12,
       "relaciones": 10,
@@ -22,8 +26,12 @@
       "titulo": "Frontend · Flujo de interacción",
       "tipo": "workflow",
       "tipoTexto": "Proceso",
-      "descripcion": "",
-      "etiquetas": [],
+      "descripcion": "Cómo viaja una interacción del gesto del usuario al redibujado del widget, por BLoCs y controllers.",
+      "etiquetas": [
+        "flutter",
+        "bloc",
+        "interacción"
+      ],
       "destacado": false,
       "nodos": 7,
       "relaciones": 7,
@@ -37,8 +45,11 @@
       "titulo": "Insight · Cómo se relaciona el código",
       "tipo": "architecture",
       "tipoTexto": "Arquitectura",
-      "descripcion": "",
-      "etiquetas": [],
+      "descripcion": "Cómo se relaciona el código del proyecto: OCR, historial, ajustes y persistencia con SharedPreferences.",
+      "etiquetas": [
+        "flutter",
+        "arquitectura"
+      ],
       "destacado": false,
       "nodos": 12,
       "relaciones": 11,
