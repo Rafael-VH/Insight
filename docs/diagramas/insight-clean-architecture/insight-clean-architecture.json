@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Insight · Arquitectura limpia",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Rafael-VH/Insight.git",
+      "provider": "github",
+      "revision": "61da8fe1342ad69ffc264917808452e99785cb84"
+    },
+    "views": [
+      { "id": "regla-dependencia", "label": "Regla de dependencia", "focus": ["entities", "usecases", "repositories", "repositoriesimpl", "datasources"], "note": "Las flechas apuntan al dominio: el código depende de abstracciones, no de implementaciones." },
+      { "id": "flujo-principal", "label": "Flujo principal", "focus": ["uikit", "blocs", "usecases", "repositories", "repositoriesimpl", "datasources", "sharedprefs"], "note": "UI → BLoC → caso de uso → contrato → implementación → almacenamiento." },
+      { "id": "pipeline-ocr", "label": "Pipeline OCR", "focus": ["uikit", "blocs", "usecases", "repositoriesimpl", "mlkit"], "note": "El reconocimiento con Google ML Kit entra por el datasource y sube como entidad del dominio." }
+    ]
+  },
+  "components": [
+    { "id": "uikit", "type": "frontend", "label": "Screens & Widgets", "sublabel": "UI por feature", "pos": [60, 60], "size": [150, 56], "sources": [{ "path": "lib/features/history/presentation/screens/history_screen.dart" }] },
+    { "id": "blocs", "type": "frontend", "label": "BLoCs & Controllers", "sublabel": "flutter_bloc · estado", "pos": [60, 150], "size": [150, 56], "sources": [{ "path": "lib/features/history/presentation/bloc/history_bloc.dart" }, { "path": "lib/features/upload/presentation/controllers/upload_controller.dart" }] },
+    { "id": "repositories", "type": "backend", "label": "Repository Ports", "sublabel": "contratos abstractos", "pos": [400, 60], "size": [150, 56], "sources": [{ "path": "lib/features/history/domain/repositories/history_repository.dart" }, { "path": "lib/features/ocr/domain/repositories/ocr_repository.dart" }] },
+    { "id": "usecases", "type": "backend", "label": "Use Cases", "sublabel": "reglas de aplicación", "pos": [400, 150], "size": [150, 56], "sources": [{ "path": "lib/features/history/domain/usecases/get_all_stats_collections.dart" }, { "path": "lib/core/usecases/base_usecase.dart" }] },
+    { "id": "entities", "type": "backend", "label": "Entities", "sublabel": "modelo de negocio inmutable", "pos": [400, 240], "size": [150, 56], "sources": [{ "path": "lib/features/history/domain/entities/game_session.dart" }, { "path": "lib/features/ocr/domain/entities/ocr_result.dart" }] },
+    { "id": "core", "type": "backend", "label": "Core compartido", "sublabel": "errores tipados + GetIt", "pos": [400, 330], "size": [150, 56], "sources": [{ "path": "lib/core/errors/app_failures.dart" }, { "path": "lib/core/injection/injection_container.dart" }] },
+    { "id": "repositoriesimpl", "type": "backend", "label": "Repository Impl", "sublabel": "implementan contratos", "pos": [740, 60], "size": [150, 56], "sources": [{ "path": "lib/features/history/data/repositories/history_repository_impl.dart" }, { "path": "lib/features/ocr/data/repositories/ocr_repository_impl.dart" }] },
+    { "id": "datasources", "type": "backend", "label": "Data Sources", "sublabel": "persistencia / OCR", "pos": [740, 150], "size": [150, 56], "sources": [{ "path": "lib/features/upload/data/datasources/local_storage_datasource.dart" }, { "path": "lib/features/upload/data/datasources/json_export_datasource.dart" }, { "path": "lib/features/ocr/data/datasources/ocr_datasource.dart" }] },
+    { "id": "datamodels", "type": "backend", "label": "Models", "sublabel": "DTO ↔ entidad", "pos": [740, 240], "size": [150, 56], "sources": [{ "path": "lib/features/upload/data/model/game_session_model.dart" }, { "path": "lib/features/ocr/data/models/ocr_result_model.dart" }] },
+    { "id": "sharedprefs", "type": "database", "label": "SharedPreferences", "sublabel": "sesiones + ajustes", "pos": [1080, 60], "size": [150, 56] },
+    { "id": "mlkit", "type": "external", "label": "Google ML Kit", "sublabel": "reconocimiento OCR", "pos": [1080, 150], "size": [150, 56] },
+    { "id": "jsonio", "type": "external", "label": "JSON Export / Import", "sublabel": "respaldos de usuario", "pos": [1080, 240], "size": [160, 56] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Presentación", "wraps": ["uikit", "blocs"] },
+    { "kind": "region", "label": "Dominio · Dart puro", "wraps": ["entities", "usecases", "repositories", "core"] },
+    { "kind": "region", "label": "Datos", "wraps": ["repositoriesimpl", "datamodels", "datasources"] },
+    { "kind": "region", "label": "Frameworks & Drivers", "wraps": ["sharedprefs", "mlkit", "jsonio"] }
+  ],
+  "connections": [
+    { "id": "ui-to-bloc", "from": "uikit", "to": "blocs", "label": "eventos / estado", "labelAt": [135, 130] },
+    { "id": "bloc-to-usecase", "from": "blocs", "to": "usecases", "label": "invoca caso de uso" },
+    { "id": "usecase-to-port", "from": "usecases", "to": "repositories", "label": "usa contrato" },
+    { "id": "usecase-to-entity", "from": "usecases", "to": "entities", "label": "opera entidades", "labelAt": [475, 222] },
+    { "id": "impl-to-port", "from": "repositoriesimpl", "to": "repositories", "label": "implementa", "variant": "dashed" },
+    { "id": "impl-to-source", "from": "repositoriesimpl", "to": "datasources", "label": "persiste / lee", "labelAt": [760, 130] },
+    { "id": "model-to-entity", "from": "datamodels", "to": "entities", "label": "convierte a entidad" },
+    { "id": "source-to-prefs", "from": "datasources", "to": "sharedprefs", "label": "SharedPreferences", "fromSide": "top", "labelAt": [961, 130] },
+    { "id": "source-to-mlkit", "from": "datasources", "to": "mlkit", "label": "TextoRecognition" },
+    { "id": "source-to-json", "from": "datasources", "to": "jsonio", "label": "JSON", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Regla de dependencia", "items": ["El dominio es Dart puro: sin Flutter, sin data.", "Data implementa los contratos del dominio.", "La presentación solo conoce casos de uso."] },
+    { "dot": "cyan", "title": "Feature-first", "items": ["7 features: history, insights, navigation, ocr, parser, settings, upload.", "Cada feature define domain / data / presentation.", "Barrel files exportan cada feature."] },
+    { "dot": "amber", "title": "Inyección y errores", "items": ["GetIt registra dependencias por feature en core/injection/.", "Errores tipados con Either/Failure en core/errors."] }
+  ]
+}

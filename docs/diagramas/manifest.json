@@ -1,7 +1,22 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 2,
+  "total": 3,
   "diagramas": [
+    {
+      "slug": "insight-clean-architecture",
+      "titulo": "Insight · Arquitectura limpia",
+      "tipo": "architecture",
+      "tipoTexto": "Arquitectura",
+      "descripcion": "",
+      "etiquetas": [],
+      "destacado": false,
+      "nodos": 12,
+      "relaciones": 10,
+      "capitulos": 3,
+      "actualizado": "2026-09-26",
+      "archivo": "diagramas/insight-clean-architecture/index.html",
+      "especificacion": "diagramas/insight-clean-architecture/insight-clean-architecture.json"
+    },
     {
       "slug": "frontend-interaccion",
       "titulo": "Frontend · Flujo de interacción",
