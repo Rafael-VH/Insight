@@ -125,6 +125,8 @@ Centraliza operaciones de exportación/importación en formato `.json` y elimina
 
 ## 🏗 Arquitectura
 
+Los diagramas del proyecto (arquitectura, flujo de interacción, etc.) viven en [docs/diagramas/README.md](docs/diagramas/README.md), cada uno con su versión simplificada en Mermaid y su versión interactiva.
+
 El proyecto implementa **Clean Architecture** dividida en módulos funcionales (`features`).
 
 ### Estructura de carpetas
