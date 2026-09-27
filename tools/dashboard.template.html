@@ -153,10 +153,7 @@
     padding: 0;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  }
-  @media (min-width: 1000px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   }
 
   .tarjeta {
@@ -259,6 +256,13 @@
   @media (prefers-reduced-motion: no-preference) {
     .tarjeta { transition: box-shadow .15s ease, transform .15s ease; }
     .tarjeta:hover { transform: translateY(-2px); }
+  }
+
+  @media (min-width: 1440px) {
+    header.encabezado, main, footer.pie { max-width: 1600px; }
+  }
+  @media (min-width: 1920px) {
+    header.encabezado, main, footer.pie { max-width: 1800px; }
   }
 </style>
 </head>
