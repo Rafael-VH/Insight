@@ -1,0 +1,4 @@
+{
+  "descripcion": "Del png de la partida al JSON guardado: OCR on-device, parseo por regex, validación y consumo local.",
+  "etiquetas": ["mlbb", "ocr", "persistencia"]
+}
