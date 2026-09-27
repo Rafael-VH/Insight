@@ -51,7 +51,7 @@ const INYECTOR_POR_DEFECTO = path.join(
   homedir(),
   '.agents',
   'skills',
-  'archify-ui-injection',
+  'archify-diagrams-dashboard',
   'scripts',
   'inject-ui.mjs',
 );
@@ -255,7 +255,7 @@ function publicarPaginas(config, diagramas, opciones) {
   if (!sinBoton && !existsSync(inyector)) {
     morir(
       `no encuentro el inyector de botones en ${inyector}.\n` +
-        `  Instalá la skill archify-ui-injection, pasá --inyector <ruta> a inject-ui.mjs,\n` +
+        `  Instalá la skill archify-diagrams-dashboard, pasá --inyector <ruta> a inject-ui.mjs,\n` +
         `  o usá --sin-boton si no querés el botón de volver.`,
     );
   }
