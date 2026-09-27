@@ -28,6 +28,10 @@ import 'features/settings/domain/entities/settings_entities_test.dart'
 // Navigation — BLoC
 import 'features/navigation/bloc/navigation_bloc_test.dart' as nav_bloc;
 
+// OCR — Preprocesado de imagen
+import 'features/ocr/data/datasources/ocr_image_preprocess_test.dart'
+    as ocr_image_preprocess;
+
 void main() {
   // Core utilities
   stats_parser.main();
@@ -43,4 +47,7 @@ void main() {
 
   // Navigation module
   nav_bloc.main();
+
+  // OCR module
+  ocr_image_preprocess.main();
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -47,6 +48,55 @@ void main() {
       expect(decoded, isNotNull, reason: 'la salida debe ser un PNG válido');
       expect(decoded!.width, 2046);
       expect(decoded.height, 1264);
+    });
+
+    test('escala 2x la share real todasLasTemporadas a 2046x1264', () {
+      final bytes = File(_kTodasLasTemporadas).readAsBytesSync();
+
+      final upscaled = preprocessImageForOcr(bytes);
+
+      expect(upscaled, isNotNull, reason: 'la share real debe escalarse');
+      final decoded = img.decodePng(upscaled!);
+      expect(decoded, isNotNull, reason: 'la salida debe ser un PNG válido');
+      expect(decoded!.width, 2046);
+      expect(decoded.height, 1264);
+    });
+
+    test('REQ-3 hornea la orientación EXIF 6 antes de escalar (transpuesta)', () {
+      // JPEG sintético en memoria con orientación 6 (rotar 90° para mostrar).
+      final source = img.decodeJpg(File(_kTemporadaActual).readAsBytesSync())!;
+      source.exif.imageIfd.orientation = 6;
+      final rotatedJpeg = img.JpegEncoder().encode(source);
+      // La orientación debe viajar EN LOS BYTES: si el JPEG no la llevara, el
+      // upscale saldría 2046x1264 y la aserción de transposición no cortaría.
+      expect(img.decodeJpgExif(rotatedJpeg)?.imageIfd.orientation, 6);
+
+      final upscaled = preprocessImageForOcr(rotatedJpeg);
+
+      expect(upscaled, isNotNull);
+      final decoded = img.decodePng(upscaled!);
+      expect(decoded, isNotNull);
+      // 1023x632 rotado -> 632x1023 -> x2: la salida queda TRANSPUESTA.
+      expect(decoded!.width, 1264);
+      expect(decoded.height, 2046);
+    });
+
+    test('REQ-5 devuelve null con bytes basura (no es una imagen)', () {
+      final garbage = Uint8List.fromList(
+        List<int>.generate(512, (i) => (i * 37) % 256),
+      );
+
+      expect(preprocessImageForOcr(garbage), isNull);
+    });
+
+    test('REQ-1 devuelve null como centinela de pass-through', () {
+      // Fixture estirado en memoria a 1600x1000: por encima del umbral.
+      final source = img.decodeJpg(File(_kTemporadaActual).readAsBytesSync())!;
+      final big = img.encodeJpg(
+        img.copyResize(source, width: 1600, height: 1000),
+      );
+
+      expect(preprocessImageForOcr(big), isNull);
     });
   });
 }
