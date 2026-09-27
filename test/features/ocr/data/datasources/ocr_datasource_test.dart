@@ -22,7 +22,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // `any()` necesita un valor de referencia para el tipo del parámetro.
-  setUpAll(() => registerFallbackValue(InputImage.fromFilePath('fallback.png')));
+  setUpAll(
+    () => registerFallbackValue(InputImage.fromFilePath('fallback.png')),
+  );
 
   late Directory tempDir;
   late _MockTextRecognizer recognizer;
@@ -62,18 +64,19 @@ void main() {
     }
   });
 
-  OcrDataSourceImpl buildDataSource() =>
-      OcrDataSourceImpl(imagePicker: _MockImagePicker(), textRecognizer: recognizer);
+  OcrDataSourceImpl buildDataSource() => OcrDataSourceImpl(
+    imagePicker: _MockImagePicker(),
+    textRecognizer: recognizer,
+  );
 
   File realShareIn(Directory dir) =>
       File('${dir.path}/temporadaActual.jpg')
         ..writeAsBytesSync(File(_kFixture).readAsBytesSync());
 
-  File garbageIn(Directory dir) =>
-      File('${dir.path}/basura.jpg')
-        ..writeAsBytesSync(
-          Uint8List.fromList(List<int>.generate(512, (i) => (i * 37) % 256)),
-        );
+  File garbageIn(Directory dir) => File('${dir.path}/basura.jpg')
+    ..writeAsBytesSync(
+      Uint8List.fromList(List<int>.generate(512, (i) => (i * 37) % 256)),
+    );
 
   group('recognizeText — rama de preprocesado', () {
     test(
@@ -121,14 +124,17 @@ void main() {
   });
 
   group('recognizeText — degradación (REQ-5)', () {
-    test('decodificación nula: el reconocedor recibe la ruta original', () async {
-      final garbage = garbageIn(tempDir);
+    test(
+      'decodificación nula: el reconocedor recibe la ruta original',
+      () async {
+        final garbage = garbageIn(tempDir);
 
-      final result = await buildDataSource().recognizeText(garbage.path);
+        final result = await buildDataSource().recognizeText(garbage.path);
 
-      expect(captured.single.filePath, garbage.path);
-      expect(result.imagePath, garbage.path);
-    });
+        expect(captured.single.filePath, garbage.path);
+        expect(result.imagePath, garbage.path);
+      },
+    );
 
     test('preprocesado que lanza: se degrada a la ruta original', () async {
       final missing = '${tempDir.path}/no-existe.jpg';
@@ -144,10 +150,7 @@ void main() {
 
       await buildDataSource().recognizeText(garbage.path);
 
-      expect(
-        tempDir.listSync().where((e) => e.path.endsWith('.png')),
-        isEmpty,
-      );
+      expect(tempDir.listSync().where((e) => e.path.endsWith('.png')), isEmpty);
     });
   });
 }

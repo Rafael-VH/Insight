@@ -33,7 +33,8 @@ import 'features/ocr/data/datasources/ocr_image_preprocess_test.dart'
     as ocr_image_preprocess;
 
 // OCR — Datasource (handoff a ML Kit)
-import 'features/ocr/data/datasources/ocr_datasource_test.dart' as ocr_datasource;
+import 'features/ocr/data/datasources/ocr_datasource_test.dart'
+    as ocr_datasource;
 
 void main() {
   // Core utilities

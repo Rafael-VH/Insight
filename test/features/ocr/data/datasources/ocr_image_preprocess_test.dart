@@ -62,24 +62,29 @@ void main() {
       expect(decoded.height, 1264);
     });
 
-    test('REQ-3 hornea la orientación EXIF 6 antes de escalar (transpuesta)', () {
-      // JPEG sintético en memoria con orientación 6 (rotar 90° para mostrar).
-      final source = img.decodeJpg(File(_kTemporadaActual).readAsBytesSync())!;
-      source.exif.imageIfd.orientation = 6;
-      final rotatedJpeg = img.JpegEncoder().encode(source);
-      // La orientación debe viajar EN LOS BYTES: si el JPEG no la llevara, el
-      // upscale saldría 2046x1264 y la aserción de transposición no cortaría.
-      expect(img.decodeJpgExif(rotatedJpeg)?.imageIfd.orientation, 6);
+    test(
+      'REQ-3 hornea la orientación EXIF 6 antes de escalar (transpuesta)',
+      () {
+        // JPEG sintético en memoria con orientación 6 (rotar 90° para mostrar).
+        final source = img.decodeJpg(
+          File(_kTemporadaActual).readAsBytesSync(),
+        )!;
+        source.exif.imageIfd.orientation = 6;
+        final rotatedJpeg = img.JpegEncoder().encode(source);
+        // La orientación debe viajar EN LOS BYTES: si el JPEG no la llevara, el
+        // upscale saldría 2046x1264 y la aserción de transposición no cortaría.
+        expect(img.decodeJpgExif(rotatedJpeg)?.imageIfd.orientation, 6);
 
-      final upscaled = preprocessImageForOcr(rotatedJpeg);
+        final upscaled = preprocessImageForOcr(rotatedJpeg);
 
-      expect(upscaled, isNotNull);
-      final decoded = img.decodePng(upscaled!);
-      expect(decoded, isNotNull);
-      // 1023x632 rotado -> 632x1023 -> x2: la salida queda TRANSPUESTA.
-      expect(decoded!.width, 1264);
-      expect(decoded.height, 2046);
-    });
+        expect(upscaled, isNotNull);
+        final decoded = img.decodePng(upscaled!);
+        expect(decoded, isNotNull);
+        // 1023x632 rotado -> 632x1023 -> x2: la salida queda TRANSPUESTA.
+        expect(decoded!.width, 1264);
+        expect(decoded.height, 2046);
+      },
+    );
 
     test('REQ-5 devuelve null con bytes basura (no es una imagen)', () {
       final garbage = Uint8List.fromList(

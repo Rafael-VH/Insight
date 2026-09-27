@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -85,7 +84,9 @@ class OcrDataSourceImpl implements OcrDataSource {
   Future<OcrResult> recognizeText(String imagePath) async {
     final (inputImage, upscaledTemp) = await _prepareInputImage(imagePath);
     try {
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
 
       if (recognizedText.text.isEmpty) {
         throw const TextRecognitionFailure('No text found in image');
@@ -124,7 +125,9 @@ class OcrDataSourceImpl implements OcrDataSource {
   /// degrada al archivo original, nunca se propaga.
   Future<(InputImage, File?)> _prepareInputImage(String imagePath) async {
     try {
-      final upscaled = preprocessImageForOcr(await File(imagePath).readAsBytes());
+      final upscaled = preprocessImageForOcr(
+        await File(imagePath).readAsBytes(),
+      );
       if (upscaled == null) {
         return (InputImage.fromFile(File(imagePath)), null);
       }
