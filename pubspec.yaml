@@ -33,6 +33,8 @@ dependencies:
   # OCR & Selección de imágenes
   google_mlkit_text_recognition: ^0.15.1
   image_picker: ^1.2.1
+  # Preprocesado de imagen para OCR (upscale 2x bicúbico)
+  image: ^4.10.1
 
   # Programación funcional
   dartz: ^0.10.1

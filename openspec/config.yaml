@@ -4,7 +4,7 @@ context: |
   Stack: Flutter 3.44.9 / Dart 3.12.2 — app 'insight' (1.0.0+1), fully offline (heroes & Supabase removed).
   Architecture: feature-first Clean Architecture (domain / data / presentation layers per feature).
   State/DI: flutter_bloc 9 + get_it (sl); dartz Either for functional results.
-  Testing: flutter_test + bloc_test + mocktail. 187 tests total; 4 pre-existing failures (stats_parser, navigation_bloc, widget smoke test).
+  Testing: flutter_test + bloc_test + mocktail. 191 tests total; 0 failures (green baseline re-measured 2026-09-27).
   Style: flutter_lints 6.0.0 (via flutter analyze); dart format; code artifacts in English.
   Conventions: GEMINI.md at project root; project skill .opencode/skills/insight-architecture.
 
