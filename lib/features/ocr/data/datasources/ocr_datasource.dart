@@ -8,6 +8,18 @@ import 'package:insight/features/ocr/data/models/ocr_result_model.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 
+/// Lado más corto (px) por debajo del cual la imagen de entrada se escala 2x.
+/// REQ-1 — 19% de margen: el corpus real mide 1023x632 (lado corto 632).
+const int kOcrMinSideForUpscale = 800;
+
+/// REQ-1. Función pura: decide el upscale sólo a partir del lado más corto.
+/// Sin decodificar imagen y sin depender del engine de Flutter.
+/// Dimensiones cero o negativas nunca escalan.
+bool shouldUpscaleForOcr(int width, int height) =>
+    width > 0 &&
+    height > 0 &&
+    (width < kOcrMinSideForUpscale || height < kOcrMinSideForUpscale);
+
 abstract class OcrDataSource {
   Future<String> pickImage(ImageSourceType source);
   Future<OcrResult> recognizeText(String imagePath);
