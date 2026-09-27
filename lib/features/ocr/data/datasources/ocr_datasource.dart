@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image/image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/ocr/data/models/ocr_result_model.dart';
@@ -12,6 +14,9 @@ import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
 /// REQ-1 — 19% de margen: el corpus real mide 1023x632 (lado corto 632).
 const int kOcrMinSideForUpscale = 800;
 
+/// Factor de escalado del preprocesado de OCR.
+const int kOcrUpscaleFactor = 2;
+
 /// REQ-1. Función pura: decide el upscale sólo a partir del lado más corto.
 /// Sin decodificar imagen y sin depender del engine de Flutter.
 /// Dimensiones cero o negativas nunca escalan.
@@ -19,6 +24,30 @@ bool shouldUpscaleForOcr(int width, int height) =>
     width > 0 &&
     height > 0 &&
     (width < kOcrMinSideForUpscale || height < kOcrMinSideForUpscale);
+
+/// REQ-2/3/5. Función pura, sin I/O: convierte los bytes de la imagen en bytes
+/// PNG escalados 2x, o devuelve `null` como centinela de "usa el archivo
+/// original" (tanto si falla la decodificación como si no corresponde escalar).
+Uint8List? preprocessImageForOcr(Uint8List bytes) {
+  final decoded = decodeImage(bytes);
+  if (decoded == null) return null;
+
+  // REQ-3 — hornear la orientación ANTES de redimensionar, si no una entrada
+  // rotada se escala de costado.
+  final upright = bakeOrientation(decoded);
+
+  if (!shouldUpscaleForOcr(upright.width, upright.height)) return null;
+
+  // REQ-2 — el filtro por defecto de copyResize es `nearest`; se exige bicúbico.
+  return encodePng(
+    copyResize(
+      upright,
+      width: upright.width * kOcrUpscaleFactor,
+      height: upright.height * kOcrUpscaleFactor,
+      interpolation: Interpolation.cubic,
+    ),
+  );
+}
 
 abstract class OcrDataSource {
   Future<String> pickImage(ImageSourceType source);
