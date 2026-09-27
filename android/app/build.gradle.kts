@@ -35,6 +35,11 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // R8 fails on google_mlkit_text_recognition: the plugin references the
+            // Chinese/Japanese/Korean/Devanagari recognizers but only `text-recognition`
+            // (Latin) is included. Disable shrinking instead of bundling unused models.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
