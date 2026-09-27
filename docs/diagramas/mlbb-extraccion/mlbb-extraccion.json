@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Insight · Datos extraídos de stats MLBB",
+    "viewBox": [1080, 374],
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "capture-parse", "label": "De la imagen al parseo", "focus": ["imagen", "mlkit", "texto", "parser", "performance"], "note": "Cómo una captura de stats se convierte en 25 campos numéricos." },
+      { "id": "persist-consume", "label": "Guardado y consumo", "focus": ["storage", "consumers"], "note": "Dónde queda la colección y quiénes la leen." }
+    ]
+  },
+  "stages": [
+    { "label": "Captura" },
+    { "label": "OCR" },
+    { "label": "Parseo" },
+    { "label": "Validación" },
+    { "label": "Almacén y consumo" }
+  ],
+  "nodes": [
+    { "id": "imagen", "type": "frontend", "label": "Imagen de stats", "sublabel": "cámara o galería", "tag": "image_picker", "stage": 0, "row": 0, "width": 136 },
+    { "id": "mlkit", "type": "external", "label": "ML Kit OCR", "sublabel": "TextRecognizer · latin", "stage": 1, "row": 0, "tag": "Google SDK", "width": 136 },
+    { "id": "texto", "type": "messagebus", "label": "Texto plano", "sublabel": "recognizedText · \\n", "stage": 2, "row": 0, "width": 136 },
+    { "id": "parser", "type": "backend", "label": "StatsParser", "sublabel": "22 regex sobre el string", "stage": 2, "row": 1, "width": 136 },
+    { "id": "performance", "type": "database", "label": "PlayerPerformance", "sublabel": "25 campos numéricos", "stage": 3, "row": 0, "tag": "entidad", "width": 136 },
+    { "id": "validator", "type": "backend", "label": "StatsValidator", "sublabel": "faltantes / advertencias", "stage": 3, "row": 1, "width": 136 },
+    { "id": "storage", "type": "database", "label": "Colección local", "sublabel": "JSON · key stats_collections", "stage": 4, "row": 0, "tag": "local", "width": 136 },
+    { "id": "consumers", "type": "frontend", "label": "Consumo", "sublabel": "Historial · insights", "stage": 4, "row": 1, "width": 136 }
+  ],
+  "flows": [
+    { "id": "imagen-mlkit", "from": "imagen", "to": "mlkit", "label": "archivo de imagen", "classification": "captura", "variant": "emphasis", "labelAt": [208, 200] },
+    { "id": "mlkit-texto", "from": "mlkit", "to": "texto", "label": "texto reconocido", "classification": "OCR", "variant": "emphasis", "labelAt": [423, 200] },
+    { "id": "texto-parser", "from": "texto", "to": "parser", "label": "fullText", "classification": "entrada del parser", "variant": "emphasis", "labelDy": 24 },
+    { "id": "parser-performance", "from": "parser", "to": "performance", "label": "22 campos extraídos", "classification": "parseo", "variant": "emphasis" },
+    { "id": "performance-validator", "from": "performance", "to": "validator", "label": "estado por campo", "classification": "validación", "variant": "default", "labelDy": 24 },
+    { "id": "validator-storage", "from": "validator", "to": "storage", "label": "guardar sesión (válida)", "classification": "manual", "variant": "emphasis", "labelDy": 24 },
+    { "id": "storage-consumers", "from": "storage", "to": "consumers", "label": "lectura", "classification": "CRUD · export · gráficos", "variant": "default", "labelDy": 24 }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Pipeline local, sin red",
+      "items": [
+        "La captura viaja por OCR → parseo → validación → almacenamiento sin ningún servicio",
+        "El único guardado explícito ocurre cuando el usuario pulsa Guardar"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Qué se extrae (y qué no)",
+      "items": [
+        "22 campos numéricos por regex: winrate, KDA, MVP, kills, daño y oro por minuto",
+        "El winrate se estima por heurística: primer % en rango 40–80",
+        "No existe identidad del jugador: sin nombre, rank, héroes ni IDs"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Límites conocidos",
+      "items": [
+        "ML Kit produce boundingBox y textBlocks, pero el parser solo usa el string plano",
+        "StatsParser y StatsValidator son estáticos, fuera de Clean Architecture"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 3,
+  "total": 4,
   "diagramas": [
     {
       "slug": "frontend-interaccion",
@@ -57,6 +57,25 @@
       "actualizado": "2026-09-26",
       "archivo": "diagramas/insight-arquitectura/index.html",
       "especificacion": "diagramas/insight-arquitectura/insight-arquitectura.json"
+    },
+    {
+      "slug": "mlbb-extraccion",
+      "titulo": "Insight · Datos extraídos de stats MLBB",
+      "tipo": "dataflow",
+      "tipoTexto": "Flujo de datos",
+      "descripcion": "Del png de la partida al JSON guardado: OCR on-device, parseo por regex, validación y consumo local.",
+      "etiquetas": [
+        "mlbb",
+        "ocr",
+        "persistencia"
+      ],
+      "destacado": false,
+      "nodos": 8,
+      "relaciones": 7,
+      "capitulos": 2,
+      "actualizado": "2026-09-26",
+      "archivo": "diagramas/mlbb-extraccion/index.html",
+      "especificacion": "diagramas/mlbb-extraccion/mlbb-extraccion.json"
     }
   ]
 }
