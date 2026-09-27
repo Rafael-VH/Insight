@@ -9,6 +9,7 @@ import 'package:insight/core/errors/app_failures.dart';
 import 'package:insight/features/ocr/data/models/ocr_result_model.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_image_source.dart';
 import 'package:insight/features/ocr/domain/entities/ocr_result.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Lado más corto (px) por debajo del cual la imagen de entrada se escala 2x.
 /// REQ-1 — 19% de margen: el corpus real mide 1023x632 (lado corto 632).
@@ -82,20 +83,61 @@ class OcrDataSourceImpl implements OcrDataSource {
 
   @override
   Future<OcrResult> recognizeText(String imagePath) async {
+    final (inputImage, upscaledTemp) = await _prepareInputImage(imagePath);
     try {
-      final inputImage = InputImage.fromFile(File(imagePath));
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
       if (recognizedText.text.isEmpty) {
         throw const TextRecognitionFailure('No text found in image');
       }
 
+      // REQ-6 — siempre la ruta original: alimenta la miniatura de la UI.
       return OcrResultModel.fromRecognizedText(recognizedText, imagePath);
     } catch (e) {
       if (e is TextRecognitionFailure) {
         rethrow;
       }
       throw TextRecognitionFailure('Failed to recognize text: ${e.toString()}');
+    } finally {
+      // `InputImage.fromFile` sólo guarda la ruta; Android la resuelve dentro
+      // de processImage, así que borrar justo después sería una carrera real.
+      // El borrado va en su propio try/catch para que un fallo al eliminar no
+      // se etiquete como TextRecognitionFailure.
+      final File? temp = upscaledTemp;
+      if (temp != null) {
+        try {
+          await temp.delete();
+        } catch (_) {
+          // Mejor esfuerzo: getTemporaryDirectory() se purga solo.
+        }
+      }
+    }
+  }
+
+  /// Prepara la imagen que se le entrega a ML Kit y devuelve, junto con ella,
+  /// el PNG temporal a eliminar (o `null` si se entrega el archivo original).
+  ///
+  /// REQ-1/2/3: escala 2x bicúbica cuando el lado corto queda bajo 800, con la
+  /// orientación EXIF ya horneada. REQ-4: el resultado se materializa como PNG
+  /// temporal porque `InputImage.fromFile` sólo acepta rutas en disco
+  /// (`fromBytes` es para buffers crudos NV21/YV12). REQ-5: cualquier fallo
+  /// degrada al archivo original, nunca se propaga.
+  Future<(InputImage, File?)> _prepareInputImage(String imagePath) async {
+    try {
+      final upscaled = preprocessImageForOcr(await File(imagePath).readAsBytes());
+      if (upscaled == null) {
+        return (InputImage.fromFile(File(imagePath)), null);
+      }
+
+      final Directory dir = await getTemporaryDirectory();
+      // Nombre único por ejecución: dos OCR solapados no pueden pisarse.
+      final File temp = File(
+        '${dir.path}/ocr_upscale_${DateTime.now().microsecondsSinceEpoch}.png',
+      );
+      await temp.writeAsBytes(upscaled, flush: true);
+      return (InputImage.fromFile(temp), temp);
+    } catch (_) {
+      return (InputImage.fromFile(File(imagePath)), null);
     }
   }
 

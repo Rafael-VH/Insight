@@ -32,6 +32,9 @@ import 'features/navigation/bloc/navigation_bloc_test.dart' as nav_bloc;
 import 'features/ocr/data/datasources/ocr_image_preprocess_test.dart'
     as ocr_image_preprocess;
 
+// OCR — Datasource (handoff a ML Kit)
+import 'features/ocr/data/datasources/ocr_datasource_test.dart' as ocr_datasource;
+
 void main() {
   // Core utilities
   stats_parser.main();
@@ -50,4 +53,5 @@ void main() {
 
   // OCR module
   ocr_image_preprocess.main();
+  ocr_datasource.main();
 }
